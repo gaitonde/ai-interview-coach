@@ -15,8 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "TODO:__Browser_Title_Update_Me__",
-  description: "TODO:__App_Description_Update_Me__",
+  title: "AI Interview Coach",
+  description: "Nail your first interview!",
 };
 
 export default function RootLayout({
