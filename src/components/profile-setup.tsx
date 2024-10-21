@@ -4,8 +4,30 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Footer } from './components-footer'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export function ProfileSetupComponent() {
+  const router = useRouter()
+  const [fileName, setFileName] = useState<string>('No file chosen')
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFileName(e.target.files[0].name)
+    } else {
+      setFileName('No file chosen')
+    }
+  }
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+    console.log("Saving profile")
+    e.preventDefault()
+    console.log("Saving profile 2")
+    // Here you would typically save the profile data
+    // For now, we'll just navigate to the job prep page
+    router.push('/job-prep')
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[#1a1f2b]">
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -14,11 +36,11 @@ export function ProfileSetupComponent() {
             <h2 className="mt-6 text-3xl font-bold text-white">Profile Setup</h2>
             <p className="mt-2 text-sm text-gray-400">Complete your profile to get started</p>
           </div>
-          <form className="mt-8 space-y-6">
+          <form className="mt-8 space-y-6" onSubmit={handleSaveProfile}>
             <div className="space-y-4">
               <div>
                 <label htmlFor="resume" className="block text-sm font-medium text-white">
-                  Upload Resume (PDF/DOCX)
+                  Upload Resume (PDF)
                 </label>
                 <div className="mt-1 flex items-center">
                   <label
@@ -31,13 +53,14 @@ export function ProfileSetupComponent() {
                     id="resume"
                     name="resume"
                     type="file"
-                    accept=".pdf,.docx"
-                    required
+                    accept=".pdf"
+                    onChange={handleFileChange}
                     className="hidden"
                   />
-                  <span className="ml-3 text-sm text-gray-400">No file chosen</span>
+                  <span className="ml-3 text-sm text-gray-400">{fileName}</span>
                 </div>
               </div>
+{/*
               <div>
                 <label htmlFor="linkedin" className="block text-sm font-medium text-white">
                   LinkedIn URL
@@ -50,6 +73,7 @@ export function ProfileSetupComponent() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
+ */}
               <div>
                 <label htmlFor="job-description" className="block text-sm font-medium text-white">
                   Job Description URL
@@ -139,6 +163,7 @@ export function ProfileSetupComponent() {
                   </Select>
                 </div>
               </div>
+{/*
               <div>
                 <label htmlFor="current-courses" className="block text-sm font-medium text-white">
                   Current Courses
@@ -151,8 +176,9 @@ export function ProfileSetupComponent() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md text-sm px-3 py-2"
                 ></textarea>
               </div>
+               */}
             </div>
-            <Button className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors">
+            <Button type="submit" className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors">
               Save Profile
             </Button>
           </form>
