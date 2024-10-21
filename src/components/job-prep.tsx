@@ -3,8 +3,11 @@
 import { Button } from '@/components/ui/button'
 import { Footer } from './components-footer'
 import { Clipboard } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export function JobPrepComponent() {
+  const router = useRouter()
+
   // Mock data - in a real application, this would come from an API or database
   const companyInfo = {
     name: "TechCorp Inc.",
@@ -138,7 +141,10 @@ export function JobPrepComponent() {
               <Clipboard className="w-4 h-4 mr-2" />
               Copy to Clipboard
             </Button>
-            <Button className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors">
+            <Button
+              onClick={() => router.push('/questions')}
+              className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+            >
               See Mock Interview Questions
             </Button>
           </div>
