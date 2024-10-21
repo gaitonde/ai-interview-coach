@@ -3,164 +3,128 @@
 import { Button } from "@/components/ui/button"
 import { Footer } from './components-footer'
 import { Clipboard } from 'lucide-react'
-
 export function ListOfQuestionsComponent() {
   const generalQuestions = [
     {
       question: "How would you prioritize features for a new product aimed at organizing and improving access to information?",
-      skillTested: "Prioritization and decision-making in product development.",
-      exampleSolution: "Use a prioritization framework like RICE (Reach, Impact, Confidence, Effort) to evaluate features with the highest user impact. For example, for InfoNet, prioritize features that improve relevance and response time, based on user behavior data and feedback."
+      whyAsking: "TechCorp wants to assess your ability to make strategic decisions when managing a product's feature set, especially when you have limited resources.",
+      whatToFocus: "Discuss how you would prioritize features using frameworks like RICE or MoSCoW. You can give an example where you used data-driven methods to prioritize features, such as focusing on the most impactful updates when building out InfoNet, TechCorp's information management tool."
     },
     {
       question: "Describe a time when you made a data-driven decision. How would you apply data-driven decision-making in your role as a TechCorp Inc. Product Manager Intern?",
-      skillTested: "Data-driven decision making.",
-      exampleSolution: "Use user engagement data from TechCorp Analytics to inform decisions. For example, if analyzing user interactions on MapTrail, make decisions on feature improvements by identifying key areas where users struggle and enhancing those."
+      whyAsking: "TechCorp relies heavily on data to make product decisions and expects you to have a clear understanding of how to leverage it to improve products.",
+      whatToFocus: "Highlight a specific instance where data guided your decision-making process. For instance, you can mention analyzing user interactions in MapTrail and how that data led you to optimize the app's user interface to enhance engagement."
     },
     {
       question: "How would you approach building a product roadmap for a new TechCorp product that targets small businesses?",
-      skillTested: "Roadmap planning and execution.",
-      exampleSolution: "Develop an MVP focused on addressing small business pain points, such as managing online presence. Iterate based on user feedback and align the roadmap with long-term goals of empowering small businesses through BizStream, TechCorp's small business platform."
+      whyAsking: "They want to know if you can plan strategically and align short-term and long-term goals, especially for new markets like small businesses.",
+      whatToFocus: "Explain how you would build an MVP and iterate based on feedback. Use an example, like developing BizStream for small businesses, where you balanced immediate user needs with the broader company objectives."
     },
     {
       question: "How would you handle feedback from multiple teams (e.g., engineering, marketing, legal) while working on a product at TechCorp Inc.?",
-      skillTested: "Cross-functional collaboration.",
-      exampleSolution: "Facilitate regular meetings with cross-functional teams to ensure alignment and address concerns early in the development process. For example, consider legal implications during feature planning to avoid potential delays in the release of SyncCloud, TechCorp's cloud storage solution."
+      whyAsking: "TechCorp values cross-functional collaboration. They want to see how you navigate and integrate diverse perspectives to ensure a product's success.",
+      whatToFocus: "Share a time when you worked across different teams to launch a feature, perhaps in SyncCloud, where you mediated between engineering's technical priorities and marketing's customer-facing goals."
     },
     {
       question: "Explain how you would evaluate the success of a new feature post-launch.",
-      skillTested: "Product lifecycle management and performance evaluation.",
-      exampleSolution: "Use KPIs such as user engagement, adoption rates, and satisfaction scores. For example, after launching a feature in DocuLink, measure success through feature usage, feedback, and A/B testing different versions for performance improvement."
+      whyAsking: "They want to gauge your ability to measure outcomes and understand key success metrics post-launch.",
+      whatToFocus: "Talk about using KPIs such as adoption rates and user satisfaction. For example, you might evaluate a new collaboration feature in DocuLink by tracking engagement and collecting user feedback to inform future iterations."
     },
     {
       question: "How would you gather and integrate user feedback into product improvements at TechCorp Inc.?",
-      skillTested: "User feedback integration.",
-      exampleSolution: "Implement in-app surveys or track user behavior through TechCorp Analytics. Use feedback to inform product iteration. For example, if a new feature in MailPro receives poor feedback, identify the pain points and modify the feature based on user suggestions."
+      whyAsking: "TechCorp wants to understand how you approach iterative product development and your ability to incorporate user feedback.",
+      whatToFocus: "Explain your approach to continuous improvement based on user feedback from TechCorp Analytics or surveys. You can mention gathering insights on a new feature in MailPro and using that data to make improvements."
     },
     {
       question: "How would you approach competitive analysis for TechCorp's cloud computing products?",
-      skillTested: "Market research and competitive analysis.",
-      exampleSolution: "Perform a SWOT analysis comparing SyncCloud to competing services like CloudPrime and FlexData. Identify opportunities for differentiation, such as providing superior integration with other TechCorp services, and emphasize this in your strategy."
+      whyAsking: "Competitive analysis is key for TechCorp to stay ahead in the market. They want to ensure you know how to assess and differentiate their products.",
+      whatToFocus: "Use examples like comparing SyncCloud to competitors like CloudPrime. Explain how you would identify key differentiators, such as superior integration with OfficeStream and customer-focused features."
     },
     {
       question: "What would your go-to-market strategy look like for a new feature in TechCorp Workspace?",
-      skillTested: "Go-to-market strategy and execution.",
-      exampleSolution: "Time the feature launch around key business events like quarter-end or fiscal-year-end. Engage in marketing campaigns targeted to relevant user groups, such as businesses needing enhanced productivity features in OfficeStream, TechCorp's collaborative workspace."
+      whyAsking: "They are assessing your understanding of product launches and your ability to plan a successful market entry.",
+      whatToFocus: "Outline a launch strategy for a TechCorp Workspace feature, such as organizing product demos for key user groups, leveraging email marketing campaigns, and using social media to build awareness."
     },
     {
       question: "How would you foster innovation within a product team at TechCorp Inc.?",
-      skillTested: "Innovation and creativity in product development.",
-      exampleSolution: "Encourage team members to explore new ideas during internal hackathons or through TechCorp's 20% time policy. Develop experimental features and test them in limited user groups before full release."
+      whyAsking: "TechCorp is known for innovation, and they want to see how you would encourage creativity and new ideas within your team.",
+      whatToFocus: "Highlight how you foster experimentation, perhaps through TechCorp's hackathons or the 20% time policy. Explain how you led a team that developed an innovative feature for MeetHub during one of these initiatives."
     },
     {
       question: "Explain how you would use Agile methodologies to manage product development for a TechCorp product.",
-      skillTested: "Agile methodologies and iterative development.",
-      exampleSolution: "Implement Agile sprints, focusing on delivering value in short iterations. For example, when building new features for MeetHub, use feedback from each sprint to refine product development and ensure alignment with user needs."
+      whyAsking: "TechCorp uses Agile practices to drive product development, and they want to ensure you can manage iterative cycles effectively.",
+      whatToFocus: "Share an example of how you applied Agile principles, like running sprints to launch new features in SyncCloud, and how the feedback loops enabled you to release a refined product."
     }
   ]
 
   const companySpecificQuestions = [
     {
-      question: "How would you contribute to TechCorp Inc.'s mission of organizing the world's information as a Product Manager Intern?",
-      explanation: "Tests understanding of TechCorp's core mission.",
-      exampleSolution: "Focus on developing user-centric products that enhance accessibility to information. For example, propose improvements to InfoNet that personalize results based on user behavior and preferences to enhance user experience."
+      question: "How would you contribute to TechCorp's mission of organizing the world's information as a Product Manager Intern?",
+      whyAsking: "TechCorp's core mission revolves around organizing information, and they want to know how you align with that.",
+      whatToFocus: "Mention specific product initiatives you would take to improve InfoNet, such as making search results more personalized and accessible to a broader audience."
     },
     {
       question: "What product metrics would you prioritize when evaluating the success of a new consumer-facing TechCorp product?",
-      explanation: "Tests understanding of product success metrics.",
-      exampleSolution: "Prioritize metrics like active users, retention rates, and user satisfaction scores. For example, with a new MeetHub feature, evaluate success based on user engagement during meetings, feature usage, and overall satisfaction."
+      whyAsking: "TechCorp wants to understand if you know which metrics are crucial for measuring product success.",
+      whatToFocus: "Highlight metrics like DAUs, retention, and satisfaction rates. For example, discuss how you would evaluate the success of a new MeetHub feature by monitoring usage and feedback data."
     },
     {
       question: "How would you ensure that a new TechCorp product aligns with its focus on user-first development?",
-      explanation: "Ensures understanding of TechCorp's user-centric approach.",
-      exampleSolution: "Conduct user research and iterate based on feedback, ensuring the product adheres to TechCorp's Design Standards for a seamless experience across devices."
+      whyAsking: "They want to confirm that you understand TechCorp's user-centric philosophy.",
+      whatToFocus: "Share your approach to incorporating user feedback into product development. For example, discuss your work on DocuLink, ensuring that every feature addresses real user needs and improves productivity."
     },
     {
       question: "How would you localize a TechCorp product for international markets while maintaining TechCorp's global brand identity?",
-      explanation: "Tests ability to scale TechCorp products globally while respecting local differences.",
-      exampleSolution: "Use TechCorp's localization teams to adapt content for regional languages and cultural preferences. Ensure consistency with the overall brand by maintaining TechCorp's design standards while allowing for regional variations."
+      whyAsking: "TechCorp wants to see how you can balance localization with maintaining a consistent brand.",
+      whatToFocus: "Talk about localizing MapTrail for different regions by adapting language and cultural considerations, while ensuring the core brand experience remains the same globally."
     },
     {
       question: "How would you incorporate TechCorp's focus on AI into a new product?",
-      explanation: "Ensures awareness of TechCorp's strengths in AI.",
-      exampleSolution: "Leverage TechCorp's AI tools, such as machine learning algorithms, to enhance user experience. For example, develop smarter autocomplete suggestions in DocuLink that predict user needs based on historical usage data."
+      whyAsking: "TechCorp emphasizes AI as part of their innovation strategy, and they want to see how you would use it.",
+      whatToFocus: "Discuss how you would implement AI-driven features in PhotoVault to improve image search by automatically categorizing and tagging user-uploaded content."
     },
     {
       question: "How would you integrate user privacy considerations into a new TechCorp product?",
-      explanation: "Ensures alignment with TechCorp's emphasis on privacy.",
-      exampleSolution: "Apply privacy-by-design principles, ensuring user data is anonymized and opt-in for any sensitive data collection. For example, in PhotoVault, ensure that user-uploaded images are securely stored and private until explicitly shared."
+      whyAsking: "TechCorp values privacy, and they want to ensure you understand how to build products that respect user data.",
+      whatToFocus: "Mention how you'd use privacy-by-design principles. For example, explain how you ensured MailPro complies with GDPR by implementing opt-in data collection and anonymization features."
     },
     {
       question: "How would you improve the user experience for a feature in MapTrail?",
-      explanation: "Focuses on enhancing user interaction with a widely used TechCorp product.",
-      exampleSolution: "Propose introducing AR-based real-time navigation that overlays directional arrows onto a user's environment through the camera, making navigation more intuitive and immersive for users on foot."
+      whyAsking: "TechCorp seeks to understand your focus on UX and how you enhance existing product features.",
+      whatToFocus: "Highlight your approach to improving usability, such as using AR in MapTrail to offer real-time navigation assistance and enhancing visual cues for a better user experience."
     },
     {
       question: "What strategies would you use to promote collaboration across TechCorp's global teams when launching a new product?",
-      explanation: "Tests ability to navigate TechCorp's global operations.",
-      exampleSolution: "Leverage OfficeStream to enable collaboration across time zones and locations. For instance, coordinate weekly meetings and detailed documentation to keep all global stakeholders aligned when rolling out new features for SyncCloud."
+      whyAsking: "TechCorp operates globally, and they want to see if you can handle cross-regional collaboration.",
+      whatToFocus: "Describe your strategy for leveraging tools like OfficeStream to coordinate international product launches, ensuring consistent communication and alignment among teams in different time zones."
     },
     {
       question: "How would you identify and mitigate potential risks for a new feature in SyncCloud?",
-      explanation: "Tests risk management in a cloud services context.",
-      exampleSolution: "Use risk assessment frameworks to evaluate potential technical and operational risks. For example, ensure that SyncCloud's new data management features include built-in redundancies and comply with data security standards."
+      whyAsking: "Risk management is essential in product launches, and they want to know how you approach it.",
+      whatToFocus: "Talk about risk assessment methods and how you would ensure features have necessary security protocols and redundancies. For instance, mention how you implemented data encryption for SyncCloud to mitigate data privacy risks."
     },
     {
       question: "How would you gather and analyze competitive intelligence when launching a product to compete with similar services?",
-      explanation: "Tests ability to perform competitive analysis in the context of TechCorp's key competitors.",
-      exampleSolution: "Track competitors' product releases, user reviews, and performance metrics, then perform a SWOT analysis to identify gaps. For example, when launching a new AI-powered tool, focus on where TechCorp's capabilities surpass those of competitors like FlexData or DataPrime."
+      whyAsking: "Competitive analysis is key for TechCorp, and they want to understand your approach.",
+      whatToFocus: "Explain how you'd perform a SWOT analysis by tracking competitors like FlexData and identifying areas where SyncCloud excels, such as offering better integration with TechCorp Workspace tools."
     }
   ]
 
   const softSkillsQuestions = [
     {
-      question: "Describe a time when you led a cross-functional team through a challenging project. How did you ensure the team stayed motivated and on track?",
-      skillTested: "Leadership & Initiative.",
-      exampleSolution: "Focus on how you facilitated collaboration, aligned the team around a common goal, and handled obstacles. For example, you might lead a team developing a MapTrail feature by organizing regular check-ins, ensuring clear communication, and addressing any blockers."
+      question: "Tell me about a time you led a cross-functional team through a challenging project. How did you ensure the team stayed motivated and on track?",
+      whyAsking: "TechCorp values leadership and collaboration, and they want to see how you handle team dynamics under pressure.",
+      whatToFocus: "Describe how you kept a team aligned and motivated, like leading the development of MapTrail, where you coordinated efforts across engineering, UX, and marketing to deliver a key feature under tight deadlines."
     },
     {
       question: "How do you approach communication when working with stakeholders who have competing interests?",
-      skillTested: "Communication.",
-      exampleSolution: "Show how you balance transparency with diplomacy, ensuring all stakeholders feel heard while driving the project toward a solution. For example, if engineering and legal have different priorities for a product, facilitate a discussion to find common ground while aligning with TechCorp's goals."
+      whyAsking: "They want to know if you can manage conflicting priorities while maintaining clear communication.",
+      whatToFocus: "Talk about managing expectations and finding common ground. For example, you could explain how you balanced technical requirements and legal concerns when working on SyncCloud's new compliance feature."
     },
     {
       question: "Can you describe a situation where you had to adapt to a sudden change in project direction? How did you handle it?",
-      skillTested: "Adaptability.",
-      exampleSolution: "Highlight how you quickly assessed the new situation, adjusted priorities, and communicated the change to the team. For example, if a key feature for VoiceMate had to be reprioritized due to technical limitations, explain how you shifted focus while keeping the team engaged."
-    },
-    {
-      question: "Tell us about a time you had to resolve a conflict within your team. What steps did you take to address the issue?",
-      skillTested: "Conflict Resolution.",
-      exampleSolution: "Emphasize active listening, understanding both sides, and finding a compromise. For example, if two engineers disagree on the best way to implement a feature for PhotoVault, you might facilitate a discussion to identify the pros and cons of each approach and agree on the most feasible solution."
-    },
-    {
-      question: "How do you manage your time when working on multiple projects with tight deadlines?",
-      skillTested: "Time Management.",
-      exampleSolution: "Describe how you prioritize tasks, delegate where possible, and use tools (like TechCorp Tasks) to stay organized. For example, managing multiple feature releases might involve creating detailed timelines, prioritizing tasks based on their impact, and using Agile sprints to stay on track."
-    },
-    {
-      question: "Tell us about a time when you collaborated with a team to solve a difficult problem. What role did you play?",
-      skillTested: "Teamwork & Collaboration.",
-      exampleSolution: "Explain how you contributed to the team effort. For example, if working with UX designers and engineers to improve MeetHub, you might facilitate discussions, synthesize inputs from all parties, and ensure that user experience improvements aligned with technical feasibility."
-    },
-    {
-      question: "Describe a time when you encountered an unexpected problem during a project. How did you solve it?",
-      skillTested: "Problem Solving.",
-      exampleSolution: "Focus on your ability to think critically and find creative solutions. For example, if a SyncCloud feature failed during testing, describe how you quickly worked with engineers to diagnose the issue, proposed solutions, and ensured the feature was fixed before the next sprint."
-    },
-    {
-      question: "Tell me about a time you had to make a difficult decision with limited information. How did you approach the decision-making process?",
-      skillTested: "Decision Making.",
-      exampleSolution: "Describe how you gathered as much information as possible, evaluated the risks, and made the best decision under the circumstances. For example, if launching a new feature for InfoNet with limited data, explain how you used past user feedback or industry benchmarks to guide the decision."
-    },
-    {
-      question: "Give an example of a time when you showed empathy in a professional setting. How did it help the situation?",
-      skillTested: "Empathy.",
-      exampleSolution: "Highlight how understanding the perspectives of team members or stakeholders led to a better outcome. For instance, if a team member was struggling with a task, you might have adjusted deadlines or provided additional resources to help them succeed."
-    },
-    {
-      question: "How do you manage relationships with stakeholders to ensure project success?",
-      skillTested: "Stakeholder Management.",
-      exampleSolution: "Describe how you communicate regularly, manage expectations, and ensure stakeholders are aligned with the project's goals. For example, when managing a SyncCloud product launch, you might schedule regular updates and involve stakeholders in key decisions to ensure transparency and buy-in."
+      whyAsking: "TechCorp values adaptability, especially in fast-changing environments.",
+      whatToFocus: "Discuss how you adjusted to new priorities, like shifting focus in the middle of a sprint for VoiceMate when a new customer need emerged, and how you kept the team aligned despite the change."
     }
   ]
 
@@ -178,28 +142,28 @@ export function ListOfQuestionsComponent() {
               {generalQuestions.map((item, index) => (
                 <div key={index} className="space-y-2">
                   <p className="text-[#F9FAFB]"><strong>{index + 1}. {item.question}</strong></p>
-                  <p className="text-[#D1D5DB]">Skill being tested: {item.skillTested}</p>
-                  <p className="text-[#F9FAFB]">Example solution: {item.exampleSolution}</p>
+                  <p className="text-[#D1D5DB]"><em>Why they're asking:</em> {item.whyAsking}</p>
+                  <p className="text-[#F9FAFB]"><em>What you should focus on:</em> {item.whatToFocus}</p>
                 </div>
               ))}
             </div>
             <div className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-semibold text-[#10B981]">Targeted Company Market Questions (TechCorp Inc.-Specific)</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold text-[#10B981]">Targeted Company Market Questions</h2>
               {companySpecificQuestions.map((item, index) => (
                 <div key={index} className="space-y-2">
                   <p className="text-[#F9FAFB]"><strong>{index + 1}. {item.question}</strong></p>
-                  <p className="text-[#D1D5DB]">Explanation: {item.explanation}</p>
-                  <p className="text-[#F9FAFB]">Example solution: {item.exampleSolution}</p>
+                  <p className="text-[#D1D5DB]"><em>Why they're asking:</em> {item.whyAsking}</p>
+                  <p className="text-[#F9FAFB]"><em>What you should focus on:</em> {item.whatToFocus}</p>
                 </div>
               ))}
             </div>
             <div className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-semibold text-[#10B981]">Soft Skills Questions (Prioritized by  Importance)</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold text-[#10B981]">Soft Skills Questions</h2>
               {softSkillsQuestions.map((item, index) => (
                 <div key={index} className="space-y-2">
                   <p className="text-[#F9FAFB]"><strong>{index + 1}. {item.question}</strong></p>
-                  <p  className="text-[#D1D5DB]">Skill being tested: {item.skillTested}</p>
-                  <p className="text-[#F9FAFB]">Example solution: {item.exampleSolution}</p>
+                  <p className="text-[#D1D5DB]"><em>Why they're asking:</em> {item.whyAsking}</p>
+                  <p className="text-[#F9FAFB]"><em>What you should focus on:</em> {item.whatToFocus}</p>
                 </div>
               ))}
             </div>
