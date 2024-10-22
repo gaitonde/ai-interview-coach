@@ -35,6 +35,16 @@ CREATE TABLE ai_interview_coach_prod_Resumes (
     CHECK (url IS NOT NULL OR text IS NOT NULL)
 );
 
+--Create a table to store the AI responses
+CREATE TABLE ai_interview_coach_prod_AIResponses (
+    id SERIAL PRIMARY KEY,
+    profile_id INTEGER NOT NULL,
+    prep_sheet_response TEXT,
+    questions_response TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_Profiles(id) ON DELETE CASCADE
+);
+
 -- Create a function to update last_updated_at
 CREATE OR REPLACE FUNCTION update_last_updated_at()
 RETURNS TRIGGER AS $$
