@@ -82,6 +82,19 @@ export function ProfileSetupComponent() {
               </div>
  */}
               <div>
+                <label htmlFor="company-url" className="block text-sm font-medium text-white">
+                  Company URL
+                </label>
+                <Input
+                  id="company-url"
+                  name="company-url"
+                  type="url"
+                  placeholder="https://acme.com"
+                  defaultValue="https://www.google.com"
+                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                />
+              </div>
+              <div>
                 <label htmlFor="job-description" className="block text-sm font-medium text-white">
                   Job Description URL
                 </label>
@@ -89,8 +102,8 @@ export function ProfileSetupComponent() {
                   id="job-description"
                   name="job-description"
                   type="url"
-                  placeholder="https://example.com/job-description"
-                  defaultValue="https://www.google.com"
+                  placeholder="https://careers.example.com/job-description"
+                  defaultValue="https://www.google.com/about/careers/applications/jobs/results/96699829618385606-customer-engineering-manager-iii-midmarket-enterprise-google-cloud"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -136,29 +149,10 @@ export function ProfileSetupComponent() {
                 />
               </div>
               <div>
-                <label htmlFor="graduation-date" className="block text-sm font-medium text-white">
-                  Graduation Date
+                <label htmlFor="graduation-year" className="block text-sm font-medium text-white">
+                  Graduation Year
                 </label>
-                <div className="mt-1 grid grid-cols-2 gap-2">
-                  <Select name="graduation-month">
-                    <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 rounded-md">
-                      <SelectValue placeholder="Month" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white text-gray-700 border-gray-300">
-                      <SelectItem value="01">January</SelectItem>
-                      <SelectItem value="02">February</SelectItem>
-                      <SelectItem value="03">March</SelectItem>
-                      <SelectItem value="04">April</SelectItem>
-                      <SelectItem value="05">May</SelectItem>
-                      <SelectItem value="06">June</SelectItem>
-                      <SelectItem value="07">July</SelectItem>
-                      <SelectItem value="08">August</SelectItem>
-                      <SelectItem value="09">September</SelectItem>
-                      <SelectItem value="10">October</SelectItem>
-                      <SelectItem value="11">November</SelectItem>
-                      <SelectItem value="12">December</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="mt-1">
                   <Select name="graduation-year" defaultValue="2025">
                     <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 rounded-md">
                       <SelectValue placeholder="Year" />
