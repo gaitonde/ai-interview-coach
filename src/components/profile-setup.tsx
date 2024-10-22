@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Footer } from './components-footer'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { saveProfile } from '@/app/actions/saveProfile'
 
 export function ProfileSetupComponent() {
   const router = useRouter()
@@ -19,13 +20,15 @@ export function ProfileSetupComponent() {
     }
   }
 
-  const handleSaveProfile = (e: React.FormEvent) => {
-    console.log("Saving profile")
-    e.preventDefault()
-    console.log("Saving profile 2")
-    // Here you would typically save the profile data
-    // For now, we'll just navigate to the job prep page
-    router.push('/job-prep')
+  const handleSaveProfile = async (formData: FormData) => {
+    const result = await saveProfile(formData)
+    if (result.success) {
+      console.log("Profile saved successfully", result.id)
+      router.push('/job-prep')
+    } else {
+      console.error("Error saving profile:", result.error)
+      // Handle error (e.g., show error message to user)
+    }
   }
 
   return (
@@ -36,7 +39,7 @@ export function ProfileSetupComponent() {
             <h2 className="mt-6 text-3xl font-bold text-white">Profile Setup</h2>
             <p className="mt-2 text-sm text-gray-400">Complete your profile to get started</p>
           </div>
-          <form className="mt-8 space-y-6" onSubmit={handleSaveProfile}>
+          <form className="mt-8 space-y-6" action={handleSaveProfile}>
             <div className="space-y-4">
               <div>
                 <label htmlFor="resume" className="block text-sm font-medium text-white">
@@ -83,6 +86,7 @@ export function ProfileSetupComponent() {
                   name="job-description"
                   type="url"
                   placeholder="https://example.com/job-description"
+                  defaultValue="https://www.google.com"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -90,7 +94,7 @@ export function ProfileSetupComponent() {
                 <label htmlFor="school" className="block text-sm font-medium text-white">
                   School
                 </label>
-                <Select name="school">
+                <Select name="school" defaultValue="berkeley">
                   <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 mt-1 rounded-md">
                     <SelectValue placeholder="Select your school" />
                   </SelectTrigger>
@@ -110,6 +114,7 @@ export function ProfileSetupComponent() {
                   name="major"
                   type="text"
                   placeholder="e.g. Finance, Marketing, etc."
+                  defaultValue="Finance"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -122,6 +127,7 @@ export function ProfileSetupComponent() {
                   name="concentration"
                   type="text"
                   placeholder="e.g. Commercial, Private Equity, International"
+                  defaultValue="Commercial"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>

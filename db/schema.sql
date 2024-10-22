@@ -1,5 +1,5 @@
 -- Create ai_interview_coach_Profiles table
-CREATE TABLE ai_interview_coach_Profiles (
+CREATE TABLE ai_interview_coach_prod_Profiles (
     id SERIAL PRIMARY KEY,
     school VARCHAR(255) NOT NULL,
     major VARCHAR(255) NOT NULL,
@@ -10,26 +10,28 @@ CREATE TABLE ai_interview_coach_Profiles (
 );
 
 -- Create ai_interview_coach_Jobs table
-CREATE TABLE ai_interview_coach_Jobs (
+CREATE TABLE ai_interview_coach_prod_Jobs (
     id SERIAL PRIMARY KEY,
     profile_id INTEGER NOT NULL,
-    url VARCHAR(2048),
-    text TEXT,
+    company_name VARCHAR(255),
+    company_url VARCHAR(2048),
+    jd_url VARCHAR(2048),
+    jd_text TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_Profiles(id) ON DELETE CASCADE,
-    CHECK (url IS NOT NULL OR text IS NOT NULL)
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_Profiles(id) ON DELETE CASCADE,
+    CHECK (jd_url IS NOT NULL OR jd_text IS NOT NULL)
 );
 
 -- Create Resumes table
-CREATE TABLE Resumes (
+CREATE TABLE ai_interview_coach_prod_Resumes (
     id SERIAL PRIMARY KEY,
     profile_id INTEGER NOT NULL,
     url VARCHAR(2048),
     text TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (profile_id) REFERENCES Profiles(id) ON DELETE CASCADE,
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_Profiles(id) ON DELETE CASCADE,
     CHECK (url IS NOT NULL OR text IS NOT NULL)
 );
 
@@ -44,15 +46,15 @@ $$ LANGUAGE plpgsql;
 
 -- Create triggers to automatically update last_updated_at
 CREATE TRIGGER update_profiles_last_updated_at
-BEFORE UPDATE ON Profiles
+BEFORE UPDATE ON ai_interview_coach_prod_Profiles
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 CREATE TRIGGER update_jobs_last_updated_at
-BEFORE UPDATE ON Jobs
+BEFORE UPDATE ON ai_interview_coach_prod_Jobs
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 CREATE TRIGGER update_resumes_last_updated_at
-BEFORE UPDATE ON Resumes
+BEFORE UPDATE ON ai_interview_coach_prod_Resumes
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 CREATE OR REPLACE FUNCTION check_resume_fields()
@@ -66,5 +68,5 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER enforce_resume_fields
-BEFORE INSERT OR UPDATE ON Resumes
+BEFORE INSERT OR UPDATE ON ai_interview_coach_prod_Resumes
 FOR EACH ROW EXECUTE FUNCTION check_resume_fields();
