@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ai_interview_coach_prod_jobs {
+  id                               Int                              @id @default(autoincrement())
+  profile_id                       Int
+  company_name                     String?                          @db.VarChar(255)
+  company_url                      String?                          @db.VarChar(2048)
+  jd_url                           String?                          @db.VarChar(2048)
+  jd_text                          String?
+  created_at                       DateTime?                        @default(now()) @db.Timestamptz(6)
+  last_updated_at                  DateTime?                        @default(now()) @db.Timestamptz(6)
+  ai_interview_coach_prod_profiles ai_interview_coach_prod_profiles @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model ai_interview_coach_prod_profiles {
+  id                              Int                               @id @default(autoincrement())
+  school                          String                            @db.VarChar(255)
+  major                           String                            @db.VarChar(255)
+  concentration                   String?                           @db.VarChar(255)
+  graduation_date                 DateTime?                         @db.Date
+  created_at                      DateTime?                         @default(now()) @db.Timestamptz(6)
+  last_updated_at                 DateTime?                         @default(now()) @db.Timestamptz(6)
+  ai_interview_coach_prod_jobs    ai_interview_coach_prod_jobs[]
+  ai_interview_coach_prod_resumes ai_interview_coach_prod_resumes[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ai_interview_coach_prod_resumes {
+  id                               Int                              @id @default(autoincrement())
+  profile_id                       Int
+  url                              String?                          @db.VarChar(2048)
+  text                             String?
+  created_at                       DateTime?                        @default(now()) @db.Timestamptz(6)
+  last_updated_at                  DateTime?                        @default(now()) @db.Timestamptz(6)
+  ai_interview_coach_prod_profiles ai_interview_coach_prod_profiles @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model development_goals {
+  id                Int                @id @default(autoincrement())
+  user_id           Int?
+  student_id        Int?
+  name              String?            @db.VarChar(255)
+  description       String?            @db.VarChar(5000)
+  benchmarks        String?            @db.VarChar(5000)
+  present_levels    String?            @db.VarChar(5000)
+  created_at        DateTime           @default(now()) @db.Timestamptz(6)
+  development_users development_users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+model development_prompts {
+  id            Int      @id @default(autoincrement())
+  prompt_key    String?  @db.VarChar(255)
+  temperature   Decimal? @db.Decimal
+  user_prompt   String?  @db.VarChar(5000)
+  system_prompt String?  @db.VarChar(5000)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model development_students {
+  id                Int                @id @default(autoincrement())
+  user_id           Int?
+  name              String?            @db.VarChar(255)
+  grade             String?            @db.VarChar(255)
+  created_at        DateTime           @default(now()) @db.Timestamptz(6)
+  development_users development_users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+model development_users {
+  id                   Int                    @id @default(autoincrement())
+  clerk_id             String?                @unique @db.VarChar(255)
+  first_name           String?                @db.VarChar(255)
+  last_name            String?                @db.VarChar(255)
+  development_goals    development_goals[]
+  development_students development_students[]
+}
+
+model packit2_activities {
+  id                    Int                     @id @default(autoincrement())
+  trip_id               Int
+  name                  String?                 @db.VarChar(255)
+  icon                  String?                 @db.VarChar(255)
+  created_at            DateTime                @default(now()) @db.Timestamp(6)
+  updated_at            DateTime                @default(now()) @db.Timestamp(6)
+  packit2_trips         packit2_trips           @relation(fields: [trip_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  packit2_packing_items packit2_packing_items[]
+}
+
+model packit2_packing_items {
+  id                 Int                @id @default(autoincrement())
+  activity_id        Int
+  name               String?            @db.VarChar(255)
+  is_packed          Boolean            @default(false)
+  created_at         DateTime           @default(now()) @db.Timestamp(6)
+  updated_at         DateTime           @default(now()) @db.Timestamp(6)
+  packit2_activities packit2_activities @relation(fields: [activity_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model packit2_trips {
+  id                 Int                  @id @default(autoincrement())
+  user_id            Int
+  start_date         DateTime             @db.Date
+  end_date           DateTime             @db.Date
+  location           String               @db.VarChar(255)
+  low_weather        Decimal?             @db.Decimal(4, 1)
+  high_weather       Decimal?             @db.Decimal(4, 1)
+  created_at         DateTime             @default(now()) @db.Timestamp(6)
+  updated_at         DateTime             @default(now()) @db.Timestamp(6)
+  packit2_activities packit2_activities[]
+}
+
+model packit2_users {
+  id         Int      @id @default(autoincrement())
+  is_male    Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+}
+
+model packit_activities {
+  id                   Int                    @id @default(autoincrement())
+  trip_id              Int
+  name                 String                 @db.VarChar(255)
+  packit_packing_items packit_packing_items[]
+
+  @@index([trip_id], map: "idx_packit_activities_trip_id")
+}
+
+model packit_packing_items {
+  id                Int               @id @default(autoincrement())
+  activity_id       Int
+  text              String            @db.VarChar(255)
+  is_packed         Boolean           @default(false)
+  packit_activities packit_activities @relation(fields: [activity_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([activity_id], map: "idx_packit_packing_items_activity_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model packit_trips {
+  id           Int          @id @default(autoincrement())
+  user_id      Int
+  start_date   DateTime     @db.Date
+  end_date     DateTime     @db.Date
+  location     String       @db.VarChar(255)
+  low_weather  Decimal?     @default(0) @db.Decimal(5, 2)
+  high_weather Decimal?     @default(0) @db.Decimal(5, 2)
+  type         String       @db.VarChar(10)
+  packit_users packit_users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model packit_users {
+  id           Int            @id @default(autoincrement())
+  email        String         @unique @db.VarChar(255)
+  name         String?        @db.VarChar(255)
+  packit_trips packit_trips[]
+}
+
+model preview_goals {
+  id             Int            @id @default(autoincrement())
+  user_id        Int?
+  student_id     Int?
+  name           String?        @db.VarChar(255)
+  description    String?        @db.VarChar(5000)
+  benchmarks     String?        @db.VarChar(5000)
+  present_levels String?        @db.VarChar(5000)
+  created_at     DateTime       @default(now()) @db.Timestamptz(6)
+  preview_users  preview_users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+model preview_students {
+  id            Int            @id @default(autoincrement())
+  user_id       Int?
+  name          String?        @db.VarChar(255)
+  grade         String?        @db.VarChar(255)
+  created_at    DateTime       @default(now()) @db.Timestamptz(6)
+  preview_users preview_users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+model preview_users {
+  id               Int                @id @default(autoincrement())
+  clerk_id         String?            @unique @db.VarChar(255)
+  first_name       String?            @db.VarChar(255)
+  last_name        String?            @db.VarChar(255)
+  preview_goals    preview_goals[]
+  preview_students preview_students[]
+}
+
+model production_goals {
+  id               Int               @id @default(autoincrement())
+  user_id          Int?
+  student_id       Int?
+  name             String?           @db.VarChar(255)
+  description      String?           @db.VarChar(5000)
+  benchmarks       String?           @db.VarChar(5000)
+  present_levels   String?           @db.VarChar(5000)
+  created_at       DateTime          @default(now()) @db.Timestamptz(6)
+  production_users production_users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+model production_prompts {
+  id            Int      @id @default(autoincrement())
+  prompt_key    String?  @db.VarChar(255)
+  temperature   Decimal? @db.Decimal
+  user_prompt   String?  @db.VarChar(5000)
+  system_prompt String?  @db.VarChar(5000)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model production_students {
+  id               Int               @id @default(autoincrement())
+  user_id          Int?
+  name             String?           @db.VarChar(255)
+  grade            String?           @db.VarChar(255)
+  created_at       DateTime          @default(now()) @db.Timestamptz(6)
+  production_users production_users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+model production_users {
+  id                  Int                   @id @default(autoincrement())
+  clerk_id            String?               @db.VarChar(255)
+  first_name          String?               @db.VarChar(255)
+  last_name           String?               @db.VarChar(255)
+  production_goals    production_goals[]
+  production_students production_students[]
+}
+
+model questions {
+  id          Int       @id @default(autoincrement())
+  type        String    @db.VarChar(255)
+  key         String    @db.VarChar(255)
+  title       String
+  placeholder String?
+  is_required Boolean?  @default(false)
+  relations   String[]
+  sub_title   String?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model shaadi_toast_questions {
+  id          Int       @id @default(autoincrement())
+  type        String    @db.VarChar(255)
+  key         String    @db.VarChar(255)
+  title       String
+  placeholder String?
+  is_required Boolean?  @default(false)
+  relations   String[]
+  sub_title   String?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+}

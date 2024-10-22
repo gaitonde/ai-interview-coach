@@ -7,6 +7,7 @@ import { Footer } from './components-footer'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { saveProfile } from '@/app/actions/saveProfile'
+import { create as createProfile } from '@/app/actions/profileActions'
 
 export function ProfileSetupComponent() {
   const router = useRouter()
@@ -21,12 +22,20 @@ export function ProfileSetupComponent() {
   }
 
   const handleSaveProfile = async (formData: FormData) => {
-    const result = await saveProfile(formData)
-    if (result.success) {
-      console.log("Profile saved successfully", result.id)
+    const newProfile = await createProfile({
+      school: formData.get('school') as string,
+      major: formData.get('major') as string,
+      concentration: formData.get('concentration') as string,
+      graduation_year: formData.get('graduation-year') as string
+    });
+    console.log("Profile created successfully", newProfile)
+
+    // // const result = await saveProfile(formData)
+    if (newProfile.id) {
+      console.log("Profile saved successfully", newProfile.id)
       router.push('/job-prep')
     } else {
-      console.error("Error saving profile:", result.error)
+      console.error("Error saving profile:", newProfile.error)
       // Handle error (e.g., show error message to user)
     }
   }
