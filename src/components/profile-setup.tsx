@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Footer } from './components-footer'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { saveProfile } from '@/app/actions/saveProfile'
-import { create as createProfile } from '@/app/actions/profileActions'
+import { handleProfileSetup } from '@/app/actions/profileActions'
+import { useRouter } from 'next/navigation'
 
 export function ProfileSetupComponent() {
   const router = useRouter()
   const [fileName, setFileName] = useState<string>('No file chosen')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -21,22 +22,16 @@ export function ProfileSetupComponent() {
     }
   }
 
-  const handleSaveProfile = async (formData: FormData) => {
-    const newProfile = await createProfile({
-      school: formData.get('school') as string,
-      major: formData.get('major') as string,
-      concentration: formData.get('concentration') as string,
-      graduation_year: formData.get('graduation-year') as string
-    });
-    console.log("Profile created successfully", newProfile)
-
-    // // const result = await saveProfile(formData)
-    if (newProfile.id) {
-      console.log("Profile saved successfully", newProfile.id)
+  const handleSubmit = async (formData: FormData) => {
+    setIsSubmitting(true)
+    setError(null)
+    try {
+      await handleProfileSetup(formData)
       router.push('/job-prep')
-    } else {
-      console.error("Error saving profile:", newProfile.error)
-      // Handle error (e.g., show error message to user)
+    } catch (error) {
+      setError('An error occurred. Please try again.')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -48,7 +43,7 @@ export function ProfileSetupComponent() {
             <h2 className="mt-6 text-3xl font-bold text-white">Profile Setup</h2>
             <p className="mt-2 text-sm text-gray-400">Complete your profile to get started</p>
           </div>
-          <form className="mt-8 space-y-6" action={handleSaveProfile}>
+          <form className="mt-8 space-y-6" action={handleSubmit}>
             <div className="space-y-4">
               <div>
                 <label htmlFor="resume" className="block text-sm font-medium text-white">
@@ -193,10 +188,15 @@ export function ProfileSetupComponent() {
               </div>
                */}
             </div>
-            <Button type="submit" className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors">
-              Save Profile
+            <Button
+              type="submit"
+              className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Save Profile'}
             </Button>
           </form>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
       </main>
       <Footer />
