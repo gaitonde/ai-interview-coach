@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { sql } from '@vercel/postgres';
 
+export const maxDuration = 30;
+export const dynamic = 'force-dynamic';
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -183,6 +186,20 @@ export async function POST(request: Request) {
     jd_url: jobDescriptionURL
   } = jobDetails.rows[0];
 
+const resumeDetails = await sql`
+    SELECT url
+    FROM ai_interview_coach_prod_resumes
+    WHERE profile_id = ${profileId}
+  `;
+
+  if (resumeDetails.rows.length === 0) {
+    return NextResponse.json({ error: "Resume not found" }, { status: 404 });
+  }
+
+  const {
+    url: resumeUrl
+  } = resumeDetails.rows[0];
+
 
 //TODO: get this from db
   const resumeText = `
@@ -239,7 +256,7 @@ September 2014 – Present | Pittsburgh,PA
   const userPrompt = `
     Job Description: ${jobDescriptionURL}
     Company: ${companyWebsiteUrl}
-    Resume: ${resumeText}
+    Resume: ${resumeUrl}
     GraduationYear: ${gradYear}
     Today's Date: ${todayDate}
     School Name: ${schoolName}

@@ -8,7 +8,7 @@
 - [ ] UI Cleanup
 - [ ] Additional Testing using different resumes, JDs?
 - [ ] Wait state before Job Prep page
-
+- [ ] Look at locking down public access to the resume file
 ---
 # Must haves
 - [ ] Implement "save" button on profile setup page

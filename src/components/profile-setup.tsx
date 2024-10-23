@@ -162,10 +162,10 @@ export function ProfileSetup() {
       // Generate Prep Sheet + Questions
       const prepSheetContent = await generatePrepSheet(profileId);
 
-      // Generate Questions
+      // // Generate Questions
       const questionsContent = await generateQuestions(profileId);
 
-      // If everything is successful, you can redirect or show a success message
+      // // If everything is successful, you can redirect or show a success message
       router.push('/job-prep');
     } catch (error) {
       console.error('Error during submission:', error);
@@ -346,7 +346,7 @@ export function ProfileSetup() {
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Saving...' : 'Save Profile'}
+              {isSubmitting ? 'Processing...' : 'Save Profile'}
             </Button>
           </form>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}

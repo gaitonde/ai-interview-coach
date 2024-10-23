@@ -15,8 +15,6 @@ export async function POST(request: Request) {
 
     //TODO: protect url
     const resumeUrl = await uploadResume(resume);
-    console.log('resumeUrl: ', resumeUrl);
-
     await updateProfileWithResumeUrl(profileId, resumeUrl);
 
     return NextResponse.json({ success: true, resumeUrl });

@@ -130,11 +130,24 @@ September 2014 – Present | Pittsburgh,PA
     jd_url: jobDescriptionURL
   } = jobDetails.rows[0];
 
+  const resumeDetails = await sql`
+  SELECT url
+  FROM ai_interview_coach_prod_resumes
+  WHERE profile_id = ${profileId}
+`;
+
+if (resumeDetails.rows.length === 0) {
+  return NextResponse.json({ error: "Resume not found" }, { status: 404 });
+}
+
+const {
+  url: resumeUrl
+} = resumeDetails.rows[0];
 
   const userPrompt = `
     Job Description: ${jobDescriptionURL}
     Company: ${companyWebsiteUrl}
-    Resume: ${resumeText}
+    Resume: ${resumeUrl}
     GraduationYear: ${gradYear}
     Today's Date: ${todayDate}
   `;
