@@ -54,95 +54,129 @@ LinkedIn Profile: Additional professional info, endorsements, certifications, or
 School’s Course Catalog: Relevant coursework that ties into the role. Use variable {schoolCourseCatalog}
 
 <example>
-Interview Prep Sheet for TechCorp Inc.
-Date: October 21, 2024
-Candidate: May Trix
-Position: 2025 Product Manager Intern
-Company: TechCorp Inc.
+# Awesome Interview Prep Sheet for TechCorp Inc.
 
-Company Research:
-TechCorp Inc. is a global leader in technology innovation, providing a wide range of products and services from digital infrastructure to smart devices. The company is well-known for its commitment to innovation and delivering customer-centric solutions.
-Mission: TechCorp aims to drive innovation that empowers individuals and businesses worldwide.
-Key Products/Services: Digital infrastructure (TechAI), smart devices (SmartEase), and cloud services.
-Recent News: TechCorp continues to expand its AI capabilities while focusing on sustainability and long-term growth. They are prioritizing customer-centric innovations and streamlining their product offerings to meet future demand.
+**Date**: October 21, 2024
+**Candidate**: May Trix
+**Position**: 2025 Product Manager Intern
+**Company**: TechCorp Inc.
 
-Company Culture Insights:
-Customer Obsession: TechCorp is driven by the mission to continuously improve the customer experience. Product managers are essential in this process, constantly identifying customer needs and providing innovative solutions.
-Team Dynamics: Employees at TechCorp collaborate closely with senior leadership and are expected to take ownership of projects from day one. Junior team members contribute to high-impact projects and gain significant exposure to leadership.
-Professional Development: TechCorp supports continuous growth through mentorship, access to specialized training programs, and opportunities for upward mobility.
-Work-Life Balance: Though fast-paced, TechCorp promotes work-life balance by fostering a flexible working environment.
-Community and Values: The company emphasizes diversity and inclusion while encouraging participation in sustainability and social responsibility programs.
-Check Out These Links:
-TechCorp’s Leadership Principles
-(https://www.techcorp.com/leadership-principles)
-TechCorp’s Data Innovation and Strategy
-(https://www.technews.com/data-strategy-techcorp)
-How TechCorp Focuses on Customer Experience
-(https://www.techcorp.com/news/customer-obsession)
-Product Management at TechCorp
-(https://www.youtube.com/watch?v=TechCorpPM)
-The Role of Product Managers at TechCorp
-(https://medium.com/pm-practice/land-a-pm-job-at-techcorp)
+---
 
-Job Description Breakdown and Your Fit (as of October 21, 2024):
-Job Description:
-As a 2025 Product Manager Intern, you'll support vendor managers in improving business performance, digitizing procurement processes, and generating insights from large datasets.
-Your Fit:
-Where You Stand: Since today is October 21, 2024, you are currently a junior, which aligns with TechCorp's requirements for rising seniors for their summer internship program.
-Technical Experience: Your work on NavCog and Chorus showcases your skills in Android development and data analysis—both critical for handling large datasets and driving insights, which TechCorp highly values.
-Leadership and Teamwork: As the captain of the women’s varsity golf team and social media manager at Business Golf Academy, you’ve demonstrated leadership and collaboration skills that TechCorp looks for in its product management interns.
-Problem-Solving: Your experience developing tools like NavCog to help visually impaired users navigate complex spaces showcases your ability to identify customer pain points and build solutions—a core focus for TechCorp.
+## Company Research
 
-Types of Questions You Might Get:
-Behavioral:
-Question: "Tell me about a time you led a team to achieve a goal under a tight deadline."
-Why they’re asking: TechCorp values leadership and ownership. They want to see how you manage pressure and lead teams to deliver results.
-What you should focus on: You can discuss your experience leading the development of Chorus, where you managed a team of 3 developers to create a conversational assistant app within a strict timeline.
-Technical:
-Question: "How would you analyze a large dataset to identify performance gaps?"
-Why they’re asking: TechCorp places a high priority on data-driven decision-making. They need to see how well you work with data and draw actionable insights.
-What you should focus on: Mention your work with NavCog and Chorus, where you analyzed data and system behaviors to optimize app performance. Highlight specific tools like Python and data visualization techniques you used.
-Role-Specific:
-Question: "What strategies would you use to improve customer conversion rates on TechCorp's platform?"
-Why they’re asking: Conversion rates are critical in e-commerce, and TechCorp needs to ensure its platform is optimized for customer engagement.
-What you should focus on: Reference your experience improving Umbrella's user interaction by utilizing A/B testing and data analysis to optimize app features.
+**TechCorp Inc.** is a global leader in technology innovation, providing a wide range of products and services from digital infrastructure to smart devices. The company is well-known for its commitment to innovation and delivering customer-centric solutions.
 
-3 STAR Stories for Behavioral Questions:
-Topic: Leadership and managing a team under pressure
-Situation: During my time as lead Android developer for Chorus, I was responsible for managing a small team of three developers to create a conversational assistant app.
-Task: We had a tight deadline and needed to deliver a high-quality product.
-Action: I organized tasks using Agile methodologies, set up frequent check-ins to track progress, and resolved technical issues as they came up.
-Result: We delivered the app on time with all its key functionalities working smoothly, including text-to-speech and speech-to-text capabilities.
-Topic: Problem-solving and innovation
-Situation: In my role with NavCog, I was tasked with developing tools to assist blind users in navigating complex spaces.
-Task: I needed to create an app that combined crowdsourcing and sensor data to accurately guide users.
-Action: I designed an innovative system using computer vision and crowdsourced data to generate 3D building models.
-Result: The tool significantly improved accessibility for blind users and was well-received by the community.
-Topic: Data-driven decision making
-Situation: While working on Budgie, an expense management app, I needed to categorize users’ expenses and present meaningful insights.
-Task: I had to ensure the app displayed financial data in a user-friendly and impactful way.
-Action: I implemented Microsoft’s OCR API to scan and categorize receipts and created visualizations of users’ spending patterns through pie charts.
-Result: The app was well-received by users who appreciated the clear, intuitive interface and easy tracking of their finances.
+* **Mission**: TechCorp aims to drive innovation that empowers individuals and businesses worldwide.
+* **Key Products/Services**: Digital infrastructure (TechAI), smart devices (SmartEase), and cloud services.
+* **Recent News**: TechCorp continues to expand its AI capabilities while focusing on sustainability and long-term growth. They are prioritizing customer-centric innovations and streamlining their product offerings to meet future demand.
 
-5 Personalized Questions for the Interviewer:
-Professional: "What are the most significant challenges TechCorp faces in optimizing conversion rates, and how do product managers contribute to overcoming them?"
-Professional but Conversational: "Could you tell me more about the mentorship opportunities for interns? I’m curious how TechCorp supports learning and growth."
-Professional: "How does TechCorp measure the success of product managers, and what metrics do you use to track performance?"
-Professional but Conversational: "I’ve read about TechCorp’s Leadership Principles. Could you share how these principles play out in your day-to-day work?"
-Professional: "What does career progression look like for product managers at TechCorp after the internship?"
+---
 
-Tech/Skills to Brush Up On:
-Data Analysis (Top Priority): Brush up on data manipulation and analysis using Python. You’ll need to be comfortable with identifying trends in large datasets and extracting actionable insights.
-Customer Metrics: Be familiar with conversion rates, retention metrics, and strategies to improve them—key performance indicators in e-commerce.
-Product Management Tools: Explore Agile methodologies and Jira for project management, since TechCorp often uses these to track product development.
-Presentation Skills: Practice presenting data-driven insights clearly and concisely, as you will likely be asked to share findings with senior leadership.
-Natural Language Processing: Since your work with Chorus and NavCog involved NLP, reviewing key concepts will prepare you for technical discussions around user interaction.
+### Company Culture Insights
 
-Personalized Pitch:
+**Customer Obsession**: TechCorp is driven by the mission to continuously improve the customer experience. Product managers are essential in this process, constantly identifying customer needs and providing innovative solutions.
+
+* **Team Dynamics**: Employees at TechCorp collaborate closely with senior leadership and are expected to take ownership of projects from day one. Junior team members contribute to high-impact projects and gain significant exposure to leadership.
+* **Professional Development**: TechCorp supports continuous growth through mentorship, access to specialized training programs, and opportunities for upward mobility.
+* **Work-Life Balance**: Though fast-paced, TechCorp promotes work-life balance by fostering a flexible working environment.
+* **Community and Values**: The company emphasizes diversity and inclusion while encouraging participation in sustainability and social responsibility programs.
+
+### Check Out These Links
+
+1. **TechCorp’s Leadership Principles**
+   ([https://www.techcorp.com/leadership-principles](https://www.techcorp.com/leadership-principles))
+2. **TechCorp’s Data Innovation and Strategy**
+   (https://www.technews.com/data-strategy-techcorp)
+3. **How TechCorp Focuses on Customer Experience**
+   (https://www.techcorp.com/news/customer-obsession)
+4. **Product Management at TechCorp**
+   ([https://www.youtube.com/watch?v=TechCorpPM](https://www.youtube.com/watch?v=TechCorpPM))
+5. **The Role of Product Managers at TechCorp**
+   (https://medium.com/pm-practice/land-a-pm-job-at-techcorp)
+
+---
+
+## Job Description Breakdown and Your Fit (as of October 21, 2024)
+
+**Job Description**
+As a **2025 Product Manager Intern**, you'll support vendor managers in improving business performance, digitizing procurement processes, and generating insights from large datasets.
+
+**Your Fit**
+1. **Where You Stand**: Since today is October 21, 2024, you are currently a junior, which aligns with TechCorp's requirements for rising seniors for their summer internship program.
+2. **Technical Experience**: Your work on **NavCog** and **Chorus** showcases your skills in Android development and data analysis—both critical for handling large datasets and driving insights, which TechCorp highly values.
+3. **Leadership and Teamwork**: As the captain of the **women’s varsity golf team** and **social media manager** at Business Golf Academy, you’ve demonstrated leadership and collaboration skills that TechCorp looks for in its product management interns.
+4. **Problem-Solving**: Your experience developing tools like **NavCog** to help visually impaired users navigate complex spaces showcases your ability to identify customer pain points and build solutions—a core focus for TechCorp.
+
+---
+
+##   Types of Questions You Might Get
+
+1. **Behavioral**
+   **Question**: "Tell me about a time you led a team to achieve a goal under a tight deadline."
+   **Why they’re asking**: TechCorp values leadership and ownership. They want to see how you manage pressure and lead teams to deliver results.
+   **What you should focus on**: You can discuss your experience leading the development of **Chorus**, where you managed a team of 3 developers to create a conversational assistant app within a strict timeline.
+2. **Technical**
+   **Question**: "How would you analyze a large dataset to identify performance gaps?"
+   **Why they’re asking**: TechCorp places a high priority on data-driven decision-making. They need to see how well you work with data and draw actionable insights.
+   **What you should focus on**: Mention your work with **NavCog** and **Chorus**, where you analyzed data and system behaviors to optimize app performance. Highlight specific tools like Python and data visualization techniques you used.
+3. **Role-Specific**
+   **Question**: "What strategies would you use to improve customer conversion rates on TechCorp's platform?"
+   **Why they’re asking**: Conversion rates are critical in e-commerce, and TechCorp needs to ensure its platform is optimized for customer engagement.
+   **What you should focus on**: Reference your experience improving **Umbrella**'s user interaction by utilizing A/B testing and data analysis to optimize app features.
+
+---
+
+### **3 STAR Stories for Behavioral Questions:**
+
+1. **Topic**: Leadership and managing a team under pressure
+   **Situation**: During my time as lead Android developer for **Chorus**, I was responsible for managing a small team of three developers to create a conversational assistant app.
+   **Task**: We had a tight deadline and needed to deliver a high-quality product.
+   **Action**: I organized tasks using Agile methodologies, set up frequent check-ins to track progress, and resolved technical issues as they came up.
+   **Result**: We delivered the app on time with all its key functionalities working smoothly, including text-to-speech and speech-to-text capabilities.
+2. **Topic**: Problem-solving and innovation
+   **Situation**: In my role with **NavCog**, I was tasked with developing tools to assist blind users in navigating complex spaces.
+   **Task**: I needed to create an app that combined crowdsourcing and sensor data to accurately guide users.
+   **Action**: I designed an innovative system using computer vision and crowdsourced data to generate 3D building models.
+   **Result**: The tool significantly improved accessibility for blind users and was well-received by the community.
+3. **Topic**: Data-driven decision making
+   **Situation**: While working on **Budgie**, an expense management app, I needed to categorize users’ expenses and present meaningful insights.
+   **Task**: I had to ensure the app displayed financial data in a user-friendly and impactful way.
+   **Action**: I implemented Microsoft’s OCR API to scan and categorize receipts and created visualizations of users’ spending patterns through pie charts.
+   **Result**: The app was well-received by users who appreciated the clear, intuitive interface and easy tracking of their finances.
+
+---
+
+### **5 Personalized Questions for the Interviewer:**
+
+1. **Professional**: "What are the most significant challenges TechCorp faces in optimizing conversion rates, and how do product managers contribute to overcoming them?"
+2. **Professional but Conversational**: "Could you tell me more about the mentorship opportunities for interns? I’m curious how TechCorp supports learning and growth."
+3. **Professional**: "How does TechCorp measure the success of product managers, and what metrics do you use to track performance?"
+4. **Professional but Conversational**: "I’ve read about TechCorp’s Leadership Principles. Could you share how these principles play out in your day-to-day work?"
+5. **Professional**: "What does career progression look like for product managers at TechCorp after the internship?"
+
+---
+
+### **Tech/Skills to Brush Up On:**
+
+1. **Data Analysis (Top Priority)**: Brush up on data manipulation and analysis using Python. You’ll need to be comfortable with identifying trends in large datasets and extracting actionable insights.
+2. **Customer Metrics**: Be familiar with conversion rates, retention metrics, and strategies to improve them—key performance indicators in e-commerce.
+3. **Product Management Tools**: Explore Agile methodologies and Jira for project management, since TechCorp often uses these to track product development.
+4. **Presentation Skills**: Practice presenting data-driven insights clearly and concisely, as you will likely be asked to share findings with senior leadership.
+5. **Natural Language Processing**: Since your work with **Chorus** and **NavCog** involved NLP, reviewing key concepts will prepare you for technical discussions around user interaction.
+
+---
+
+## Personalized Pitch
+
 "Hi, I’m May Trix, a junior at Carnegie Mellon University majoring in Computer Science. My experience in data analysis, mobile app development, and leadership—along with my work on projects like NavCog and Chorus—aligns well with TechCorp’s focus on data-driven product management. I’m excited about the opportunity to work with your team to develop innovative solutions and improve customer experiences."
+  
+---
+  
+**This prep sheet is personalized for May Trix on October 21, 2024\. Note that the prep sheet is meant as a guide based on the information you have provided. You should verify all information. Good luck. Go crush it\!**
 
-This prep sheet is personalized for May Trix on October 21, 2024. Note that the prep sheet is meant as a guide based on the information you have provided. You should verify all information. Good luck. Go crush it!
 </example>
+
 `;
 
 export async function POST(request: Request) {

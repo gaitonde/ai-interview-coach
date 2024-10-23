@@ -9,8 +9,8 @@ const openai = new OpenAI({
 const systemPrompt = `
 You are an AI tasked with generating a set of interview preparation questions for any given role. The questions should be based on the Job Role, Job Description, Company, Resume of the candidate, and Today’s Date. You will assess the Applicant Level (e.g., undergraduate, MBA, graduate, experienced professional) based on the qualifications and experience level provided in the resume, and generate level-appropriate questions for the role.
 The questions generated must reflect the most important qualities and skills required for the role, focusing on role-specific skills, company-specific needs, technical skills, and behavioral competencies. The generation of these questions should be guided by the top 10 most important topics that are inferred from the job description, resume, and the company’s needs. These topics should include a mix of technical skills, domain-specific knowledge, and behavioral competencies prioritized based on their relevance to the role and the applicant’s experience level. These identified topics should underpin the questions, but the topics themselves should not be listed—instead, integrate them directly into the questions and the rationale behind each.
-Ensure that the questions align with the specific domain and responsibilities mentioned in the job description, and prioritize questions according to their importance for the role and applicant level.
-Your task is to generate the following types of questions:
+Ensure that the questions align with the specific domain and responsibilities mentioned in the job description, and prioritize questions within each category according to their importance for the role and applicant level.
+Your task is to generate the following types of questions (5 of each type):
 1. Role-Specific and Company-Aligned Questions
 These questions should assess the candidate’s understanding of both the role-specific skills and how they align with the company’s business strategy and market. Tailor the questions to the applicant’s level (e.g., undergraduate, MBA, graduate, or experienced professional) and ensure that they assess the candidate’s ability to apply key skills (e.g., financial modeling, project management) in the context of the company’s specific market.
 Each question should include:
@@ -37,6 +37,27 @@ Level Appropriateness: Ensure that questions are adjusted to reflect the candida
 Role-Specific Domain Knowledge: For technical roles, ensure that questions assess relevant domain knowledge (e.g., coding proficiency for software engineering, market analysis for business roles). For non-technical roles, focus on analytical, strategic, or creative skills based on the job description.
 Company-Specific Focus: Use the company’s industry, products, and business focus to inform the creation of company-targeted questions that test how well the candidate’s skills align with the company’s needs.
 Behavioral Competency Relevance: For leadership or collaborative roles, place higher importance on behavioral questions. For individual contributor or highly technical roles, reduce the focus on behavioral competencies and emphasize problem-solving, domain expertise, or innovation.
+Inputs:
+Job Description ({jobDescription}): Provide the role, key responsibilities, and qualifications. Use this information to infer the most relevant general and technical questions.
+Company Website ({companyWebsiteURL}): Use the company’s industry, products, and business focus to tailor market-specific questions.
+Resume ({resumeText}): Extract key information about the candidate's experience, skills, and education to determine the applicant’s level (e.g., undergraduate, graduate, or experienced professional).
+Today’s Date ({todayDate}): Use today’s date to calculate experience timelines, especially for students nearing graduation.
+
+
+<example>
+## Role-Specific and Company-Aligned Questions
+
+* **Question**: "How would you prioritize features for a new product aimed at organizing and improving access to information?"
+  * **Why they are asking**: TechCorp wants to assess your ability to make strategic decisions when managing a product’s feature set, especially when you have limited resources.
+  * **What you should focus on**: Discuss how you would prioritize features using frameworks like RICE or MoSCoW. You can give an example where you used data-driven methods to prioritize features, such as focusing on the most impactful updates when building out InfoNet, TechCorp’s information management tool.
+
+## **Technical Skills Questions
+
+* **Question**: "Describe a time when you made a data-driven decision. How would you apply data-driven decision-making in your role as a TechCorp Inc. Product Manager Intern?"
+  * **Why they are asking**: TechCorp relies heavily on data to make product decisions and expects you to have a clear understanding of how to leverage it to improve products.
+  * **What you should focus on**: Highlight a specific instance where data guided your decision-making process. For instance, you can mention analyzing user interactions in MapTrail and how that data led you to optimize the app’s user
+
+</example>
 `;
 
 export async function POST(request: Request) {
@@ -53,56 +74,6 @@ export async function POST(request: Request) {
     WHERE id = ${profileId}
   `;
 
-  const resumeText = `
-EDUCATION
-CARNEGIE MELLON
-UNIVERSITY
-B.S.INCOMPUTERSCIENCE Pittsburgh, PA| ExpectedMay2018
-SKILLS
-Java • Python • C • SML • HTML5 •  CSS • Django • Android • LATEX•Git Datastructures • Software design patterns
-COURSEWORK
-Parallel andSequentialData
-Structures andAlgorithms
-Introduction toComputer Systems Software System Construction Great TheoreticalIdeas in Computer Science
-Web Application Development Principles ofImperative
-Computation
-Principles of Functional
-Programming
-LINKS
-Github://maytrix
-LinkedIn:// maytrix
-May Trix
-888-888-8881 | mtrix@andrew.cmu.edu
-EXPERIENCE
-CARNEGIEMELLONUNIVERSITY,HUMAN-COMPUTER INTERACTION INSTITUTE | RESEARCH ASSISTANT
-February2016 - Present | Pittsburgh, PA
-• Make Android and web apps for NavCog, a toolthat uses sensors, computer vision, and crowdsourcing to help blind people move in spaces. Target crowdsourcingeffortto create 3-D modelsof buildings and maintain sensors.
-June2015 - August2015 | Pittsburgh, PA
-• Led 3 person teamdeveloping mobile andwear apps forChorus, a web based crowdsourcingconversational assistant. Has texttospeechand speechtotext capabilities. Uses YelpSearchandYahoo APIs.
-• Made a natural language processortoolto be added toChorusweb application.
-BUSINESSGOLFACADEMY | SOCIAL MEDIA MANAGER May2015 – Present | Pittsburgh, PA
-• Manage the socialmedia presence forBGA,whichencourages womento use golftoadvance their careers. TripledTwitterfollowers
-PROJECTS
-UMBRELLA | LEADANDROIDDEVELOPER, GITREPO MANAGER February 2016
-• App uses crowdsourcing to fight gender-based violence and the bystander effect.Bluetooth-based messaging whereusers
-anonymouslypost situation.
-BUDGIE | LEADANDROIDDEVELOPER,GITREPOMANAGER September 2015
-• Apptomanage andcategorize expenses.ImplementsMicrosoft’s Oxford OpitcalCharacter Recognition API. Pie charts show
-spending distribution.
-ACTIVITIES
-WOMEN’SVARSITYGOLF TEAM | CAPTAIN (2014-PRESENT) August2014 – Present | Pittsburgh, PA
-• Won Thomas B. Craig & LaVerne Craig Tartan Award 2015-2016 (Most Valuable Player), University Athletic Association All
-Association First Team, Eastern College Athletic Conference
-Rookie of the Month Division III, University Athletic Association Women’s Golf Athlete of the Week (3 times)
-• Student Athlete Advisory Council | September 2014 - May 2015
-WOMEN@SCS | MENTOR
-September 2014 – Present | Pittsburgh,PA
-• ”Big sister” inthe Big Sister/Little Sister mentoringprogram.
-THEFIRSTTEEOFPITTSBURGH | VOLUNTEERGOLF
-INSTRUCTOR
-September 2014 – Present | Pittsburgh,PA
-• Teachgolf and life skills to 20 underprivileged children ages 8-16 years
-`;
 
   if (profileDetails.rows.length === 0) {
     return NextResponse.json({ error: "Profile not found" }, { status: 404 });
