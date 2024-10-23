@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Footer } from './footer'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { FormEvent } from 'react'
 
 export function ProfileSetup() {
   const router = useRouter()
@@ -144,9 +145,12 @@ export function ProfileSetup() {
     }
   };
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+
+    const formData = new FormData(e.currentTarget);
 
     try {
       // Save profile
@@ -162,10 +166,10 @@ export function ProfileSetup() {
       // Generate Prep Sheet + Questions
       const prepSheetContent = await generatePrepSheet(profileId);
 
-      // // Generate Questions
+      // Generate Questions
       const questionsContent = await generateQuestions(profileId);
 
-      // // If everything is successful, you can redirect or show a success message
+      // If everything is successful, you can redirect or show a success message
       router.push('/job-prep');
     } catch (error) {
       console.error('Error during submission:', error);
@@ -185,8 +189,7 @@ export function ProfileSetup() {
           </div>
           <form
             className="mt-8 space-y-6"
-            action={handleSubmit}
-            // encType="multipart/form-data"
+            onSubmit={handleSubmit}
           >
             <div className="space-y-4">
               <div>

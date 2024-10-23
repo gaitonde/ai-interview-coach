@@ -4,10 +4,12 @@
 - [x] SP/DG: Update Prompt for Job Prep
 - [x] SP/DG: Update Prompt for Questions
 - [x] Add link to home page on questions page
+- [ ] - [x] Wait state before Job Prep page
 ---
-- [ ] UI Cleanup
-- [ ] Additional Testing using different resumes, JDs?
-- [ ] Wait state before Job Prep page
+- [ ] Markdown formatting for Job Prep + Questions pages
+- [ ] Validation for the Profile Setup page
+
+# Later
 - [ ] Look at locking down public access to the resume file
 ---
 # Must haves
