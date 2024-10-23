@@ -2,9 +2,8 @@
 
 import { PrismaClient } from '@prisma/client'
 import { put } from '@vercel/blob'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import OpenAI from 'openai';
+import { sql } from '@vercel/postgres';
 // import formidable from 'formidable';
 // import fs from 'fs/promises';
 // import { IncomingMessage } from 'http';
@@ -146,13 +145,6 @@ September 2014 – Present | Pittsburgh,PA
 • Teachgolf and life skills to 20 underprivileged children ages 8-16 years
 `;
 
-
-// export const config = {
-//   api: {
-//     bodyParser: false, // Disable the default body parser
-//   },
-// };
-
 export async function handleProfileSetup(formData: FormData) {
   console.log('in BE with formData: ', formData);
   try {
@@ -162,19 +154,23 @@ export async function handleProfileSetup(formData: FormData) {
     // TODO: Parse resume text
 
     // Create profile
-    const profile = await createProfile({
-      school: formData.get('school') as string,
-      major: formData.get('major') as string,
-      concentration: formData.get('concentration') as string,
-      graduation_year: formData.get('graduation-year') as string,
-    })
+    // const profile = await createProfile({
+    //   school: formData.get('school') as string,
+    //   major: formData.get('major') as string,
+    //   concentration: formData.get('concentration') as string,
+    //   graduation_year: formData.get('graduation-year') as string,
+    // })
 
-    // Make AI API calls
-    // const aiResponse = await makeAIAPICalls(profile)
-    // console.log(aiResponse);
+    // // Make AI API calls
+    // const aiInterviewPrepSheet = await getInterviewPrepSheet(profile)
+    // console.log(aiInterviewPrepSheet);
 
-    // const questions = await getQuestions(profile)
-    // console.log(questions);
+    // const aiQuestions = await getQuestions(profile)
+    // console.log(aiQuestions);
+
+    // if (aiInterviewPrepSheet.content && aiQuestions.content) {
+    //   const savedAIResponse = await saveInterviewPrepSheet(aiInterviewPrepSheet.content, aiQuestions.content);
+    // }
 
     // Store AI response in database
     // await storeAIResponse(profile.id, aiResponse)
@@ -206,6 +202,20 @@ async function uploadResume(file: File): Promise<string> {
   })
 
   return url
+}
+
+async function saveInterviewPrepSheet(aiResponse: string, aiQuestions: string) {
+  try {
+    const result = await sql`
+      INSERT INTO ai_interview_coach_prod_AIResponses (prep_sheet_response, questions_response)
+      VALUES (${aiResponse}, ${aiQuestions})
+      RETURNING *;
+    `;
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error saving interview prep sheet:', error);
+    throw new Error('Failed to save interview prep sheet');
+  }
 }
 
 async function createProfile(data: {
@@ -282,7 +292,7 @@ Behavioral Competency Relevance: For leadership or collaborative roles, place hi
     const generatedContent = completion.choices[0].message.content;
 
     // Return the generated content
-    return { generatedContent };
+    return { content: generatedContent };
   } catch (error) {
     console.error('Error calling OpenAI API:', error);
     throw new Error('Failed to generate interview preparation materials.');
@@ -291,7 +301,7 @@ Behavioral Competency Relevance: For leadership or collaborative roles, place hi
 }
 
 //TODO: add correct params
-async function makeAIAPICalls(profile: any) {
+async function getInterviewPrepSheet(profile: any) {
 
   const systemPrompt = `
 You are a senior recruiter helping a student prepare for an interview. I will provide the student’s resume, job description, company website URL, and today’s date. Based on the information provided, generate a personalized interview preparation prep sheet that includes the following sections:
@@ -348,7 +358,7 @@ today's date: ${todayDate}
     const generatedContent = completion.choices[0].message.content;
 
     // Return the generated content
-    return { generatedContent };
+    return { content: generatedContent };
   } catch (error) {
     console.error('Error calling OpenAI API:', error);
     throw new Error('Failed to generate interview preparation materials.');

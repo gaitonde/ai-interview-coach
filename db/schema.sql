@@ -1,6 +1,9 @@
 -- Create ai_interview_coach_Profiles table
-CREATE TABLE ai_interview_coach_prod_Profiles (
+DROP TABLE IF EXISTS ai_interview_coach_prod_profiles CASCADE;
+
+CREATE TABLE ai_interview_coach_prod_profiles (
     id SERIAL PRIMARY KEY,
+    email VARCHAR(255),
     school VARCHAR(255) NOT NULL,
     major VARCHAR(255) NOT NULL,
     concentration VARCHAR(255),
@@ -10,7 +13,7 @@ CREATE TABLE ai_interview_coach_prod_Profiles (
 );
 
 -- Create ai_interview_coach_Jobs table
-CREATE TABLE ai_interview_coach_prod_Jobs (
+CREATE TABLE ai_interview_coach_prod_jobs (
     id SERIAL PRIMARY KEY,
     profile_id INTEGER NOT NULL,
     company_name VARCHAR(255),
@@ -24,7 +27,7 @@ CREATE TABLE ai_interview_coach_prod_Jobs (
 );
 
 -- Create Resumes table
-CREATE TABLE ai_interview_coach_prod_Resumes (
+CREATE TABLE ai_interview_coach_prod_resumes (
     id SERIAL PRIMARY KEY,
     profile_id INTEGER NOT NULL,
     url VARCHAR(2048),
@@ -36,7 +39,7 @@ CREATE TABLE ai_interview_coach_prod_Resumes (
 );
 
 --Create a table to store the AI responses
-CREATE TABLE ai_interview_coach_prod_AIResponses (
+CREATE TABLE ai_interview_coach_prod_airesponses (
     id SERIAL PRIMARY KEY,
     profile_id INTEGER NOT NULL,
     prep_sheet_response TEXT,
@@ -80,3 +83,5 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER enforce_resume_fields
 BEFORE INSERT OR UPDATE ON ai_interview_coach_prod_Resumes
 FOR EACH ROW EXECUTE FUNCTION check_resume_fields();
+
+ALTER TABLE ai_interview_coach_prod_airesponses ADD CONSTRAINT unique_profile_id UNIQUE (profile_id);

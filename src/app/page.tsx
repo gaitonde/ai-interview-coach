@@ -1,9 +1,9 @@
-import { ProfileSetupComponent } from "@/components/profile-setup";
+import { ProfileSetup } from "@/components/profile-setup";
 
 export default function Home() {
   return (
     <>
-      <ProfileSetupComponent />
+      <ProfileSetup />
     </>
   );
 }

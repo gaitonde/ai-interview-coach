@@ -7,27 +7,27 @@ import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import MarkdownRenderer from "./markdown-renderer"
 
-export function JobPrep() {
+export function Questions() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
 
   useEffect(() => {
-    const fetchPrepSheetResponse = async () => {
+    const fetchQuestions = async () => {
       try {
-        const response = await fetch('/api/get-prep-sheet');
+        const response = await fetch('/api/get-questions');
         if (!response.ok) {
           throw new Error('Failed to fetch prep sheet response');
         }
         const data = await response.json();
         setContent(data.content);
       } catch (error) {
-        console.error('Error fetching prep sheet response:', error);
+        console.error('Error fetching questions response:', error);
         setContent('Error loading content. Please try again later.');
       }
     };
 
-    fetchPrepSheetResponse();
-  }, []);
+    fetchQuestions();
+  }, []); // Add empty dependency array here
 
   return (
     <div className="flex flex-col min-h-screen bg-[#111827]">
@@ -52,9 +52,9 @@ export function JobPrep() {
               Copy to Clipboard
             </Button>
             <Button
-              onClick={() => router.push('/questions')}
+              onClick={() => router.push('/')}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors">
-              See Mock Interview Questions
+              Home
             </Button>
           </div>
       </main>

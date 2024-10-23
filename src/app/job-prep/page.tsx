@@ -1,4 +1,4 @@
-import { JobPrepComponent } from '@/components/job-prep'
+import { JobPrep } from '@/components/job-prep'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function JobPrepPage() {
   return (
     <div className="min-h-screen bg-[#111827]">
-      <JobPrepComponent />
+      <JobPrep />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { Footer } from './components-footer'
+import { Footer } from '../footer'
 import { Clipboard } from 'lucide-react'
 export function ListOfQuestionsComponent() {
   const generalQuestions = [

@@ -1,0 +1,34 @@
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+
+interface MarkdownRendererProps {
+  content: string;
+}
+
+export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
+  return (
+    <div className="flex flex-col min-h-screen bg-[#111827]">
+      <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-4xl p-6 sm:p-8 space-y-6 sm:space-y-8 bg-[#1F2937] rounded-xl shadow-md">
+          <div className="markdown-content text-[#F9FAFB]">
+            <ReactMarkdown
+              components={{
+                h1: ({ node, ...props }) => <h1 className="text-2xl sm:text-3xl font-bold text-[#10B981] text-center mb-4" {...props} />,
+                h2: ({ node, ...props }) => <h2 className="text-xl sm:text-2xl font-semibold text-[#10B981] mt-6 mb-3" {...props} />,
+                h3: ({ node, ...props }) => <h3 className="text-lg font-semibold text-[#D1D5DB] mt-4 mb-2" {...props} />,
+                p: ({ node, ...props }) => <p className="mb-3" {...props} />,
+                ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-2 mb-4" {...props} />,
+                ol: ({ node, ...props }) => <ol className="list-decimal pl-5 space-y-2 mb-4" {...props} />,
+                li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                a: ({ node, ...props }) => <a className="text-[#10B981] hover:underline" {...props} />,
+                strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
+              }}
+            >
+              {content}
+            </ReactMarkdown>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

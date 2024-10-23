@@ -1,5 +1,5 @@
-import { ListOfQuestionsComponent } from '@/components/list-of-questions'
+import { Questions } from "@/components/questions"
 
 export default function QuestionsPage() {
-  return <ListOfQuestionsComponent />
+  return <Questions />
 }
