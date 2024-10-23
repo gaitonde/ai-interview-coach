@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Footer } from './footer'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { FormEvent } from 'react'
 
@@ -13,12 +13,16 @@ export function ProfileSetup() {
   const [fileName, setFileName] = useState<string>('No file chosen')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFileName(e.target.files[0].name)
+      setFileName(e.target.files[0].name);
+      setResumeFile(e.target.files[0]);
     } else {
-      setFileName('No file chosen')
+      setFileName('No file chosen');
+      setResumeFile(null);
     }
   }
 
@@ -114,7 +118,6 @@ export function ProfileSetup() {
       }
 
       const result = await response.json();
-      console.log('Prep sheet generated:', result.content);
       return result.content;
     } catch (error) {
       console.error('Error generating prep sheet:', error);
@@ -145,12 +148,45 @@ export function ProfileSetup() {
     }
   };
 
+  const validateForm = (formData: FormData): string | null => {
+    const requiredFields = ['email', 'company_url', 'jd_url', 'school', 'major', 'graduation_year'];
+    for (const field of requiredFields) {
+      if (!formData.get(field)) {
+        return `${field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')} is required`;
+      }
+    }
+
+    if (!resumeFile) {
+      return 'Resume is required';
+    }
+
+    const urlFields = ['company_url', 'jd_url'];
+    for (const field of urlFields) {
+      let value = formData.get(field) as string;
+      if (value) {
+        if (!value.startsWith('http://') && !value.startsWith('https://')) {
+          value = `http://${value}`;
+          formData.set(field, value);
+        }
+      }
+    }
+
+    return null;
+  }
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
     const formData = new FormData(e.currentTarget);
+
+    const validationError = validateForm(formData);
+    if (validationError) {
+      setError(validationError);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       // Save profile
@@ -167,7 +203,7 @@ export function ProfileSetup() {
       const prepSheetContent = await generatePrepSheet(profileId);
 
       // Generate Questions
-      const questionsContent = await generateQuestions(profileId);
+      // const questionsContent = await generateQuestions(profileId);
 
       // If everything is successful, you can redirect or show a success message
       router.push('/job-prep');
@@ -188,6 +224,7 @@ export function ProfileSetup() {
             <p className="mt-2 text-sm text-gray-400">Complete your profile to get started</p>
           </div>
           <form
+            ref={formRef}
             className="mt-8 space-y-6"
             onSubmit={handleSubmit}
           >
@@ -201,14 +238,14 @@ export function ProfileSetup() {
                   name="email"
                   type="email"
                   placeholder="email@example.com"
-                  // defaultValue="may@trix.com"
+                  defaultValue="may@trix.com"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
 
               <div>
                 <label htmlFor="resume" className="block text-sm font-medium text-white">
-                  Upload Resume (PDF)
+                  Upload Resume (PDF) *
                 </label>
                 <div className="mt-1 flex items-center">
                   <label
@@ -249,9 +286,9 @@ export function ProfileSetup() {
                 <Input
                   id="company_url"
                   name="company_url"
-                  type="url"
+                  type="text"
                   placeholder="https://acme.com"
-                  // defaultValue="https://www.snowflake.com/en/"
+                  defaultValue="https://www.snowflake.com/en/"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -262,9 +299,9 @@ export function ProfileSetup() {
                 <Input
                   id="jd_url"
                   name="jd_url"
-                  type="url"
+                  type="text"
                   placeholder="https://careers.example.com/job-description"
-                  // defaultValue="https://careers.snowflake.com/us/en/job/SNCOUSD38DF19E64C1405CA3A1ADC24F5ADB9EEXTERNALENUS152B293DEC65486289577F50089728AC/Software-Engineer-Intern-Toronto-Summer-2025"
+                  defaultValue="https://careers.snowflake.com/us/en/job/SNCOUSD38DF19E64C1405CA3A1ADC24F5ADB9EEXTERNALENUS152B293DEC65486289577F50089728AC/Software-Engineer-Intern-Toronto-Summer-2025"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -272,8 +309,7 @@ export function ProfileSetup() {
                 <label htmlFor="school" className="block text-sm font-medium text-white">
                   School
                 </label>
-                {/* <Select name="school" defaultValue="Carnegie Mellon University"> */}
-                <Select name="school">
+                <Select name="school" defaultValue="Carnegie Mellon University">
                   <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 mt-1 rounded-md">
                     <SelectValue placeholder="Select your school" />
                   </SelectTrigger>
@@ -294,20 +330,20 @@ export function ProfileSetup() {
                   name="major"
                   type="text"
                   placeholder="e.g. Finance, Marketing, etc."
-                  // defaultValue="Computer Science"
+                  defaultValue="Computer Science"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
               <div>
                 <label htmlFor="concentration" className="block text-sm font-medium text-white">
-                  Concentration
+                  Concentration (Optional)
                 </label>
                 <Input
                   id="concentration"
                   name="concentration"
                   type="text"
                   placeholder="e.g. Commercial, Private Equity, International"
-                  // defaultValue="Software Engineering"
+                  defaultValue="Software Engineering"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -316,8 +352,7 @@ export function ProfileSetup() {
                   Graduation Year
                 </label>
                 <div className="mt-1">
-                  {/* <Select name="graduation_year" defaultValue="2025"> */}
-                  <Select name="graduation_year">
+                  <Select name="graduation_year" defaultValue="2025">
                     <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 rounded-md">
                       <SelectValue placeholder="Year" />
                     </SelectTrigger>

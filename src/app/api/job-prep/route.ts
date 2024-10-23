@@ -170,9 +170,13 @@ As a **2025 Product Manager Intern**, you'll support vendor managers in improvin
 ## Personalized Pitch
 
 "Hi, I’m May Trix, a junior at Carnegie Mellon University majoring in Computer Science. My experience in data analysis, mobile app development, and leadership—along with my work on projects like NavCog and Chorus—aligns well with TechCorp’s focus on data-driven product management. I’m excited about the opportunity to work with your team to develop innovative solutions and improve customer experiences."
-  
+
+<br>
+
 ---
-  
+
+<br>
+
 **This prep sheet is personalized for May Trix on October 21, 2024\. Note that the prep sheet is meant as a guide based on the information you have provided. You should verify all information. Good luck. Go crush it\!**
 
 </example>
