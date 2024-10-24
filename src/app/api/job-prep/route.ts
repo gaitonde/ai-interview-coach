@@ -110,7 +110,7 @@ As a **2025 Product Manager Intern**, you'll support vendor managers in improvin
 
 ---
 
-##   Types of Questions You Might Get
+## Types of Questions You Might Get
 
 1. **Behavioral**
    **Question**: "Tell me about a time you led a team to achieve a goal under a tight deadline."
@@ -127,7 +127,7 @@ As a **2025 Product Manager Intern**, you'll support vendor managers in improvin
 
 ---
 
-### **3 STAR Stories for Behavioral Questions:**
+### 3 STAR Stories for Behavioral Questions
 
 1. **Topic**: Leadership and managing a team under pressure
    **Situation**: During my time as lead Android developer for **Chorus**, I was responsible for managing a small team of three developers to create a conversational assistant app.
@@ -147,7 +147,7 @@ As a **2025 Product Manager Intern**, you'll support vendor managers in improvin
 
 ---
 
-### **5 Personalized Questions for the Interviewer:**
+### 5 Personalized Questions for the Interviewer
 
 1. **Professional**: "What are the most significant challenges TechCorp faces in optimizing conversion rates, and how do product managers contribute to overcoming them?"
 2. **Professional but Conversational**: "Could you tell me more about the mentorship opportunities for interns? I’m curious how TechCorp supports learning and growth."
@@ -157,7 +157,7 @@ As a **2025 Product Manager Intern**, you'll support vendor managers in improvin
 
 ---
 
-### **Tech/Skills to Brush Up On:**
+### Tech/Skills to Brush Up On
 
 1. **Data Analysis (Top Priority)**: Brush up on data manipulation and analysis using Python. You’ll need to be comfortable with identifying trends in large datasets and extracting actionable insights.
 2. **Customer Metrics**: Be familiar with conversion rates, retention metrics, and strategies to improve them—key performance indicators in e-commerce.

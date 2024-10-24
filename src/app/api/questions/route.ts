@@ -51,7 +51,7 @@ Today’s Date ({todayDate}): Use today’s date to calculate experience timelin
   * **Why they are asking**: TechCorp wants to assess your ability to make strategic decisions when managing a product’s feature set, especially when you have limited resources.
   * **What you should focus on**: Discuss how you would prioritize features using frameworks like RICE or MoSCoW. You can give an example where you used data-driven methods to prioritize features, such as focusing on the most impactful updates when building out InfoNet, TechCorp’s information management tool.
 
-## **Technical Skills Questions
+## Technical Skills Questions
 
 * **Question**: "Describe a time when you made a data-driven decision. How would you apply data-driven decision-making in your role as a TechCorp Inc. Product Manager Intern?"
   * **Why they are asking**: TechCorp relies heavily on data to make product decisions and expects you to have a clear understanding of how to leverage it to improve products.
