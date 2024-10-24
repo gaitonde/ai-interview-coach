@@ -203,7 +203,7 @@ export function ProfileSetup() {
       const prepSheetContent = await generatePrepSheet(profileId);
 
       // Generate Questions
-      // const questionsContent = await generateQuestions(profileId);
+      const questionsContent = await generateQuestions(profileId);
 
       // If everything is successful, you can redirect or show a success message
       router.push('/job-prep');
