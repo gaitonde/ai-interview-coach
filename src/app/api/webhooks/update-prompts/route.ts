@@ -76,10 +76,28 @@ async function deleteAllPrompts() {
 
 async function insertPrompts(prompts: any[]) {
   console.log('inserting prompts.length: ', prompts.length);
-  for(const prompt of prompts) {
-    console.log('inserting prompt id: ', prompt.id);
-    console.log('inserting prompt key: ', prompt.key);
-    await sql`INSERT INTO ai_interview_coach_prod_prompts (
+  
+  if (prompts.length === 0) {
+    console.log('No prompts to insert');
+    return;
+  }
+
+  const values = prompts.map((_, index) => 
+    `($${index * 7 + 1}, $${index * 7 + 2}, $${index * 7 + 3}, $${index * 7 + 4}, $${index * 7 + 5}, $${index * 7 + 6}, $${index * 7 + 7})`
+  ).join(', ');
+
+  const flattenedValues = prompts.flatMap(prompt => [
+    prompt.id,
+    prompt.key,
+    prompt.model,
+    prompt.temperature,
+    prompt.max_completion_tokens,
+    prompt.system_prompt,
+    prompt.user_prompt
+  ]);
+
+  const query = `
+    INSERT INTO ai_interview_coach_prod_prompts (
       id, 
       key, 
       model, 
@@ -87,15 +105,16 @@ async function insertPrompts(prompts: any[]) {
       max_completion_tokens, 
       system_prompt, 
       user_prompt
-    ) VALUES (
-      ${prompt.id}, 
-      ${prompt.key}, 
-      ${prompt.model}, 
-      ${prompt.temperature}, 
-      ${prompt.max_completion_tokens}, 
-      ${prompt.system_prompt}, 
-      ${prompt.user_prompt}
-    )`;
+    ) VALUES ${values}
+  `;
+
+  try {
+    const result = await sql.query(query, flattenedValues);
+    console.log(`Successfully inserted ${result.rowCount} prompts`);
+  } catch (error) {
+    console.error('Error inserting prompts:', error);
+    console.error('Query:', query);
+    console.error('Values:', flattenedValues);
+    throw error;
   }
 }
-
