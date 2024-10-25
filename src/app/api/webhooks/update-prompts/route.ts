@@ -24,6 +24,7 @@ function getServiceAccountAuth(): JWT {
 //TODO: could do more/better validation to ensure the request is valid
 export async function GET() {
   console.log('in google sheets to prompts webhook')
+  console.log('GOOGLE_SHEET_ID', process.env.GOOGLE_SHEET_ID);
 
   try {
     const auth = getServiceAccountAuth();
@@ -75,6 +76,8 @@ async function deleteAllPrompts() {
 
 async function insertPrompts(prompts: any[]) {
   for(const prompt of prompts) {
+    console.log('inserting prompt id: ', prompt.id);
+    console.log('inserting prompt key: ', prompt.key);
     await sql`INSERT INTO ai_interview_coach_prod_prompts (
       id, 
       key, 
