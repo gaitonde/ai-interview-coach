@@ -39,6 +39,7 @@ export async function GET() {
 
     //key	model	temperature	max_completion_tokens	system prompt	user prompt
     for(const row of rows) {
+      console.log('adding row', row.rowNumber);
       const promptData = {
         id: row.rowNumber - 1,
         key: row.get('key'),
@@ -48,8 +49,7 @@ export async function GET() {
         system_prompt: row.get('system prompt'),
         user_prompt: row.get('user prompt')
       };
-      prompts.push(promptData);      
-
+      prompts.push(promptData);
     }
     insertPrompts(prompts);
 
@@ -75,6 +75,7 @@ async function deleteAllPrompts() {
 }
 
 async function insertPrompts(prompts: any[]) {
+  console.log('inserting prompts.length: ', prompts.length);
   for(const prompt of prompts) {
     console.log('inserting prompt id: ', prompt.id);
     console.log('inserting prompt key: ', prompt.key);
