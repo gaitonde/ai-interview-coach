@@ -4,13 +4,13 @@ import { JWT } from 'google-auth-library';
 
 const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
-const SHEET_ID = process.env.SHEET_ID;
+const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
 export async function GET() {
   console.log('Fetching sheet data');
   try {
-    if (!SHEET_ID) {
-      throw new Error('SHEET_ID is not defined');
+    if (!GOOGLE_SHEET_ID) {
+      throw new Error('GOOGLE_SHEET_ID is not defined');
     }
     // Create a JWT client
     const serviceAccountAuth = new JWT({
@@ -22,7 +22,7 @@ export async function GET() {
     });
 
     // Initialize the sheet
-    const doc = new GoogleSpreadsheet(SHEET_ID, serviceAccountAuth);
+    const doc = new GoogleSpreadsheet(GOOGLE_SHEET_ID, serviceAccountAuth);
 
     // Load the document properties and worksheets
     await doc.loadInfo();

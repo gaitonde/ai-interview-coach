@@ -85,3 +85,21 @@ BEFORE INSERT OR UPDATE ON ai_interview_coach_prod_Resumes
 FOR EACH ROW EXECUTE FUNCTION check_resume_fields();
 
 ALTER TABLE ai_interview_coach_prod_airesponses ADD CONSTRAINT unique_profile_id UNIQUE (profile_id);
+
+-- Create ai_interview_coach_prod_prompts table
+CREATE TABLE ai_interview_coach_prod_prompts (
+    id SERIAL PRIMARY KEY,
+    key VARCHAR(255) NOT NULL,
+    model VARCHAR(255) NOT NULL,
+    temperature DECIMAL(3,2) NOT NULL,
+    max_completion_tokens INTEGER NOT NULL,
+    system_prompt TEXT NOT NULL,
+    user_prompt TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create trigger to automatically update last_updated_at
+CREATE TRIGGER update_prompts_last_updated_at
+BEFORE UPDATE ON ai_interview_coach_prod_prompts
+FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();

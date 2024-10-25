@@ -5,8 +5,7 @@ import { sql } from '@vercel/postgres';
 export async function POST(request: Request) {
   console.log('POST request received for resume');
   try {
-    const formData = await request.formData() ;
-    console.log('in resume BE with formData: ', formData);
+    const formData = await request.formData() ;    
 
     const profileId = formData.get('profileId') as string;
     const resume = formData.get('resume') as File;
