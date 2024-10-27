@@ -62,7 +62,8 @@ async function fetchProfileData(profileId: string): Promise<ProfileData> {
 }
 
 async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: string; user_prompt: string; temperature: number; max_completion_tokens: number }> {
-  const promptResponse = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prompts?key=${promptKey}`);
+  console.log('fetching prompt', process.env.NEXT_PUBLIC_VERCEL_URL);
+  const promptResponse = await fetch(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prompts?key=${promptKey}`);
   if (!promptResponse.ok) throw new Error("Failed to fetch prompt");
   const promptData = await promptResponse.json();
   return promptData.data;
