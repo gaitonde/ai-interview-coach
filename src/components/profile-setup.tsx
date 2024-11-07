@@ -197,13 +197,14 @@ export function ProfileSetup() {
 
       // Upload Resume
       const resumeFile = formData.get('resume') as File;
-      const resumeUploaded = await uploadResume(profileId, resumeFile);
+      await uploadResume(profileId, resumeFile);
 
       // Generate Prep Sheet + Questions
-      const prepSheetContent = await generatePrepSheet(profileId);
+      await generatePrepSheet(profileId);
 
+      //TODO: re-enable this
       // Generate Questions
-      const questionsContent = await generateQuestions(profileId);
+      // const questionsContent = await generateQuestions(profileId);
 
       // If everything is successful, you can redirect or show a success message
       router.push('/job-prep');
