@@ -1,8 +1,6 @@
 {
   "extends": ["next/core-web-vitals", "next/typescript"],
   "rules": {
-    "@typescript-eslint/no-empty-object-type": ["error", {
-      "allowEmptyExtends": true
-    }]
+    "@typescript-eslint/no-empty-object-type": ["error"]
   }
 }
