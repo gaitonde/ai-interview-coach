@@ -1,9 +1,10 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from "next/server";
-import { getPageContent } from '@/services/browserService';
-import { Readability } from '@mozilla/readability';
 import TurndownService from 'turndown';
-import { JSDOM } from 'jsdom';
+import fetch from 'node-fetch';
+import * as cheerio from 'cheerio';
+
+const turndownService = new TurndownService();
 
 export async function GET() {
   const jobs = await sql`SELECT * FROM ai_interview_coach_prod_jobs`;
@@ -41,27 +42,25 @@ export async function POST(request: Request) {
 async function fetchUrlContents(url: string): Promise<string> {
   console.log('url', url);
 
-  // Get HTML content using the browser service
-  const html = await getPageContent(url);
-  console.log('html', html);
-
-  // Create virtual DOM
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
-
-  console.log('document', document);
-
-  // Use Readability to parse the main content
-  const reader = new Readability(document);
-  const article = reader.parse();
-
-  if (!article) {
-    throw new Error('Failed to parse article content');
+  try {
+    const response = await fetch(url);
+    const html = await response.text();
+    const $ = cheerio.load(html);
+    $('script').remove();  
+    $('[onload], [onclick], [onmouseover], [onfocus], [onsubmit], [oninput]').each((_, element) => {
+      Object.keys(element.attribs).forEach(attr => {
+        if (attr.startsWith('on')) {
+          $(element).removeAttr(attr);
+        }
+      });
+    });
+  
+    // Get the cleaned HTML
+    const cleanHtml = $('body').html();
+    const markdown = turndownService.turndown(cleanHtml || '');
+    return markdown;
+  } catch (error) {
+    console.error('Error in fetchUrlContents:', error);
+    throw error;
   }
-
-  // Convert HTML to Markdown
-  const turndownService = new TurndownService();
-  const markdown = turndownService.turndown(article.content);
-
-  return markdown;
 }
