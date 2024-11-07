@@ -5,9 +5,7 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },  
-  experimental: {
-    serverComponentsExternalPackages: ['pdf2json']
-  }
+  serverExternalPackages: ['pdf2json']
 }
 
 export default nextConfig;
