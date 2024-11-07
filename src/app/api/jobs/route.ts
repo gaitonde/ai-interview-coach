@@ -1,7 +1,6 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from "next/server";
-// import chromium from '@sparticuz/chromium';
-// import puppeteer from 'puppeteer-core';
+import { getPageContent } from '@/services/browserService';
 import { Readability } from '@mozilla/readability';
 import TurndownService from 'turndown';
 import { JSDOM } from 'jsdom';
@@ -42,50 +41,9 @@ export async function POST(request: Request) {
 async function fetchUrlContents(url: string): Promise<string> {
   console.log('url', url);
 
-  // Launch browser
-  // // const options = process.env.NODE_ENV === 'production'
-  // // ? {
-  // //     args: chromium.args,
-  // //     executablePath: await chromium.executablePath(),
-  // //     headless: chromium.headless,
-  // //     defaultViewport: {
-  // //       width: 1920,
-  // //       height: 1080,
-  // //     },
-  // //   }
-  // // : {
-  // //     args: [],
-  // //     executablePath: process.platform === 'win32'
-  // //       ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-  // //       : process.platform === 'linux'
-  // //       ? '/usr/bin/google-chrome'
-  // //       : '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  // //     headless: true,
-  // //   };
-
-  // // const browser = await puppeteer.launch(options);  
-
-  // // console.log('browser', browser);
-
-  // // Create new page
-  // const page = await browser.newPage();
-  // console.log('page', page);
-
-  // // Navigate to URL
-  // await page.goto(url, {
-  //     waitUntil: 'load',
-  // });
-  
-  // console.log('here after navigating to url');
-
-  // Get the HTML content
-  const html = '<h1>fix me</h1>'; //await page.content();
-
+  // Get HTML content using the browser service
+  const html = await getPageContent(url);
   console.log('html', html);
-
-  // Close browser
-  // await browser.close();
-  // console.log('browser closed');
 
   // Create virtual DOM
   const dom = new JSDOM(html);
