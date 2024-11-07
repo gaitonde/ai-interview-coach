@@ -20,9 +20,12 @@ export async function POST(request: Request) {
         { role: "system", content: promptData.systemPrompt },
         { role: "user", content: promptData.userPrompt }
       ],
-      max_completion_tokens: promptData.maxCompletionTokens,
+      // max_completion_tokens: promptData.maxCompletionTokens,
       temperature: promptData.temperature,
     });
+
+    //TODO: store usage
+    console.log('XXX completion: ', completion);
 
     const generatedContent = completion.choices[0]?.message?.content;
 

@@ -36,11 +36,3 @@ async function createProfile(
     throw error; // Re-throw the error to be handled by the caller
   }
 }
-
-// async function clearAiResponses() {
-//   try {
-//     await sql`DELETE FROM ai_interview_coach_prod_airesponses WHERE profile_id = 1`;
-//   } catch (error) {
-//     console.error('Error clearing AI responses:', error);
-//   }
-// }

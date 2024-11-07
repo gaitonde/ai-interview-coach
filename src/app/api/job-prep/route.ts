@@ -14,15 +14,20 @@ export async function POST(request: Request) {
 
   try {
     const promptData: PromptData = await fetchPrompt(profileId, 'prompt-job-prep');
+    console.log('XXX JOB PREP promptData.systemPrompt: ', promptData.systemPrompt);
+    console.log('XXX JOB PREP promptData.userPrompt: ', promptData.userPrompt);
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini-2024-07-18",
       messages: [
         { role: "system", content: promptData.systemPrompt },
         { role: "user", content: promptData.userPrompt }
       ],
-      max_completion_tokens: promptData.maxCompletionTokens,
+      // max_completion_tokens: promptData.maxCompletiosnTokens,
       temperature: promptData.temperature,
     });
+
+    //TODO: store usage
+    console.log('XXX JOB PREP completion: ', completion);
 
     const generatedContent = completion.choices[0]?.message?.content;
 

@@ -103,3 +103,6 @@ CREATE TABLE ai_interview_coach_prod_prompts (
 CREATE TRIGGER update_prompts_last_updated_at
 BEFORE UPDATE ON ai_interview_coach_prod_prompts
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+
+
+ALTER TABLE ai_interview_coach_prod_jobs ADD COLUMN company_text TEXT;

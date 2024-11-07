@@ -22,7 +22,6 @@ export async function GET(request: Request) {
       };
     }
 
-    console.log('prompt', prompt);
     if (!prompt) {
       return NextResponse.json({ success: false }, { status: 404 });
     } else {

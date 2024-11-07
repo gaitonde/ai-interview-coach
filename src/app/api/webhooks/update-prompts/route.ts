@@ -86,6 +86,8 @@ async function insertPrompts(prompts: any[]) {
     `($${index * 7 + 1}, $${index * 7 + 2}, $${index * 7 + 3}, $${index * 7 + 4}, $${index * 7 + 5}, $${index * 7 + 6}, $${index * 7 + 7})`
   ).join(', ');
 
+  console.debug('values: ', values);
+
   const flattenedValues = prompts.flatMap(prompt => [
     prompt.id,
     prompt.key,
@@ -95,6 +97,8 @@ async function insertPrompts(prompts: any[]) {
     prompt.system_prompt,
     prompt.user_prompt
   ]);
+  
+  console.debug('flattenedValues: ', flattenedValues);
 
   const query = `
     INSERT INTO ai_interview_coach_prod_prompts (
@@ -107,6 +111,8 @@ async function insertPrompts(prompts: any[]) {
       user_prompt
     ) VALUES ${values}
   `;
+
+  console.debug('query: ', query);
 
   try {
     const result = await sql.query(query, flattenedValues);
