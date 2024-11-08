@@ -12,11 +12,14 @@ export function JobPrep() {
   const [content, setContent] = useState<string>('')
   const [questionsRetrieved, setQuestionsRetrieved] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false)  
-  const profileId = localStorage.getItem('profileId');
+  const [profileId, setProfileId] = useState<string | null>(null);
   const hasFetchedQuestions = useRef(false);
 
   
   useEffect(() => {
+    const storedProfileId = localStorage.getItem('profileId');
+    setProfileId(storedProfileId);
+
     if (profileId && !hasFetchedQuestions.current) {
       hasFetchedQuestions.current = true;
       (async () => {
