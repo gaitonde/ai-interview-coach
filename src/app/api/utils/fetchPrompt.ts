@@ -55,7 +55,7 @@ async function fetchProfileData(profileId: string): Promise<ProfileData> {
 
   const gradYear = new Date(graduationDate).getFullYear();
   const gradeClass = await fetchGradeClass(gradYear, todayDate);
-  console.debug('gradeClass', gradeClass);
+  console.debug('gradYear, todayDate, gradeClass:', gradYear, todayDate, gradeClass);
 
   return {
     profileId,
