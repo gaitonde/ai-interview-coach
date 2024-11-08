@@ -13,7 +13,7 @@ interface ProfileData {
   schoolConcentration?: string;
   gradYear: number;
   gradeClass?: string;
-  todayDate: string;
+  todayDateFormatted: string;
 }
 
 export interface PromptData {
@@ -37,7 +37,8 @@ export async function fetchPrompt(profileId: string, promptKey: string): Promise
 
 async function fetchProfileData(profileId: string): Promise<ProfileData> {
   console.log("XXX Fetching profile data for profile ID: ", profileId)
-  const todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  const todayDate = new Date();
+  const todayDateFormatted = todayDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
   const [profileDetails, jobDetails, resumeDetails] = await Promise.all([
     sql`SELECT school, major, concentration, graduation_date FROM ai_interview_coach_prod_profiles WHERE id = ${profileId}`,
@@ -70,14 +71,13 @@ async function fetchProfileData(profileId: string): Promise<ProfileData> {
     schoolConcentration,
     gradYear: new Date(graduationDate).getFullYear(),
     gradeClass: gradeClass,
-    todayDate,
+    todayDateFormatted,
   };
 }
 
-export function fetchGradeClass(graduationYear: number, currentDate: string): string {
-  const [year, month] = currentDate.split('-');
-  const todayYear = parseInt(year, 10);
-  const todayMonth = parseInt(month, 10);
+export function fetchGradeClass(graduationYear: number, currentDate: Date): string {
+  const todayYear = currentDate.getFullYear();
+  const todayMonth = currentDate.getMonth() + 1;
   const delta = graduationYear - todayYear;
 
   if (delta < 0) return 'Graduate';
@@ -104,7 +104,7 @@ function applyVariables(prompt: string, data: ProfileData): string {
     .replace('${resume}', data.resume || '')
     .replace('${gradYear}', data.gradYear.toString())
     .replace('${gradeClass}', data.gradeClass || '')
-    .replace('${todayDate}', data.todayDate)
+    .replace('${todayDate}', data.todayDateFormatted)
     .replace('${schoolName}', data.schoolName || '')
     .replace('${schoolMajor}', data.schoolMajor || '')
     .replace('${schoolConcentration}', data.schoolConcentration || '');
