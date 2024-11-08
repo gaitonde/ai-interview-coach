@@ -1,14 +1,14 @@
 # To Triage
-- [ ] Auth/Login/Signup
 - [ ] 
 
 ---
 # Todo
-- [ ] Connect model to Google Sheet
 - [ ] Validation on prompts from webhook
+- [ ] Fix build linter errors
 
 # Later
 - [ ] Look at locking down public access to the resume file
+- [ ] Auth/Login/Signup
 
 ---
 # Done
@@ -22,3 +22,7 @@
 - [x] Markdown formatting for Job Prep + Questions pages
 - [x] Validation for the Profile Setup page
 - [x] Google Spreadsheet Integration
+- [x] Connect model to Google Sheet
+- [x] Stop years at 2028
+- [x] Implement Grade logic
+- [x] Move questions call to Questions page

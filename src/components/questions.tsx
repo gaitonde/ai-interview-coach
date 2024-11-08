@@ -12,9 +12,11 @@ export function Questions() {
   const [content, setContent] = useState<string>('')
 
   useEffect(() => {
+    console.log("Fetching Questions Should only happen once!!!")
     const fetchQuestions = async () => {
       try {
-        const response = await fetch('/api/get-questions');
+        const profileId = localStorage.getItem('profileId');
+        const response = await fetch(`/api/get-questions?profileId=${profileId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch prep sheet response');
         }
@@ -23,11 +25,13 @@ export function Questions() {
       } catch (error) {
         console.error('Error fetching questions response:', error);
         setContent('Error loading content. Please try again later.');
-      }
-    };
+        }
+    }
 
-    fetchQuestions();
-  }, []); // Add empty dependency array here
+    if (!content) {
+      fetchQuestions();
+    }
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#111827]">

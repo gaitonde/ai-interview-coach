@@ -6,8 +6,12 @@ import * as cheerio from 'cheerio';
 
 const turndownService = new TurndownService();
 
-export async function GET() {
-  const jobs = await sql`SELECT * FROM ai_interview_coach_prod_jobs`;
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const profileId = searchParams.get('profileId');
+
+  //TODO: get jobs for a specific profile
+  const jobs = await sql`SELECT * FROM ai_interview_coach_prod_jobs WHERE profile_id = ${profileId}`;
   return NextResponse.json(jobs);
 }
 

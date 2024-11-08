@@ -12,6 +12,7 @@ interface ProfileData {
   schoolMajor?: string;
   schoolConcentration?: string;
   gradYear: number;
+  gradeClass?: string;
   todayDate: string;
 }
 
@@ -35,6 +36,7 @@ export async function fetchPrompt(profileId: string, promptKey: string): Promise
 }
 
 async function fetchProfileData(profileId: string): Promise<ProfileData> {
+  console.log("XXX Fetching profile data for profile ID: ", profileId)
   const todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
   const [profileDetails, jobDetails, resumeDetails] = await Promise.all([
@@ -51,6 +53,10 @@ async function fetchProfileData(profileId: string): Promise<ProfileData> {
   const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription } = jobDetails.rows[0];
   const { url: resumeUrl, text: resume } = resumeDetails.rows[0];
 
+  const gradYear = new Date(graduationDate).getFullYear();
+  const gradeClass = await fetchGradeClass(gradYear, todayDate);
+  console.debug('gradeClass', gradeClass);
+
   return {
     profileId,
     companyWebsiteUrl,
@@ -63,8 +69,23 @@ async function fetchProfileData(profileId: string): Promise<ProfileData> {
     schoolMajor,
     schoolConcentration,
     gradYear: new Date(graduationDate).getFullYear(),
+    gradeClass: gradeClass,
     todayDate,
   };
+}
+
+export function fetchGradeClass(graduationYear: number, currentDate: string): string {
+  const [year, month] = currentDate.split('-');
+  const todayYear = parseInt(year, 10);
+  const todayMonth = parseInt(month, 10);
+  const delta = graduationYear - todayYear;
+
+  if (delta < 0) return 'Graduate';
+  if (delta === 0) return 'Senior';
+  if (delta === 1) return todayMonth < 6 ? 'Junior' : 'Senior';
+  if (delta === 2) return todayMonth < 6 ? 'Sophomore' : 'Junior';
+  if (delta === 3) return todayMonth >= 6 ? 'Sophomore' : 'Freshman';
+  return 'Freshman';
 }
 
 async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: string; user_prompt: string; temperature: number; max_completion_tokens: number }> {
@@ -82,6 +103,7 @@ function applyVariables(prompt: string, data: ProfileData): string {
     .replace('${companyWebsiteText}', data.companyWebsiteText)
     .replace('${resume}', data.resume || '')
     .replace('${gradYear}', data.gradYear.toString())
+    .replace('${gradeClass}', data.gradeClass || '')
     .replace('${todayDate}', data.todayDate)
     .replace('${schoolName}', data.schoolName || '')
     .replace('${schoolMajor}', data.schoolMajor || '')

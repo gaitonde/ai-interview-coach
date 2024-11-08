@@ -79,7 +79,7 @@ export function ProfileSetup() {
 
   const saveJob = async (profileId: number, formData: FormData) => {
     try {
-      const response = await fetch('/api/jobs', {
+      const response = await fetch(`/api/jobs?profileId=${profileId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -125,29 +125,6 @@ export function ProfileSetup() {
     }
   };
 
-  const generateQuestions = async (profileId: number) => {
-    try {
-      const response = await fetch('/api/questions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ profileId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate questions');
-      }
-
-      const result = await response.json();
-      console.log('Questions generated:', result.content);
-      return result.content;
-    } catch (error) {
-      console.error('Error generating questions:', error);
-      throw error;
-    }
-  };
-
   const validateForm = (formData: FormData): string | null => {
     const requiredFields = ['email', 'company_url', 'jd_url', 'school', 'major', 'graduation_year'];
     for (const field of requiredFields) {
@@ -189,25 +166,17 @@ export function ProfileSetup() {
     }
 
     try {
-      // Save profile
       const profileId = await saveProfile(formData);
+      localStorage.setItem('profileId', profileId.toString());
 
-      // Save Job
-      const jobCreated = await saveJob(profileId, formData);
+      await saveJob(profileId, formData);
 
-      // Upload Resume
       const resumeFile = formData.get('resume') as File;
       await uploadResume(profileId, resumeFile);
 
-      // Generate Prep Sheet + Questions
       await generatePrepSheet(profileId);
 
-      //TODO: re-enable this
-      // Generate Questions
-      // const questionsContent = await generateQuestions(profileId);
-
-      // If everything is successful, you can redirect or show a success message
-      router.push('/job-prep');
+      router.push(`/job-prep`);
     } catch (error) {
       console.error('Error during submission:', error);
       setError('An error occurred. Please try again.');
@@ -239,7 +208,7 @@ export function ProfileSetup() {
                   name="email"
                   type="email"
                   placeholder="email@example.com"
-                  // defaultValue="may@trix.com"
+                  defaultValue="a@b.com"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -289,7 +258,7 @@ export function ProfileSetup() {
                   name="company_url"
                   type="text"
                   placeholder="https://acme.com"
-                  // defaultValue="https://www.snowflake.com/en/"
+                  defaultValue="http://www.apple.com/careers/us/"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -302,7 +271,7 @@ export function ProfileSetup() {
                   name="jd_url"
                   type="text"
                   placeholder="https://careers.example.com/job-description"
-                  // defaultValue="https://careers.snowflake.com/us/en/job/SNCOUSD38DF19E64C1405CA3A1ADC24F5ADB9EEXTERNALENUS152B293DEC65486289577F50089728AC/Software-Engineer-Intern-Toronto-Summer-2025"
+                  defaultValue="https://jobs.apple.com/en-us/details/200554357/business-marketing-and-g-a-internships?team=STDNT"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -310,8 +279,8 @@ export function ProfileSetup() {
                 <label htmlFor="school" className="block text-sm font-medium text-white">
                   School
                 </label>
-                {/* <Select name="school" defaultValue="Carnegie Mellon University"> */}
-                <Select name="school">
+                <Select name="school" defaultValue="Baylor University Hankamer School of Business">
+                {/* <Select name="school"> */}
                   <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 mt-1 rounded-md">
                     <SelectValue placeholder="Select your school" />
                   </SelectTrigger>
@@ -332,7 +301,7 @@ export function ProfileSetup() {
                   name="major"
                   type="text"
                   placeholder="e.g. Finance, Marketing, etc."
-                  // defaultValue="Computer Science"
+                  defaultValue="Marketing, Management, Entrepreneurship"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -345,7 +314,7 @@ export function ProfileSetup() {
                   name="concentration"
                   type="text"
                   placeholder="e.g. Commercial, Private Equity, International"
-                  // defaultValue="Software Engineering"
+                  defaultValue="SEO, Consulting"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -354,8 +323,7 @@ export function ProfileSetup() {
                   Graduation Year
                 </label>
                 <div className="mt-1">
-                  {/* <Select name="graduation_year" defaultValue="2025"> */}
-                  <Select name="graduation_year">
+                  <Select name="graduation_year" defaultValue="2025">
                     <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 rounded-md">
                       <SelectValue placeholder="Year" />
                     </SelectTrigger>
@@ -365,6 +333,7 @@ export function ProfileSetup() {
                       <SelectItem value="2025">2025</SelectItem>
                       <SelectItem value="2026">2026</SelectItem>
                       <SelectItem value="2027">2027</SelectItem>
+                      <SelectItem value="2028">2028</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -391,6 +360,12 @@ export function ProfileSetup() {
             >
               {isSubmitting ? 'Processing...' : 'Save Profile'}
             </Button>
+            <p className="text-sm text-muted-foreground mt-1">
+              {isSubmitting && (
+                'Takes about 30 seconds, please be patient. Thank you.'
+              )}
+            </p>
+            
           </form>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>

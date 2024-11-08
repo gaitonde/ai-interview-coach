@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Footer } from './footer'
 import { Clipboard } from 'lucide-react'
@@ -10,24 +10,70 @@ import MarkdownRenderer from "./markdown-renderer"
 export function JobPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
+  const [questionsRetrieved, setQuestionsRetrieved] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)  
+  const profileId = localStorage.getItem('profileId');
+  const hasFetchedQuestions = useRef(false);
 
+  
   useEffect(() => {
-    const fetchPrepSheetResponse = async () => {
-      try {
-        const response = await fetch('/api/get-prep-sheet');
-        if (!response.ok) {
-          throw new Error('Failed to fetch prep sheet response');
+    if (profileId && !hasFetchedQuestions.current) {
+      hasFetchedQuestions.current = true;
+      (async () => {
+        try {
+          await generateQuestions(profileId);
+          setQuestionsRetrieved(true);
+        } catch (error) {
+          console.error('Error generating questions:', error);
         }
-        const data = await response.json();
-        setContent(data.content);
-      } catch (error) {
-        console.error('Error fetching prep sheet response:', error);
-        setContent('Error loading content. Please try again later.');
-      }
-    };
+      })();
+    }    
 
-    fetchPrepSheetResponse();
+    // Fetch prep sheet response
+    if (profileId) {
+        fetch(`/api/get-prep-sheet?profileId=${profileId}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch prep sheet response');
+            }
+            return response.json();
+          })
+          .then(data => {
+            setContent(data.content);
+          })
+          .catch(error => {
+            console.error('Error fetching prep sheet response:', error);
+            setContent('Error loading content. Please try again later.');
+          });
+    }
   }, []);
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);    
+  }  
+
+  const generateQuestions = async (profileId: string) => {
+    try {
+      const response = await fetch('/api/questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ profileId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate questions');
+      }
+
+      const result = await response.json();
+      // console.log('Questions generated:', result.content);
+      return result.content;
+    } catch (error) {
+      console.error('Error generating questions:', error);
+      throw error;
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-[#111827]">
@@ -52,8 +98,13 @@ export function JobPrep() {
               Copy to Clipboard
             </Button>
             <Button
+              type="submit"
+              disabled={isSubmitting || !questionsRetrieved}
+              onSubmit={handleSubmit}
+
               onClick={() => router.push('/questions')}
-              className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors">
+              className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+            >
               See Mock Interview Questions
             </Button>
           </div>
