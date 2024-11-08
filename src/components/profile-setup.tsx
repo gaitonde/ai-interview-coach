@@ -208,7 +208,7 @@ export function ProfileSetup() {
                   name="email"
                   type="email"
                   placeholder="email@example.com"
-                  defaultValue="a@b.com"
+                  // defaultValue="a@b.com"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -258,7 +258,7 @@ export function ProfileSetup() {
                   name="company_url"
                   type="text"
                   placeholder="https://acme.com"
-                  defaultValue="http://www.apple.com/careers/us/"
+                  // defaultValue="http://www.apple.com/careers/us/"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -271,7 +271,7 @@ export function ProfileSetup() {
                   name="jd_url"
                   type="text"
                   placeholder="https://careers.example.com/job-description"
-                  defaultValue="https://jobs.apple.com/en-us/details/200554357/business-marketing-and-g-a-internships?team=STDNT"
+                  // defaultValue="https://jobs.apple.com/en-us/details/200554357/business-marketing-and-g-a-internships?team=STDNT"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -279,8 +279,8 @@ export function ProfileSetup() {
                 <label htmlFor="school" className="block text-sm font-medium text-white">
                   School
                 </label>
-                <Select name="school" defaultValue="Baylor University Hankamer School of Business">
-                {/* <Select name="school"> */}
+                {/* <Select name="school" defaultValue="Baylor University Hankamer School of Business"> */}
+                <Select name="school">
                   <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 mt-1 rounded-md">
                     <SelectValue placeholder="Select your school" />
                   </SelectTrigger>
@@ -301,7 +301,7 @@ export function ProfileSetup() {
                   name="major"
                   type="text"
                   placeholder="e.g. Finance, Marketing, etc."
-                  defaultValue="Marketing, Management, Entrepreneurship"
+                  // defaultValue="Marketing, Management, Entrepreneurship"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -314,7 +314,7 @@ export function ProfileSetup() {
                   name="concentration"
                   type="text"
                   placeholder="e.g. Commercial, Private Equity, International"
-                  defaultValue="SEO, Consulting"
+                  // defaultValue="SEO, Consulting"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -323,7 +323,8 @@ export function ProfileSetup() {
                   Graduation Year
                 </label>
                 <div className="mt-1">
-                  <Select name="graduation_year" defaultValue="2025">
+                  {/* <Select name="graduation_year" defaultValue="2025"> */}
+                  <Select name="graduation_year">
                     <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 rounded-md">
                       <SelectValue placeholder="Year" />
                     </SelectTrigger>

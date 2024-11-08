@@ -14,17 +14,23 @@ export function JobPrep() {
   const [isSubmitting, setIsSubmitting] = useState(false)  
   const [profileId, setProfileId] = useState<string | null>(null);
   const hasFetchedQuestions = useRef(false);
-
   
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId');
+    console.log("Stored Profile ID!!:", storedProfileId);
     setProfileId(storedProfileId);
 
-    if (profileId && !hasFetchedQuestions.current) {
+    console.log("Profile ID:", profileId);
+    console.log("Has Fetched Questions:", hasFetchedQuestions.current);
+
+    if (storedProfileId && !hasFetchedQuestions.current) {
+      console.log("Generating Questions!!")
       hasFetchedQuestions.current = true;
       (async () => {
         try {
-          await generateQuestions(profileId);
+          console.log("Generating Questions2!!")
+          await generateQuestions(storedProfileId);
+          console.log("DONE Generating Questions3!!")
           setQuestionsRetrieved(true);
         } catch (error) {
           console.error('Error generating questions:', error);
@@ -33,8 +39,8 @@ export function JobPrep() {
     }    
 
     // Fetch prep sheet response
-    if (profileId) {
-        fetch(`/api/get-prep-sheet?profileId=${profileId}`)
+    if (storedProfileId) {
+        fetch(`/api/get-prep-sheet?profileId=${storedProfileId}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('Failed to fetch prep sheet response');
