@@ -49,13 +49,14 @@ export async function GET() {
         system_prompt: row.get('system prompt'),
         user_prompt: row.get('user prompt')
       };
+      await insertPrompt(promptData);
       prompts.push(promptData);
     }
-    insertPrompts(prompts);
+    //  insertPrompts(prompts);
 
     return NextResponse.json({
       success: true,
-      prompts: prompts,
+      // prompts: prompts,
       count: prompts.length,
       title: sheet.title,
       sheetId: sheet.sheetId,
@@ -72,6 +73,12 @@ export async function GET() {
 
 async function deleteAllPrompts() {
   await sql`DELETE FROM ai_interview_coach_prod_prompts`;
+}
+
+async function insertPrompt(prompt: any) {
+  await sql`INSERT INTO ai_interview_coach_prod_prompts 
+    (id, key, model, temperature, max_completion_tokens, system_prompt, user_prompt) 
+    VALUES (${prompt.id}, ${prompt.key}, ${prompt.model}, ${prompt.temperature}, ${prompt.max_completion_tokens}, ${prompt.system_prompt}, ${prompt.user_prompt})`;
 }
 
 async function insertPrompts(prompts: any[]) {

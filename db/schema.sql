@@ -175,3 +175,7 @@ FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 ALTER TABLE ai_interview_coach_prod_job_questions ADD COLUMN why VARCHAR(255);
 ALTER TABLE ai_interview_coach_prod_job_questions ADD COLUMN focus VARCHAR(255);
+
+
+ALTER TABLE ai_interview_coach_prod_job_questions ALTER COLUMN why TYPE TEXT;
+ALTER TABLE ai_interview_coach_prod_job_questions ALTER COLUMN focus TYPE TEXT;
