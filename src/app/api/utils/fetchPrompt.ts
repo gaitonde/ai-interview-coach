@@ -55,7 +55,7 @@ async function fetchProfileData(profileId: string, question?: string): Promise<P
   if (resumeDetails.rows.length === 0) throw new Error("Resume not found");
 
   const { school: schoolName, major: schoolMajor, concentration: schoolConcentration, graduation_date: graduationDate } = profileDetails.rows[0];
-  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription } = jobDetails.rows[0];
+  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, interviewer_name: interviewerName, interviewer_role: interviewerRole } = jobDetails.rows[0];
   const { url: resumeUrl, text: resume } = resumeDetails.rows[0];
 
   const gradYear = new Date(graduationDate).getFullYear();
@@ -76,7 +76,9 @@ async function fetchProfileData(profileId: string, question?: string): Promise<P
     gradYear: new Date(graduationDate).getFullYear(),
     gradeClass: gradeClass,
     todayDateFormatted,
-    question: question
+    question: question,
+    interviewerName,
+    interviewerRole
   };
 }
 
