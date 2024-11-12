@@ -51,11 +51,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Transcription is required' }, { status: 400 });
     }
 
-    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-answer-score');
+    const question = await sql`
+    SELECT id, question FROM ai_interview_coach_prod_job_questions 
+    WHERE id = ${questionId}`;
+
+    //TODO: handle case where question is not found    
+    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-generate-suggestions', question.rows[0].question);
     promptData.userPrompt = promptData.userPrompt.replace('${transcription}', transcription);
 
     const completion = await openai.chat.completions.create({
-      model: promptData.model,//"gpt-4o-mini-2024-07-18",
+      model: promptData.model,
       messages: [
         { role: "system", content: promptData.systemPrompt },
         { role: "user", content: promptData.userPrompt }

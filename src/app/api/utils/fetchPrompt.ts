@@ -16,6 +16,7 @@ interface ProfileData {
   todayDateFormatted: string;
   interviewerName?: string;
   interviewerRole?: string;
+  question?: string;
 }
 
 export interface PromptData {
@@ -26,8 +27,8 @@ export interface PromptData {
   maxCompletionTokens: number;
 }
 
-export async function fetchPrompt(profileId: string, promptKey: string): Promise<PromptData> {
-  const profileData = await fetchProfileData(profileId);
+export async function fetchPrompt(profileId: string, promptKey: string, question?: string): Promise<PromptData> {
+  const profileData = await fetchProfileData(profileId, question);
   const rawPromptData = await fetchRawPrompt(promptKey);
 
   return {
@@ -39,8 +40,7 @@ export async function fetchPrompt(profileId: string, promptKey: string): Promise
   };
 }
 
-async function fetchProfileData(profileId: string): Promise<ProfileData> {
-  console.log("XXX Fetching profile data for profile ID: ", profileId)
+async function fetchProfileData(profileId: string, question?: string): Promise<ProfileData> {
   const todayDate = new Date();
   const todayDateFormatted = todayDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
@@ -76,6 +76,7 @@ async function fetchProfileData(profileId: string): Promise<ProfileData> {
     gradYear: new Date(graduationDate).getFullYear(),
     gradeClass: gradeClass,
     todayDateFormatted,
+    question: question
   };
 }
 
@@ -113,5 +114,6 @@ function applyVariables(prompt: string, data: ProfileData): string {
     .replace('${schoolMajor}', data.schoolMajor || '')
     .replace('${schoolConcentration}', data.schoolConcentration || '')
     .replace('${interviewerName}', data.interviewerName || '')
-    .replace('${interviewerRole}', data.interviewerRole || '');
+    .replace('${interviewerRole}', data.interviewerRole || '')
+    .replace('${question}', data.question || '');
 }

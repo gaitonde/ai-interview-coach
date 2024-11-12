@@ -10,12 +10,9 @@
 
 ---
 # Now
-- [x] Add new "Interview Prep" Page
-- [x] DG: add section for question, why, focus
-- [x] Insert records into questions table after AI call
-  - [x] Update prompt to get back questions in json format
-
-- [ ] Prompt for asking for interviewer
+- [x] Add the question to the prompt
+- [ ] Debug why the prompt update is not working in prod
+- [ ] Prompt for asking for interviewer from job-prep page
 - [ ] N2H: "interim/wait" page that describes the sections on the job prep
 
 # Next
@@ -23,7 +20,6 @@
 - [ ] Auth/Login/Signup
 - [ ] Discuss Demo Mode (how to show)
 - [ ] Figure out a better way to handle versioning/handling prompts
-- [ ] Debug why the prompt update is not working in prod
 - [ ] Multi-jobs; Use sessions; right now every run is a new profile
 
 # Later
@@ -62,6 +58,11 @@
 - [x] Add new button on Interviewer page to goto "next" question
 - [x] Iterate over questions for Interviewer
 - [x] each answer has it's score; question just shows latest score? => Yes
+- [x] Add new "Interview Prep" Page
+- [x] DG: add section for question, why, focus
+- [x] Insert records into questions table after AI call
+  - [x] Update prompt to get back questions in json format
+
 
 # Flow
 1. Setup profile - prompted for resume, school stuff, etc
@@ -70,7 +71,7 @@
 4. Get interview prep page - questions to ask, questions i'll be asked, stories to tell
 5. Get Practice - get questions, record and get score and feedback
 
-
+# Pages Flow
 profile-setup
 job-prep
 interview-prep
