@@ -46,7 +46,7 @@ async function fetchProfileData(profileId: string, question?: string): Promise<P
 
   const [profileDetails, jobDetails, resumeDetails] = await Promise.all([
     sql`SELECT school, major, concentration, graduation_date FROM ai_interview_coach_prod_profiles WHERE id = ${profileId}`,
-    sql`SELECT company_url, company_text, jd_url, jd_text FROM ai_interview_coach_prod_jobs WHERE profile_id = ${profileId}`,
+    sql`SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role FROM ai_interview_coach_prod_jobs WHERE profile_id = ${profileId}`,
     sql`SELECT url, text FROM ai_interview_coach_prod_resumes WHERE profile_id = ${profileId}`
   ]);
 
