@@ -33,8 +33,6 @@ export function ProfileSetup() {
       major: formData.get('major'),
       concentration: formData.get('concentration'),
       graduation_year: formData.get('graduation_year'),
-      company_url: formData.get('company_url'),
-      jd_url: formData.get('jd_url')
     };
 
     const profileResponse = await fetch('/api/profile', {
@@ -87,7 +85,9 @@ export function ProfileSetup() {
         body: JSON.stringify({
           profileId,
           company_url: formData.get('company_url'),
-          jd_url: formData.get('jd_url')
+          jd_url: formData.get('jd_url'),
+          interviewer_name: formData.get('interviewer_name'),
+          interviewer_role: formData.get('interviewer_role')
         }),
       });
 
@@ -103,9 +103,9 @@ export function ProfileSetup() {
     }
   };
 
-  const generatePrepSheet = async (profileId: number) => {
+  const generateJobPrep = async (profileId: number) => {
     try {
-      const response = await fetch('/api/job-prep', {
+      const response = await fetch('/api/generate-job-prep', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +126,14 @@ export function ProfileSetup() {
   };
 
   const validateForm = (formData: FormData): string | null => {
-    const requiredFields = ['email', 'company_url', 'jd_url', 'school', 'major', 'graduation_year'];
+    const requiredFields = [
+      'email', 
+      'school', 
+      'major', 
+      'graduation_year', 
+      'company_url', 
+      'jd_url',      
+    ];
     for (const field of requiredFields) {
       if (!formData.get(field)) {
         return `${field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')} is required`;
@@ -167,14 +174,14 @@ export function ProfileSetup() {
 
     try {
       const profileId = await saveProfile(formData);
-      localStorage.setItem('profileId', profileId.toString());
+      localStorage.setItem('profileId', profileId);
 
       await saveJob(profileId, formData);
 
       const resumeFile = formData.get('resume') as File;
       await uploadResume(profileId, resumeFile);
 
-      await generatePrepSheet(profileId);
+      await generateJobPrep(profileId);
 
       router.push(`/job-prep`);
     } catch (error) {
@@ -208,7 +215,7 @@ export function ProfileSetup() {
                   name="email"
                   type="email"
                   placeholder="email@example.com"
-                  // defaultValue="a@b.com"
+                  defaultValue="a@b.com"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -250,37 +257,11 @@ export function ProfileSetup() {
               </div>
  */}
               <div>
-                <label htmlFor="company_url" className="block text-sm font-medium text-white">
-                  Company URL
-                </label>
-                <Input
-                  id="company_url"
-                  name="company_url"
-                  type="text"
-                  placeholder="https://acme.com"
-                  // defaultValue="http://www.apple.com/careers/us/"
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-                />
-              </div>
-              <div>
-                <label htmlFor="jd_url" className="block text-sm font-medium text-white">
-                  Job Description URL
-                </label>
-                <Input
-                  id="jd_url"
-                  name="jd_url"
-                  type="text"
-                  placeholder="https://careers.example.com/job-description"
-                  // defaultValue="https://jobs.apple.com/en-us/details/200554357/business-marketing-and-g-a-internships?team=STDNT"
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-                />
-              </div>
-              <div>
                 <label htmlFor="school" className="block text-sm font-medium text-white">
                   School
                 </label>
-                {/* <Select name="school" defaultValue="Baylor University Hankamer School of Business"> */}
-                <Select name="school">
+                <Select name="school" defaultValue="Baylor University Hankamer School of Business">
+                {/* <Select name="school"> */}
                   <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 mt-1 rounded-md">
                     <SelectValue placeholder="Select your school" />
                   </SelectTrigger>
@@ -301,7 +282,7 @@ export function ProfileSetup() {
                   name="major"
                   type="text"
                   placeholder="e.g. Finance, Marketing, etc."
-                  // defaultValue="Marketing, Management, Entrepreneurship"
+                  defaultValue="Marketing, Management, Entrepreneurship"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -314,7 +295,7 @@ export function ProfileSetup() {
                   name="concentration"
                   type="text"
                   placeholder="e.g. Commercial, Private Equity, International"
-                  // defaultValue="SEO, Consulting"
+                  defaultValue="SEO, Consulting"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -323,8 +304,8 @@ export function ProfileSetup() {
                   Graduation Year
                 </label>
                 <div className="mt-1">
-                  {/* <Select name="graduation_year" defaultValue="2025"> */}
-                  <Select name="graduation_year">
+                  <Select name="graduation_year" defaultValue="2025">
+                  {/* <Select name="graduation_year"> */}
                     <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 rounded-md">
                       <SelectValue placeholder="Year" />
                     </SelectTrigger>
@@ -339,6 +320,58 @@ export function ProfileSetup() {
                   </Select>
                 </div>
               </div>
+              <div>
+                <label htmlFor="company_url" className="block text-sm font-medium text-white">
+                  Company URL
+                </label>
+                <Input
+                  id="company_url"
+                  name="company_url"
+                  type="text"
+                  placeholder="https://acme.com"
+                  defaultValue="http://www.apple.com/careers/us/"
+                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                />
+              </div>
+              <div>
+                <label htmlFor="jd_url" className="block text-sm font-medium text-white">
+                  Job Description URL
+                </label>
+                <Input
+                  id="jd_url"
+                  name="jd_url"
+                  type="text"
+                  placeholder="https://careers.example.com/job-description"
+                  defaultValue="https://jobs.apple.com/en-us/details/200554357/business-marketing-and-g-a-internships?team=STDNT"
+                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                />
+              </div>
+              <div>
+                <label htmlFor="interviewer_name" className="block text-sm font-medium text-white">
+                  Interviewer Name (Optional)
+                </label>
+                <Input
+                  id="interviewer_name"
+                  name="interviewer_name"
+                  type="text"
+                  placeholder="Ira Johnson"
+                  defaultValue="Ira Johnson"
+                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                />
+              </div>
+              <div>
+                <label htmlFor="interviewer_role" className="block text-sm font-medium text-white">
+                  Interviewer Role (Optional)
+                </label>
+                <Input
+                  id="interviewer_role"
+                  name="interviewer_role"
+                  type="text"
+                  placeholder="Senior Product Manager"
+                  defaultValue="Senior Product Manager"
+                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                />
+              </div>                            
 {/*
               <div>
                 <label htmlFor="current-courses" className="block text-sm font-medium text-white">

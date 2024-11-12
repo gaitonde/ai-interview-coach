@@ -7,40 +7,47 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function POST(request: Request) {
-  console.log('in BE with request for generating questions');
-  const body = await request.json();
-  const profileId = body.profileId;
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const profileId = searchParams.get('profileId');
+  const offset = searchParams.get('offset') || 0;
+  console.log('offset: ', offset);
 
-  try {
-    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-questions');
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini-2024-07-18",
-      messages: [
-        { role: "system", content: promptData.systemPrompt },
-        { role: "user", content: promptData.userPrompt }
-      ],
-      // max_completion_tokens: promptData.maxCompletionTokens,
-      temperature: promptData.temperature,
-    });
+  if (!profileId) {
+    return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 });
+  }
 
-    //TODO: store usage
-    console.log('XXX completion: ', completion);
+  // const result = await sql`
+  //     SELECT category, question 
+  //     FROM ai_interview_coach_prod_job_questions 
+  //     WHERE profile_id = ${profileId}
+  //     ORDER BY id ASC
+  //     LIMIT 1
+  //     OFFSET ${offset}
+  //   `;
 
-    const generatedContent = completion.choices[0]?.message?.content;
+  
+  // const question = result.rows[0];
+  // return NextResponse.json({ question });
 
-    // Upsert operation for questions_response
-    await sql`
-      INSERT INTO ai_interview_coach_prod_airesponses (profile_id, questions_response)
-      VALUES (${profileId}, ${generatedContent})
-      ON CONFLICT (profile_id)
-      DO UPDATE SET questions_response = EXCLUDED.questions_response;
+
+  const result = await sql`
+      SELECT id, category, question, why, focus
+      FROM ai_interview_coach_prod_job_questions 
+      WHERE profile_id = ${profileId}
+      ORDER BY id ASC
+      LIMIT 2
+      OFFSET ${offset}
     `;
 
-    // console.log('in BE with questions response: ', generatedContent);
-    return NextResponse.json({ content: generatedContent });
-  } catch (error) {
-    console.error('Error:', error);
-    return NextResponse.json({ content: "unable to get content" }, { status: 500 });
-  }
+  // Check if we have a current question and if there's a next one
+  const currentQuestion = result.rows[0];
+  const hasMoreQuestions = result.rows.length > 1;
+  const nextOffset = hasMoreQuestions ? Number(offset) + 1 : -1;
+  
+  return NextResponse.json({ 
+    question: currentQuestion,
+    offset: nextOffset 
+  });  
 }
+

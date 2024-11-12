@@ -7,40 +7,18 @@ import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import MarkdownRenderer from "./markdown-renderer"
 
-export function JobPrep() {
+export default function InterviewPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
-  // const [questionsRetrieved, setQuestionsRetrieved] = useState(false);
+  // const [questionsRetrieved, setQuestionsRetrieved] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)  
-  const [profileId, setProfileId] = useState<string | null>(null);
-  // const hasFetchedQuestions = useRef(false);
-  
+
   useEffect(() => {
-    const storedProfileId = localStorage.getItem('profileId');
-    console.log("Stored Profile ID!!:", storedProfileId);
-    setProfileId(storedProfileId);
-
-    console.log("Profile ID:", profileId);
-    // console.log("Has Fetched Questions:", hasFetchedQuestions.current);
-
-    // if (storedProfileId && !hasFetchedQuestions.current) {
-    //   console.log("Generating Questions!!")
-    //   hasFetchedQuestions.current = true;
-    //   (async () => {
-    //     try {
-    //       console.log("Generating Questions2!!")
-    //       await generateQuestions(storedProfileId);
-    //       console.log("DONE Generating Questions3!!")
-    //       setQuestionsRetrieved(true);
-    //     } catch (error) {
-    //       console.error('Error generating questions:', error);
-    //     }
-    //   })();
-    // }    
-
+    const profileId = localStorage.getItem('profileId');
+    console.log("Stored Profile ID!!:", profileId);
     // Fetch prep sheet response
-    if (storedProfileId) {
-        fetch(`/api/get-prep-sheet?profileId=${storedProfileId}`)
+    if (profileId) {
+        fetch(`/api/get-questions?profileId=${profileId}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('Failed to fetch prep sheet response');
@@ -55,18 +33,12 @@ export function JobPrep() {
             setContent('Error loading content. Please try again later.');
           });
     }
-  }, []);
-
-  const handleSubmit = async () => {
-    setIsSubmitting(true);    
-    const profileId = localStorage.getItem('profileId') || '';
-    await generateInterviewPrep(profileId);
-    router.push('/interview-prep');
-  }  
-
-  const generateInterviewPrep = async (profileId: string) => {
+  }, []);  
+  
+  const generateInterviewQuestions = async (profileId: number) => {
+    console.log('VVV generateInterviewQuestions', profileId)
     try {
-      const response = await fetch('/api/generate-interview-prep', {
+      const response = await fetch('/api/generate-interview-questions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,16 +47,25 @@ export function JobPrep() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate questions');
+        throw new Error('Failed to generate prep sheet');
       }
 
       const result = await response.json();
       return result.content;
     } catch (error) {
-      console.error('Error generating questions:', error);
+      console.error('Error generating prep sheet:', error);
       throw error;
     }
-  };
+  };  
+
+  const handleSubmit = async () => {
+    console.log('VVV handleSubmit')
+    setIsSubmitting(true)
+    const profileId = Number(localStorage.getItem('profileId')) || 0
+    console.log('VVV profileId: ', profileId)
+    await generateInterviewQuestions(profileId)
+    router.push(`/interview-practice`)
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#111827]">
@@ -109,12 +90,11 @@ export function JobPrep() {
               Copy to Clipboard
             </Button>
             <Button
-              type="submit"
               disabled={isSubmitting}
               onClick={handleSubmit}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
-            >
-              Prepare for Interview
+            >              
+              Practice Interview Now
             </Button>
           </div>
       </main>

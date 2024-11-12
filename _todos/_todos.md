@@ -1,14 +1,35 @@
-# To Triage
+# High Level Plan
+[x] v1 - just text
+[~] v2 - voice (11/15 - J + S)
+[ ] v3 - auth + home page
+
+# To Discuss / Triage
+- [ ] How do we calc score for an interview?
+- [ ] TODO: Discuss how to test at scale
 - [ ] 
 
 ---
-# Todo
-- [ ] Validation on prompts from webhook
-- [ ] Fix build linter errors
+# Now
+- [x] Add new "Interview Prep" Page
+- [x] DG: add section for question, why, focus
+- [x] Insert records into questions table after AI call
+  - [x] Update prompt to get back questions in json format
+
+- [ ] Prompt for asking for interviewer
+- [ ] N2H: "interim/wait" page that describes the sections on the job prep
+
+# Next
+- [ ] Break up profile setup
+- [ ] Auth/Login/Signup
+- [ ] Discuss Demo Mode (how to show)
+- [ ] Figure out a better way to handle versioning/handling prompts
+- [ ] Debug why the prompt update is not working in prod
+- [ ] Multi-jobs; Use sessions; right now every run is a new profile
 
 # Later
 - [ ] Look at locking down public access to the resume file
-- [ ] Auth/Login/Signup
+- [ ] Validation on prompts from webhook
+- [ ] Fix build linter errors
 
 ---
 # Done
@@ -26,3 +47,31 @@
 - [x] Stop years at 2028
 - [x] Implement Grade logic
 - [x] Move questions call to Questions page
+- [x] Update Prompts
+- [x] Talk about what is desired in "version" in job prep page 
+- [x] Store AI response metrics in db
+- [x] Add Initial Interviewer Page and all associated navigation
+- [x] Add Interviewer name and role to model and ui
+- [x] Change prompt to only ask for only 1 question of each type for
+- [x] Put back in token limit: 10k?
+- [x] Update button on Interviewer page to goto "Profile Setup" page
+- [x] Update button on Interviewer page to goto "Job Prep" page
+- [x] Store answers in db
+- [x] Store scores in db
+- [x] Manually insert questions into db
+- [x] Add new button on Interviewer page to goto "next" question
+- [x] Iterate over questions for Interviewer
+- [x] each answer has it's score; question just shows latest score? => Yes
+
+# Flow
+1. Setup profile - prompted for resume, school stuff, etc
+2. Get job prep page - company overview, job fit, pitch
+3. Setup Interview - Prompted for interviewer name and role
+4. Get interview prep page - questions to ask, questions i'll be asked, stories to tell
+5. Get Practice - get questions, record and get score and feedback
+
+
+profile-setup
+job-prep
+interview-prep
+interview

@@ -14,15 +14,13 @@ export async function POST(request: Request) {
 
   try {
     const promptData: PromptData = await fetchPrompt(profileId, 'prompt-job-prep');
-    console.log('XXX JOB PREP promptData.systemPrompt: ', promptData.systemPrompt);
-    console.log('XXX JOB PREP promptData.userPrompt: ', promptData.userPrompt);
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini-2024-07-18",
+      model: promptData.model,
       messages: [
         { role: "system", content: promptData.systemPrompt },
         { role: "user", content: promptData.userPrompt }
       ],
-      // max_completion_tokens: promptData.maxCompletiosnTokens,
+      max_completion_tokens: promptData.maxCompletionTokens,
       temperature: promptData.temperature,
     });
 
@@ -30,10 +28,11 @@ export async function POST(request: Request) {
     console.log('XXX JOB PREP completion: ', completion);
 
     const generatedContent = completion.choices[0]?.message?.content;
+    const usage = JSON.stringify(completion.usage);
 
     await sql`
-      INSERT INTO ai_interview_coach_prod_airesponses (profile_id, prep_sheet_response)
-      VALUES (${profileId}, ${generatedContent})
+      INSERT INTO ai_interview_coach_prod_airesponses (profile_id, prep_sheet_response, usage)
+      VALUES (${profileId}, ${generatedContent}, ${usage})
       ON CONFLICT (profile_id)
       DO UPDATE SET prep_sheet_response = EXCLUDED.prep_sheet_response;
     `;

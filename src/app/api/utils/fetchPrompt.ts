@@ -14,9 +14,12 @@ interface ProfileData {
   gradYear: number;
   gradeClass?: string;
   todayDateFormatted: string;
+  interviewerName?: string;
+  interviewerRole?: string;
 }
 
 export interface PromptData {
+  model: string;
   systemPrompt: string;
   userPrompt: string;
   temperature: number;
@@ -28,6 +31,7 @@ export async function fetchPrompt(profileId: string, promptKey: string): Promise
   const rawPromptData = await fetchRawPrompt(promptKey);
 
   return {
+    model: rawPromptData.model,
     systemPrompt: applyVariables(rawPromptData.system_prompt, profileData),
     userPrompt: applyVariables(rawPromptData.user_prompt, profileData),
     temperature: rawPromptData.temperature,
@@ -76,19 +80,19 @@ async function fetchProfileData(profileId: string): Promise<ProfileData> {
 }
 
 export function fetchGradeClass(graduationYear: number, currentDate: Date): string {
-  const todayYear = currentDate.getFullYear();
-  const todayMonth = currentDate.getMonth() + 1;
-  const delta = graduationYear - todayYear;
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const delta = graduationYear - currentYear;
 
   if (delta < 0) return 'Graduate';
   if (delta === 0) return 'Senior';
-  if (delta === 1) return todayMonth < 6 ? 'Junior' : 'Senior';
-  if (delta === 2) return todayMonth < 6 ? 'Sophomore' : 'Junior';
-  if (delta === 3) return todayMonth >= 6 ? 'Sophomore' : 'Freshman';
+  if (delta === 1) return currentMonth < 5 ? 'Junior' : 'Senior';
+  if (delta === 2) return currentMonth < 5 ? 'Sophomore' : 'Junior';
+  if (delta === 3) return currentMonth >= 5 ? 'Sophomore' : 'Freshman';
   return 'Freshman';
 }
 
-async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: string; user_prompt: string; temperature: number; max_completion_tokens: number }> {
+async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: string; user_prompt: string; model: string; temperature: number; max_completion_tokens: number }> {
   console.log('fetching prompt', process.env.NEXT_PUBLIC_VERCEL_URL);
   const protocol = process.env.NEXT_PUBLIC_VERCEL_URL?.startsWith('localhost') ? 'http' : 'https';
   const promptResponse = await fetch(`${protocol}://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prompts?key=${promptKey}`);
@@ -107,5 +111,7 @@ function applyVariables(prompt: string, data: ProfileData): string {
     .replace('${todayDate}', data.todayDateFormatted)
     .replace('${schoolName}', data.schoolName || '')
     .replace('${schoolMajor}', data.schoolMajor || '')
-    .replace('${schoolConcentration}', data.schoolConcentration || '');
+    .replace('${schoolConcentration}', data.schoolConcentration || '')
+    .replace('${interviewerName}', data.interviewerName || '')
+    .replace('${interviewerRole}', data.interviewerRole || '');
 }

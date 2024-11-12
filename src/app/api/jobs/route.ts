@@ -17,10 +17,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const profileId = body.profileId;
-  const company_url = body.company_url;
-  const jd_url = body.jd_url;
+  const { 
+    profileId, 
+    company_url, 
+    jd_url, 
+    interviewer_name, 
+    interviewer_role 
+  } = body;
 
+  //TODO: do these url fetches async
   const company_md = await fetchUrlContents(company_url);
   const jd_md = await fetchUrlContents(jd_url);
 
@@ -30,14 +35,18 @@ export async function POST(request: Request) {
     company_url,
     company_text,
     jd_url,
-    jd_text
+    jd_text,
+    interviewer_name,
+    interviewer_role
   )
   VALUES (
     ${profileId},
     ${company_url},
     ${company_md},
     ${jd_url},
-    ${jd_md}
+    ${jd_md},
+    ${interviewer_name},
+    ${interviewer_role}
   )`;
 
   return NextResponse.json(jobs);

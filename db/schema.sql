@@ -22,7 +22,7 @@ CREATE TABLE ai_interview_coach_prod_jobs (
     jd_text TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_Profiles(id) ON DELETE CASCADE,
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_profiles(id) ON DELETE CASCADE,
     CHECK (jd_url IS NOT NULL OR jd_text IS NOT NULL)
 );
 
@@ -34,7 +34,7 @@ CREATE TABLE ai_interview_coach_prod_resumes (
     text TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_Profiles(id) ON DELETE CASCADE,
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_profiles(id) ON DELETE CASCADE,
     CHECK (url IS NOT NULL OR text IS NOT NULL)
 );
 
@@ -45,7 +45,7 @@ CREATE TABLE ai_interview_coach_prod_airesponses (
     prep_sheet_response TEXT,
     questions_response TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_Profiles(id) ON DELETE CASCADE
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_profiles(id) ON DELETE CASCADE
 );
 
 -- Create a function to update last_updated_at
@@ -59,15 +59,15 @@ $$ LANGUAGE plpgsql;
 
 -- Create triggers to automatically update last_updated_at
 CREATE TRIGGER update_profiles_last_updated_at
-BEFORE UPDATE ON ai_interview_coach_prod_Profiles
+BEFORE UPDATE ON ai_interview_coach_prod_profiles
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 CREATE TRIGGER update_jobs_last_updated_at
-BEFORE UPDATE ON ai_interview_coach_prod_Jobs
+BEFORE UPDATE ON ai_interview_coach_prod_jobs
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 CREATE TRIGGER update_resumes_last_updated_at
-BEFORE UPDATE ON ai_interview_coach_prod_Resumes
+BEFORE UPDATE ON ai_interview_coach_prod_resumes
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 CREATE OR REPLACE FUNCTION check_resume_fields()
@@ -81,7 +81,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER enforce_resume_fields
-BEFORE INSERT OR UPDATE ON ai_interview_coach_prod_Resumes
+BEFORE INSERT OR UPDATE ON ai_interview_coach_prod_resumes
 FOR EACH ROW EXECUTE FUNCTION check_resume_fields();
 
 ALTER TABLE ai_interview_coach_prod_airesponses ADD CONSTRAINT unique_profile_id UNIQUE (profile_id);
@@ -106,3 +106,72 @@ FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 
 ALTER TABLE ai_interview_coach_prod_jobs ADD COLUMN company_text TEXT;
+
+CREATE TABLE ai_interview_coach_prod_job_sessions (
+    id SERIAL PRIMARY KEY,
+    profile_id INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_profiles(id) ON DELETE CASCADE
+);
+
+CREATE TRIGGER update_job_sessions_last_updated_at
+BEFORE UPDATE ON ai_interview_coach_prod_job_sessions
+FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+
+
+ALTER TABLE ai_interview_coach_prod_airesponses ADD COLUMN usage JSON;
+ALTER TABLE ai_interview_coach_prod_jobs ADD COLUMN interviewer_name VARCHAR(255);
+ALTER TABLE ai_interview_coach_prod_jobs ADD COLUMN interviewer_role VARCHAR(255);
+
+CREATE TABLE ai_interview_coach_prod_job_questions (
+    id SERIAL PRIMARY KEY,
+    profile_id INTEGER NOT NULL,
+    category VARCHAR(255),
+    question TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_profiles(id) ON DELETE CASCADE
+);
+
+CREATE TABLE ai_interview_coach_prod_job_question_answers (
+    id SERIAL PRIMARY KEY,
+    profile_id INTEGER NOT NULL,
+    question_id INTEGER NOT NULL,
+    answer TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_profiles(id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES ai_interview_coach_prod_job_questions(id) ON DELETE CASCADE
+);
+
+CREATE TABLE ai_interview_coach_prod_answer_scores (
+    id SERIAL PRIMARY KEY,
+    profile_id INTEGER NOT NULL,
+    answer_id INTEGER NOT NULL,
+    total_score DECIMAL(5,2),
+    scores JSON,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_profiles(id) ON DELETE CASCADE,
+    FOREIGN KEY (answer_id) REFERENCES ai_interview_coach_prod_job_question_answers(id) ON DELETE CASCADE,
+    CONSTRAINT unique_profile_answer_score UNIQUE (profile_id, answer_id)
+);
+
+
+CREATE TRIGGER update_job_questions_last_updated_at
+BEFORE UPDATE ON ai_interview_coach_prod_job_questions
+FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+
+CREATE TRIGGER update_job_question_answers_last_updated_at
+BEFORE UPDATE ON ai_interview_coach_prod_job_question_answers
+FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+
+CREATE TRIGGER update_answer_scores_last_updated_at
+BEFORE UPDATE ON ai_interview_coach_prod_answer_scores
+FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+
+
+
+ALTER TABLE ai_interview_coach_prod_job_questions ADD COLUMN why VARCHAR(255);
+ALTER TABLE ai_interview_coach_prod_job_questions ADD COLUMN focus VARCHAR(255);
