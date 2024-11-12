@@ -35,18 +35,19 @@ export async function POST(req: NextRequest) {
       temperature: promptData.temperature,
     });
     
-    const suggestionsText = completion.choices[0]?.message?.content?.replaceAll('```json', '').replaceAll('```', '');
-    let suggestions: Suggestion[];
+    const suggestions = completion.choices[0]?.message?.content;
+    console.log('Suggestions :', suggestions);
+    // let suggestions: Suggestion[];
 
-    try {
-      suggestions = JSON.parse(suggestionsText || '[]');
-    } catch (error) {
-      console.error('Error parsing OpenAI response:', error);
-      return NextResponse.json({ error: 'Invalid response from AI' }, { status: 500 });
-    }
+    // try {
+    //   suggestions = JSON.parse(suggestionsText || '[]');
+    // } catch (error) {
+    //   console.error('Error parsing OpenAI response:', error);
+    //   return NextResponse.json({ error: 'Invalid response from AI' }, { status: 500 });
+    // }
 
     // Ensure we have no more than 5 suggestions
-    suggestions = suggestions.slice(0, 5);
+    // suggestions = suggestions.slice(0, 5);
 
     return NextResponse.json({ suggestions });
   } catch (error) {

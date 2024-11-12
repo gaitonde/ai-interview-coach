@@ -1,17 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import CircularProgress from "./circular-progress"
 import { Separator } from "./ui/separator"
-import { ChevronDown, ChevronUp } from 'lucide-react'
-
-interface Subcategory {
-  name: string
-  score: number
-}
+import MarkdownRenderer from "./markdown-renderer"
 
 interface Category {
   name: string
   score: number
-  subcategories: Subcategory[]
 }
 
 interface Suggestion {
@@ -20,6 +14,7 @@ interface Suggestion {
 }
 
 interface EvaluationRatingProps {
+  finalScore: number;
   averageScore: number;
   definedRound: string;
   categories: Category[];
@@ -31,9 +26,10 @@ interface EvaluationRatingProps {
   onToggle: () => void;
 }
 
-export default function Scoring({ averageScore, definedRound, categories, transcript, audioUrl, recordingTimestamp, versionNumber, isExpanded, onToggle }: EvaluationRatingProps) {
+export default function Scoring({ finalScore, averageScore, definedRound, categories, transcript, audioUrl, recordingTimestamp, versionNumber, isExpanded, onToggle }: EvaluationRatingProps) {
   console.log('YYY Version:', versionNumber, 'Audio URL:', audioUrl);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [suggestionsMarkdown, setSuggestionsMarkdown] = useState<string>('');
   const [audioError, setAudioError] = useState<string | null>(null);
   const suggestionRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
 
@@ -54,7 +50,7 @@ export default function Scoring({ averageScore, definedRound, categories, transc
         }
 
         const data = await response.json();
-        setSuggestions(data.suggestions);
+        setSuggestionsMarkdown(data.suggestions);
       } catch (error) {
         console.error('Error fetching suggestions:', error);
         // Handle error (e.g., show an error message to the user)
@@ -71,7 +67,7 @@ export default function Scoring({ averageScore, definedRound, categories, transc
     });
   }, [isExpanded, audioUrl, categories]);
 
-  const overallAverageScore = categories.reduce((sum, category) => sum + category.score, 0) / categories.length;
+  // const overallAverageScore = categories.reduce((sum, category) => sum + category.score, 0) / categories.length;
 
   // Format the timestamp
   const formattedTimestamp = recordingTimestamp
@@ -86,15 +82,15 @@ export default function Scoring({ averageScore, definedRound, categories, transc
     : 'Date not available';
 
   //to satisfy the type checker
-  console.debug('averageScore', averageScore);
+  console.log('finalScore', finalScore);
   console.debug('definedRound', definedRound);
 
-  const scrollToSuggestion = (categoryName: string) => {
-    const ref = suggestionRefs.current[categoryName];
-    if (ref && ref.current) {
-      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
+  // const scrollToSuggestion = (categoryName: string) => {
+  //   const ref = suggestionRefs.current[categoryName];
+  //   if (ref && ref.current) {
+  //     ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  //   }
+  // };
 
   // Add this CSS class to your existing styles
   const chevronStyles = {
@@ -111,7 +107,7 @@ export default function Scoring({ averageScore, definedRound, categories, transc
       >
         <div className="flex items-center">
           <CircularProgress
-            progress={Number((overallAverageScore / 3).toFixed(1))}
+            progress={Number((averageScore).toFixed(1))}
             size={88}
           />
           <div className="ml-4">
@@ -143,40 +139,31 @@ export default function Scoring({ averageScore, definedRound, categories, transc
 
           <Separator className="my-8 h-px bg-gray-200" />
           <h2 className="text-3xl font-bold text-gray-800 mb-4">Scoring</h2>
-
-          {categories.map((category, index) => (
-            <div key={index} className="mb-8">
-              <div
-                className="flex justify-between items-center mb-2 cursor-pointer hover:bg-gray-100 p-2 rounded"
-                onClick={() => scrollToSuggestion(category.name)}
-              >
-                <span className="font-bold text-xl text-gray-800">{category.name}</span>
-                <span className="font-bold text-xl text-gray-800">{(category.score / 3).toFixed(1)} / 10</span>
-              </div>
-              {category.subcategories.map((subcategory, subIndex) => (
-                <div key={subIndex} className="flex items-center mb-2">
-                  <span className="w-1/3 text-sm text-gray-600">{subcategory.name}</span>
-                  <span className="w-8 text-right mr-3 text-sm font-semibold text-gray-800">
-                    {(subcategory.score ?? 0).toFixed(1)}
-                  </span>
-                  <div className="flex-grow bg-gray-200 h-5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#10B981] h-full rounded-full"
-                      style={{ width: `${(subcategory.score / 10) * 100}%` }}
-                    ></div>
-                  </div>
+            
+            {categories.map((category, index) => (
+              <div key={index} className="flex items-center mb-4">
+                <span className="w-1/3 text-sm text-gray-600">{category.name}</span>
+                <span className="w-8 text-right mr-3 text-sm font-semibold text-gray-800">
+                  {(category.score ?? 0).toFixed(1)}
+                </span>
+                <div className="flex-grow bg-gray-200 h-5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-[#10B981] h-full rounded-full"
+                    style={{ width: `${(category.score / 10) * 100}%` }}
+                  ></div>
                 </div>
-              ))}
-            </div>
-          ))}
-
+              </div>
+            ))}
+          
           {/* Total Score */}
-          <div className="flex items-center justify-between bg-[#10B981] p-4 rounded-lg mb-8">
+{/* 
+          <div className="flex items-center justify-between bg-[#10B981] p-4 rounded-lg mt-8 mb-8">
             <span className="font-bold text-lg text-white">Total Score</span>
             <div className="flex items-center">
-              <span className="font-bold text-2xl text-white mr-3">{(overallAverageScore ?? 0).toFixed(1)} / 30</span>
+              <span className="font-bold text-2xl text-white mr-3">{(finalScore ?? 0).toFixed(1)} / 70</span>
             </div>
           </div>
+           */}
           <Separator className="my-8 h-px bg-gray-200" />
 
           {/* Transcript section */}
@@ -206,6 +193,12 @@ export default function Scoring({ averageScore, definedRound, categories, transc
             </div>
           )}
 
+          <MarkdownRenderer content={suggestionsMarkdown} />
+{/* 
+          <div className="text-gray-900">
+            <Markdown>{suggestionsMarkdown}</Markdown>
+          </div>
+           */}
           {/* Suggestions section */}
           {suggestions.length > 0 ? (
             <div className="mt-8">
@@ -228,7 +221,7 @@ export default function Scoring({ averageScore, definedRound, categories, transc
             </div>
           ) : (
             <div className="mt-8">
-              <p className="text-gray-600 text-lg">Great work. No suggestions.</p>
+              {/* <p className="text-gray-600 text-lg">Great work. No suggestions.</p> */}
             </div>
           )}
         </>

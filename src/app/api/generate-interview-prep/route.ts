@@ -14,6 +14,7 @@ export async function POST(request: Request) {
 
   try {
     const promptData: PromptData = await fetchPrompt(profileId, 'prompt-interview-prep');
+    console.log('CCC userPrompt: ', promptData.userPrompt);
     console.log('BBB promptData: ', promptData.systemPrompt);
 
     const completion = await openai.chat.completions.create({

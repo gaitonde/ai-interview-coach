@@ -15,26 +15,16 @@ interface Question {
 }
 
 interface ScoringResult {
-  contentAndStructure: {
-    thesisClarity: number;
-    organization: number;
-    supportEvidence: number;
-    total: number;
-  };
-  deliveryAndVocalControl: {
-    pacingPausing: number;
-    volumeClarity: number;
-    vocalVariety: number;
-    total: number;
-  };
-  languageUseAndStyle: {
-    grammarSyntax: number;
-    appropriateness: number;
-    wordChoiceRhetoric: number;
-    total: number;
-  };
+  foundationalKnowledge: number;
+  problemSolvingAndLearningPotential: number;
+  behavioralAndSoftSkills: number;
+  culturalFitAndMotivation: number;
+  initiativeAndLeadershipPotential: number;
+  starMethodAdherence: number;
+  confidenceAndProfessionalism: number;
   finalScore: number;
-}
+  averageScore: number;
+  };
 
 export default function InterviewPractice() {
   const [versions, setVersions] = useState<Array<{
@@ -48,6 +38,7 @@ export default function InterviewPractice() {
   const [question, setQuestion] = useState<Question | null>(null);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [offset, setOffset] = useState(0);
+  const [manualTranscript, setManualTranscript] = useState('');
   const router = useRouter();
 
   const handleTranscriptionComplete = async (newTranscript: string, newAudioUrl: string) => {
@@ -182,6 +173,33 @@ export default function InterviewPractice() {
             </button>            
           </div>
         </div>
+        <div className="p-4 bg-white rounded-lg shadow">
+          <div className="flex items-center space-x-4">
+            <textarea
+              className="w-full h-24 p-2 border border-gray-300 text-black rounded-md"
+              placeholder="Enter transcript here..."
+              value={manualTranscript}
+              onChange={(e) => setManualTranscript(e.target.value)}
+            />
+            <button
+              className="text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
+              disabled={offset === -1 || !manualTranscript.trim()}
+              onClick={() => {
+                const newVersion = {
+                  transcript: manualTranscript,
+                  aiScoringResult: null,
+                  audioUrl: '',
+                  recordingTimestamp: new Date(),
+                };
+                setVersions(prevVersions => [newVersion, ...prevVersions]);
+                handleAiScoring(manualTranscript, 0);
+                setManualTranscript(''); // Clear the textarea after submission
+              }}
+            >
+              Score Transcript
+            </button>        
+          </div>
+        </div>        
 
         {versions.map((version, index) => (
           <div key={version.recordingTimestamp.toISOString()}>
@@ -195,36 +213,17 @@ export default function InterviewPractice() {
             )}
             {version.aiScoringResult && (
               <Scoring
-                averageScore={version.aiScoringResult.finalScore}
+                finalScore={version.aiScoringResult.finalScore}
+                averageScore={version.aiScoringResult.averageScore}
                 definedRound={`AI Evaluation (Version ${versions.length - index})`}
                 categories={[
-                  {
-                    name: 'Content & Structure',
-                    score: version.aiScoringResult.contentAndStructure.total,
-                    subcategories: [
-                      { name: 'Thesis & Message Clarity', score: version.aiScoringResult.contentAndStructure.thesisClarity },
-                      { name: 'Organization', score: version.aiScoringResult.contentAndStructure.organization },
-                      { name: 'Support & Evidence', score: version.aiScoringResult.contentAndStructure.supportEvidence },
-                    ],
-                  },
-                  {
-                    name: 'Delivery & Vocal Control',
-                    score: version.aiScoringResult.deliveryAndVocalControl.total,
-                    subcategories: [
-                      { name: 'Pacing & Pausing', score: version.aiScoringResult.deliveryAndVocalControl.pacingPausing },
-                      { name: 'Volume & Clarity', score: version.aiScoringResult.deliveryAndVocalControl.volumeClarity },
-                      { name: 'Vocal Variety', score: version.aiScoringResult.deliveryAndVocalControl.vocalVariety },
-                    ],
-                  },
-                  {
-                    name: 'Language Use & Style',
-                    score: version.aiScoringResult.languageUseAndStyle.total,
-                    subcategories: [
-                      { name: 'Grammar & Syntax', score: version.aiScoringResult.languageUseAndStyle.grammarSyntax },
-                      { name: 'Appropriateness', score: version.aiScoringResult.languageUseAndStyle.appropriateness },
-                      { name: 'Word Choice & Rhetoric', score: version.aiScoringResult.languageUseAndStyle.wordChoiceRhetoric },
-                    ],
-                  },
+                  { name: 'Foundational Knowledge', score: version.aiScoringResult.foundationalKnowledge },
+                  { name: 'Problem Solving & Learning', score: version.aiScoringResult.problemSolvingAndLearningPotential },
+                  { name: 'Behavioral & Soft Skills', score: version.aiScoringResult.behavioralAndSoftSkills },
+                  { name: 'Cultural Fit & Motivation', score: version.aiScoringResult.culturalFitAndMotivation },
+                  { name: 'Initiative & Leadership', score: version.aiScoringResult.initiativeAndLeadershipPotential },
+                  { name: 'STAR Method Adherence', score: version.aiScoringResult.starMethodAdherence },
+                  { name: 'Confidence & Professionalism', score: version.aiScoringResult.confidenceAndProfessionalism },
                 ]}
                 transcript={version.transcript}
                 audioUrl={version.audioUrl}
