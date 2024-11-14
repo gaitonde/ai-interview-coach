@@ -6,7 +6,7 @@ import Scoring from "./scoring";
 import { get } from 'idb-keyval';
 import { useRouter } from 'next/navigation';
 import { Footer } from "./footer";
-import { content as initialContent } from './content'
+// import { content as initialContent } from './content'
 import styles from '../styles/interview-practice.module.css';
 
 type EvaluatingState = 'Ready' | 'Evaluating';
@@ -135,10 +135,10 @@ export default function InterviewPractice() {
           interviewer = `${data.interviewer_role}`;
         }
         setWhom(interviewer);
-        setContent(initialContent
-          // .replaceAll('__TITLE__', interviewer)
-          .replaceAll('__INTERVIEWER__', interviewer)
-        );
+        // setContent(initialContent
+        //   // .replaceAll('__TITLE__', interviewer)
+        //   .replaceAll('__INTERVIEWER__', interviewer)
+        // );
       } catch (error) {
         console.error('Error fetching questions response:', error);
         }
