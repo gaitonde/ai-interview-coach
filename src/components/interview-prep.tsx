@@ -25,7 +25,7 @@ export default function InterviewPrep() {
             return response.json();
           })
           .then(data => {
-            setContent('## Awesome Interview Cheat Sheet\n\n' + data.content);
+            setContent('# Awesome Interview Cheat Sheet\n\n' + data.content);
           })
           .catch(error => {
             console.error('Error fetching prep sheet response:', error);

@@ -185,9 +185,9 @@ export default function InterviewPractice() {
     <>
       <div className="flex flex-col min-h-screen bg-[#111827]">
         <main className="flex-grow flex justify-center px-4 sm:px-6 lg:px-8 mt-6">
-        <div className="w-full max-w-3xl p-6 sm:p-8 space-y-6 sm:space-y-8 bg-[#1F2937] rounded-xl shadow-md">
+        <div className="w-full max-w-3xl p-6 sm:p-8 sm:space-y-8 bg-[#1F2937] rounded-xl shadow-md">
           <div className="markdown-content text-[#F9FAFB]">
-            <h2 className={styles.h2}>Interview Jam Session</h2>
+            <h1 className={styles.h1}>Interview Jam Session</h1>
             {whom && <h3 className={styles.h3}>with {whom}</h3>}
           </div>
           <div className="p-4 bg-white rounded-lg shadow">
