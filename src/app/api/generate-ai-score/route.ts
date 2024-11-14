@@ -31,21 +31,18 @@ interface ScoringResult {
 }
 
 export async function POST(req: NextRequest) {
+  console.log('IN generate-ai-score');
   try {
     const body = await req.json();
-    const { profileId, questionId, transcription } = body;
+    const { profileId, questionId, answerId } = body;
 
-    if (!transcription) {
-      return NextResponse.json({ error: 'Transcription is required' }, { status: 400 });
+    if (!questionId || !answerId) {
+      return NextResponse.json({ error: 'Question ID and Answer ID are required' }, { status: 400 });
     }
 
-    const question = await sql`
-    SELECT id, question FROM ai_interview_coach_prod_job_questions 
-    WHERE id = ${questionId}`;
-
-    //TODO: handle case where question is not found    
-    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-answer-score', question.rows[0].question);
-    promptData.userPrompt = promptData.userPrompt.replace('${transcription}', transcription);
+    console.log('PPP  IN generate-ai-score fetchPrompt', questionId, answerId);
+    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-answer-score', questionId, answerId);
+    console.log('IN generate-ai-score promptData');
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,
@@ -65,6 +62,9 @@ export async function POST(req: NextRequest) {
       throw new Error('Invalid AI response');
     }
 
+    const finalScore = aiScores.reduce((sum, score) => sum + score, 0);
+    const averageScore = finalScore / aiScores.length;
+
     const rubricScores: RubricScores = {
       foundationalKnowledge: aiScores[0],
       problemSolvingAndLearningPotential: aiScores[1],
@@ -75,8 +75,6 @@ export async function POST(req: NextRequest) {
       confidenceAndProfessionalism: aiScores[6],
     };
 
-    const finalScore = aiScores.reduce((sum, score) => sum + score, 0);
-    const averageScore = finalScore / aiScores.length;
 
     const result: ScoringResult = {
       foundationalKnowledge: rubricScores.foundationalKnowledge,
@@ -91,7 +89,7 @@ export async function POST(req: NextRequest) {
     };
 
     const json = NextResponse.json(result);
-    const answerId = await insertAnswer(profileId, questionId, transcription);
+    // const answerId = await insertAnswer(profileId, questionId, transcription);
     await insertScore(profileId, answerId, finalScore, result);
 
     return json;
@@ -101,14 +99,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function insertAnswer(profileId: string, questionId: string, transcript: string) {
-  const result = await sql`
-    INSERT INTO ai_interview_coach_prod_job_question_answers 
-    (profile_id, question_id, answer) 
-    VALUES (${profileId}, ${questionId}, ${transcript}) 
-    RETURNING id`;
-  return result.rows[0].id;
-}
+
 
 async function insertScore(profileId: string, answerId: string, finalScore: number, scores: ScoringResult) {
   await sql`

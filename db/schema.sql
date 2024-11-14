@@ -171,11 +171,24 @@ CREATE TRIGGER update_answer_scores_last_updated_at
 BEFORE UPDATE ON ai_interview_coach_prod_answer_scores
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
-
-
 ALTER TABLE ai_interview_coach_prod_job_questions ADD COLUMN why VARCHAR(255);
 ALTER TABLE ai_interview_coach_prod_job_questions ADD COLUMN focus VARCHAR(255);
 
 
 ALTER TABLE ai_interview_coach_prod_job_questions ALTER COLUMN why TYPE TEXT;
 ALTER TABLE ai_interview_coach_prod_job_questions ALTER COLUMN focus TYPE TEXT;
+
+CREATE TABLE ai_interview_coach_prod_suggestions (
+    id SERIAL PRIMARY KEY,
+    profile_id INTEGER NOT NULL,
+    question_id INTEGER NOT NULL,
+    answer_id INTEGER NOT NULL,
+    suggestion_content TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_prod_profiles(id) ON DELETE CASCADE,
+    FOREIGN KEY (answer_id) REFERENCES ai_interview_coach_prod_job_question_answers(id) ON DELETE CASCADE
+);
+
+CREATE TRIGGER update_suggestions_last_updated_at
+BEFORE UPDATE ON ai_interview_coach_prod_suggestions
+FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();

@@ -38,7 +38,7 @@ export function JobPrep() {
 
     // Fetch prep sheet response
     if (storedProfileId) {
-        fetch(`/api/get-prep-sheet?profileId=${storedProfileId}`)
+        fetch(`/api/generated-prep-sheet?profileId=${storedProfileId}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('Failed to fetch prep sheet response');

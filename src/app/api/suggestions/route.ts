@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 
   const result = await sql`
       SELECT id, category, question, why, focus
-      FROM ai_interview_coach_prod_job_questions 
+      FROM ai_interview_coach_prod_suggestions 
       WHERE profile_id = ${profileId}
       ORDER BY id ASC
   `;

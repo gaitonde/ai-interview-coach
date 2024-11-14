@@ -4,13 +4,14 @@ import { set } from 'idb-keyval';
 interface AudioRecorderProps {
   onTranscriptionComplete: (transcript: string, audioUrl: string) => void;
   version: number;
+  questionId: string;
 }
 
 type RecorderState = 'Ready' | 'Recording' | 'Transcribing';
 
 const FIXED_TIME_LIMIT = 30;
 
-export default function AudioRecorder({ onTranscriptionComplete, version }: AudioRecorderProps) {
+export default function AudioRecorder({ onTranscriptionComplete, version, questionId }: AudioRecorderProps) {
   const [recorderState, setRecorderState] = useState<RecorderState>('Ready');
   const [recordingTime, setRecordingTime] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -25,7 +26,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version }: Audi
     };
 
     mediaRecorder.onstop = async () => {
-      console.log('in onstop');
+      console.log('Recording stopped');
       setRecorderState('Transcribing');
       const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm; codecs=opus' });
       const url = URL.createObjectURL(audioBlob);
@@ -43,6 +44,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version }: Audi
 
       try {
         const transcription = await getTranscription(audioBlob);
+        console.log('ZZZ transcription', transcription);
         onTranscriptionComplete(transcription, url);
       } catch (error) {
         console.error('Transcription error in component:', error);
@@ -85,12 +87,13 @@ export default function AudioRecorder({ onTranscriptionComplete, version }: Audi
   }, [recorderState, startRecording, stopRecording]);
 
   const getTranscription = async (audioBlob: Blob): Promise<string> => {
+    const profileId = localStorage.getItem('profileId');
     const audioBase64 = await blobToBase64(audioBlob);
 
     const response = await fetch('/api/transcribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ audio: audioBase64 }),
+      body: JSON.stringify({ profileId, questionId, audio: audioBase64 }),
     });
 
     if (!response.ok) {
@@ -98,7 +101,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version }: Audi
     }
 
     const data = await response.json();
-    return data.transcription;
+    return data.result;
   };
 
   const blobToBase64 = (blob: Blob): Promise<string> => {

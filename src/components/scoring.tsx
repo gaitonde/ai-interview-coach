@@ -23,11 +23,12 @@ interface EvaluationRatingProps {
   recordingTimestamp: Date | null;
   versionNumber: number;
   isExpanded: boolean;
+  answerId: string;
+  questionId: string;
   onToggle: () => void;
 }
 
-export default function Scoring({ finalScore, averageScore, definedRound, categories, transcript, audioUrl, recordingTimestamp, versionNumber, isExpanded, onToggle }: EvaluationRatingProps) {
-  console.log('YYY Version:', versionNumber, 'Audio URL:', audioUrl);
+export default function Scoring({ finalScore, averageScore, definedRound, categories, transcript, audioUrl, recordingTimestamp, versionNumber, isExpanded, onToggle, answerId, questionId }: EvaluationRatingProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [suggestionsMarkdown, setSuggestionsMarkdown] = useState<string>('');
   const [audioError, setAudioError] = useState<string | null>(null);
@@ -43,7 +44,7 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ profileId, categories }),
+          body: JSON.stringify({ profileId, answerId, questionId, categories }),
         });
 
         if (!response.ok) {

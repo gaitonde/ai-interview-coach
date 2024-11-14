@@ -12,19 +12,27 @@
 
 # Pages Flow
 profile-setup
-job-prep
-interview-prep
-interview
+job-prep / Company Scoop
+interview-prep / Awesome Interview Cheat Sheet
+interview-practice / Interview Jam Session
 
 # To Discuss / Triage
 - [ ] Discuss how to test at scale
 - [ ] Wait state on Job Prep page
 - [ ] Unhide copy button on Job Prep page
+- [ ] Add Nav?
 
 ---
 # Now
+- [x] Interview Practice Page: Fix getting of questions
+- [x] Interview Practice Page: Fix next/previous question buttons
+- [x] Interview Practice Page: Fix disabled state
+- [ ] Interview Practice Page: fix the suggestion thingy
+- [ ] Interview Practice Page: Store suggestions in db
+- [ ] Interview Practice Page: Fix getting of answers
+
 - [ ] N2H: "interim/wait" page that describes the sections on the job prep
-- [ ] Interview Prep Page: Fix title; 4 cases (name + role, name only, role only, neither)
+- [x] Interview Prep Page: Fix title; 4 cases (name + role, name only, role only, neither)
 - [ ] Interview Prep Page: Add a "Back Question" button
 - [ ] Interview Prep Page: Add a "Header" for manual transcript; update button text
 - [ ] Interview Prep Page: N2H Show total questions
@@ -77,7 +85,7 @@ interview
 - [x] Add new "Interview Prep" Page
 - [x] DG: add section for question, why, focus
 - [x] Insert records into questions table after AI call
-  - [x] Update prompt to get back questions in json format
+- [x] Update prompt to get back questions in json format
 - [x] Add the question to the prompt
 - [x] Debug why the prompt update is not working in prod
 - [ ] 

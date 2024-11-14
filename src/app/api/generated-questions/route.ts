@@ -22,15 +22,14 @@ export async function GET(request: Request) {
         FROM ai_interview_coach_prod_airesponses
         WHERE profile_id = $1
         ORDER BY created_at DESC
-        LIMIT 1
       `, [profileId]);
 
-      if (result.rows.length === 0) {
-        return NextResponse.json({ error: 'No prep sheet response found' }, { status: 404 });
+      if (result.rows.length < 1) {
+        return NextResponse.json({ error: 'No questions found' }, { status: 404 });
       }
-      const content = result.rows[0].questions_response
+      // const content = result.rows[0].questions_response
 
-      return NextResponse.json({ content: content });
+      return NextResponse.json({ content: result.rows });
     } finally {
       client.release();
     }

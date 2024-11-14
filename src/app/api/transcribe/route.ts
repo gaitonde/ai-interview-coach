@@ -36,7 +36,7 @@ export async function POST(inRequest: Request) {
       ?.map(result => result.alternatives?.[0].transcript)
       .join('\n') || 'No transcription available';
 
-    return NextResponse.json({ transcription });
+    return NextResponse.json({ result: transcription });
   } catch (error) {
     console.error('Transcription error in API:', error);
     return NextResponse.json({ error: 'Transcription failed' }, { status: 500 });

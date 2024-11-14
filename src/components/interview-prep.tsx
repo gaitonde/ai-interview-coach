@@ -17,7 +17,7 @@ export default function InterviewPrep() {
     console.log("Stored Profile ID!!:", profileId);
     // Fetch prep sheet response
     if (profileId) {
-        fetch(`/api/get-questions?profileId=${profileId}`)
+        fetch(`/api/generated-prep-sheet?profileId=${profileId}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('Failed to fetch prep sheet response');

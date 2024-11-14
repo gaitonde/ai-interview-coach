@@ -17,6 +17,7 @@ interface ProfileData {
   interviewerName?: string;
   interviewerRole?: string;
   question?: string;
+  answer?: string;
 }
 
 export interface PromptData {
@@ -27,8 +28,8 @@ export interface PromptData {
   maxCompletionTokens: number;
 }
 
-export async function fetchPrompt(profileId: string, promptKey: string, question?: string): Promise<PromptData> {
-  const profileData = await fetchProfileData(profileId, question);
+export async function fetchPrompt(profileId: string, promptKey: string, questionId?: string, answerId?: string): Promise<PromptData> {
+  const profileData = await fetchProfileData(profileId, questionId, answerId);
   const rawPromptData = await fetchRawPrompt(promptKey);
 
   return {
@@ -40,24 +41,30 @@ export async function fetchPrompt(profileId: string, promptKey: string, question
   };
 }
 
-async function fetchProfileData(profileId: string, question?: string): Promise<ProfileData> {
+async function fetchProfileData(profileId: string, questionId?: string, answerId?: string): Promise<ProfileData> {
   const todayDate = new Date();
   const todayDateFormatted = todayDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-  const [profileDetails, jobDetails, resumeDetails] = await Promise.all([
+  const [profileDetails, jobDetails, resumeDetails, questionDetails, answerDetails] = await Promise.all([
     sql`SELECT school, major, concentration, graduation_date FROM ai_interview_coach_prod_profiles WHERE id = ${profileId}`,
     sql`SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role FROM ai_interview_coach_prod_jobs WHERE profile_id = ${profileId}`,
-    sql`SELECT url, text FROM ai_interview_coach_prod_resumes WHERE profile_id = ${profileId}`
+    sql`SELECT url, text FROM ai_interview_coach_prod_resumes WHERE profile_id = ${profileId}`,
+    sql`SELECT question FROM ai_interview_coach_prod_job_questions WHERE profile_id = ${profileId} and id = ${questionId}`,
+    sql`SELECT answer FROM ai_interview_coach_prod_job_question_answers WHERE profile_id = ${profileId} and id = ${answerId}`
   ]);
 
   if (profileDetails.rows.length === 0) throw new Error("Profile not found");
   if (jobDetails.rows.length === 0) throw new Error("Job not found");
   if (resumeDetails.rows.length === 0) throw new Error("Resume not found");
+  if (questionId && questionDetails.rows.length === 0) throw new Error("Question not found");
+  if (answerId && answerDetails.rows.length === 0) throw new Error("Answers not found");
 
   const { school: schoolName, major: schoolMajor, concentration: schoolConcentration, graduation_date: graduationDate } = profileDetails.rows[0];
   const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, interviewer_name: interviewerName, interviewer_role: interviewerRole } = jobDetails.rows[0];
   const { url: resumeUrl, text: resume } = resumeDetails.rows[0];
-
+  const question = questionId ? questionDetails.rows[0]?.question : null;
+  const answer = answerId ? answerDetails.rows[0]?.answer : null;
+  
   const gradYear = new Date(graduationDate).getFullYear();
   const gradeClass = await fetchGradeClass(gradYear, todayDate);
   console.debug('gradYear, todayDate, gradeClass:', gradYear, todayDate, gradeClass);
@@ -76,9 +83,10 @@ async function fetchProfileData(profileId: string, question?: string): Promise<P
     gradYear: new Date(graduationDate).getFullYear(),
     gradeClass: gradeClass,
     todayDateFormatted,
-    question: question,
     interviewerName,
-    interviewerRole
+    interviewerRole,
+    question,
+    answer
   };
 }
 
@@ -117,5 +125,6 @@ function applyVariables(prompt: string, data: ProfileData): string {
     .replace('${schoolConcentration}', data.schoolConcentration || '')
     .replace('${interviewerName}', data.interviewerName || '')
     .replace('${interviewerRole}', data.interviewerRole || '')
-    .replace('${question}', data.question || '');
+    .replace('${question}', data.question || '')
+    .replace('${transcription}', data.answer || '');
 }
