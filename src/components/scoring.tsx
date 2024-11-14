@@ -195,8 +195,8 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
             </div>
           )}
 
-          <div className="markdown-content">
-            <Markdown className="text-black">{suggestionsMarkdown}</Markdown>
+          <div className="markdown-content-on-white text-black">
+            <Markdown>{suggestionsMarkdown}</Markdown>
           </div>
 {/* 
           <div className="text-gray-900">

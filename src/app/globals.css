@@ -91,28 +91,37 @@ body {
   }
 }
 
-/* Scoring.tsx */
-.markdown-content h2 {
-  /* text-3xl font-bold text-gray-800 mb-4 */
-  @apply text-2xl sm:text-3xl font-bold text-[#10B981] mb-2;
+/* Base markdown styles */
+.markdown-content,
+.markdown-content-on-white {
+  @apply mb-4;
 }
 
-.markdown-content h3 {
-  @apply text-2xl font-semibold text-white mb-3;
+.markdown-content h2,
+.markdown-content-on-white h2 {
+  @apply text-2xl sm:text-3xl font-bold mb-2 text-[#10B981];
 }
 
-.markdown-content p {
-  @apply text-black mb-4;
+.markdown-content h3,
+.markdown-content-on-white h3 {
+  @apply text-2xl font-semibold mb-3;
 }
 
-.markdown-content ul {
+.markdown-content ul,
+.markdown-content-on-white ul {
   @apply list-disc pl-5 mb-4;
 }
 
-.markdown-content li {
-  @apply text-black mb-1;
+.markdown-content li,
+.markdown-content-on-white li {
+  @apply mb-1;
 }
 
+/* Color variants */
 .markdown-content {
+  @apply text-white;
+}
+
+.markdown-content-on-white {
   @apply text-black;
 }
