@@ -197,7 +197,7 @@ export function ProfileSetup() {
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-[#252b3b] p-8 rounded-lg shadow-lg">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-bold text-white">Profile Setup</h2>
+            <h2 className="mt-6 text-3xl font-bold">Profile Setup</h2>
             <p className="mt-2 text-sm text-gray-400">Complete your profile to get started</p>
           </div>
           <form
@@ -266,10 +266,15 @@ export function ProfileSetup() {
                     <SelectValue placeholder="Select your school" />
                   </SelectTrigger>
                   <SelectContent className="bg-white text-gray-700 border-gray-300">
-                    <SelectItem value="UC Berkeley Haas School of Business">UC Berkeley Haas School of Business</SelectItem>
-                    <SelectItem value="Emory University Goizueta Business School">Emory University Goizueta Business School</SelectItem>
                     <SelectItem value="Baylor University Hankamer School of Business">Baylor University Hankamer School of Business</SelectItem>
+                    <SelectItem value="Boston College">Boston College</SelectItem>
                     <SelectItem value="Carnegie Mellon University">Carnegie Mellon University</SelectItem>
+                    <SelectItem value="Columbia University">Columbia University</SelectItem>
+                    <SelectItem value="Emory University Goizueta Business School">Emory University Goizueta Business School</SelectItem>
+                    <SelectItem value="Washington University in St. Louis">Washington University in St. Louis</SelectItem>
+                    <SelectItem value="UC Berkeley">UC Berkeley</SelectItem>
+                    <SelectItem value="UC Berkeley Haas School of Business">UC Berkeley Haas School of Business</SelectItem>
+                    <SelectItem value="USC Marshall School of Business">USC Marshall School of Business</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
