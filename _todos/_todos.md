@@ -3,21 +3,37 @@
 [~] v2 - voice (11/15 - J + S)
 [ ] v3 - auth + home page
 
+# Flow
+1. Setup profile - prompted for resume, school stuff, etc
+2. Get job prep page - company overview, job fit, pitch
+3. Setup Interview - Prompted for interviewer name and role
+4. Get interview prep page - questions to ask, questions i'll be asked, stories to tell
+5. Get Practice - get questions, record and get score and feedback
+
+# Pages Flow
+profile-setup
+job-prep
+interview-prep
+interview
+
 # To Discuss / Triage
-- [ ] How do we calc score for an interview?
-- [ ] TODO: Discuss how to test at scale
-- [ ] 
+- [ ] Discuss how to test at scale
+- [ ] Wait state on Job Prep page
+- [ ] Unhide copy button on Job Prep page
 
 ---
 # Now
-- [x] Add the question to the prompt
-- [ ] Debug why the prompt update is not working in prod
-- [ ] Prompt for asking for interviewer from job-prep page
 - [ ] N2H: "interim/wait" page that describes the sections on the job prep
+- [ ] Interview Prep Page: Fix title; 4 cases (name + role, name only, role only, neither)
+- [ ] Interview Prep Page: Add a "Back Question" button
+- [ ] Interview Prep Page: Add a "Header" for manual transcript; update button text
+- [ ] Interview Prep Page: N2H Show total questions
+- [ ] Interview Prep Page: Fix/test mobile record button
+- [ ] Check out putting queries up front
 
 # Next
-- [ ] Break up profile setup
 - [ ] Auth/Login/Signup
+- [ ] Break up profile setup
 - [ ] Discuss Demo Mode (how to show)
 - [ ] Figure out a better way to handle versioning/handling prompts
 - [ ] Multi-jobs; Use sessions; right now every run is a new profile
@@ -29,10 +45,10 @@
 
 ---
 # Done
-- [x] DG: add email to profile setup page
-- [x] DG: Profile Setup Page: Make it real; Pass and save data to db (upload file); parse the pdf for text
-- [x] SP/DG: Update Prompt for Job Prep
-- [x] SP/DG: Update Prompt for Questions
+- [x] add email to profile setup page
+- [x] Profile Setup Page: Make it real; Pass and save data to db (upload file); parse the pdf for text
+- [x] Update Prompt for Job Prep
+- [x] Update Prompt for Questions
 - [x] Add link to home page on questions page
 - [x] Wait state before Job Prep page
 - [x] Remove default values from Profile Setup page
@@ -62,17 +78,6 @@
 - [x] DG: add section for question, why, focus
 - [x] Insert records into questions table after AI call
   - [x] Update prompt to get back questions in json format
-
-
-# Flow
-1. Setup profile - prompted for resume, school stuff, etc
-2. Get job prep page - company overview, job fit, pitch
-3. Setup Interview - Prompted for interviewer name and role
-4. Get interview prep page - questions to ask, questions i'll be asked, stories to tell
-5. Get Practice - get questions, record and get score and feedback
-
-# Pages Flow
-profile-setup
-job-prep
-interview-prep
-interview
+- [x] Add the question to the prompt
+- [x] Debug why the prompt update is not working in prod
+- [ ] 

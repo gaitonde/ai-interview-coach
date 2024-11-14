@@ -7,12 +7,44 @@ import * as cheerio from 'cheerio';
 const turndownService = new TurndownService();
 
 export async function GET(request: Request) {
+  console.log('IN jobs GET');
   const { searchParams } = new URL(request.url);
   const profileId = searchParams.get('profileId');
+  const scope = searchParams.get('scope');
 
-  //TODO: get jobs for a specific profile
-  const jobs = await sql`SELECT * FROM ai_interview_coach_prod_jobs WHERE profile_id = ${profileId}`;
-  return NextResponse.json(jobs);
+  if (!profileId) {
+    return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 });
+  }
+
+  //TODO: fix dynamic columns
+  // let columns: string;
+  // if (interviewer) {
+  //   columns = 'id, profile_id, interviewer_name, interviewer_role';
+  // } else {
+  //   columns = '*';
+  // }
+  // console.log('ZZZ profileId:', profileId);
+  // console.log('ZZZ columns:', columns);
+
+  
+  // const queryText = `SELECT $1 FROM ai_interview_coach_prod_jobs WHERE profile_id = $2 ORDER BY id DESC LIMIT 1`;
+  // const jobs = await sql.query(queryText, [columns, profileId]);
+
+  const jobs = await sql`
+    SELECT id, profile_id, interviewer_name, interviewer_role 
+    FROM ai_interview_coach_prod_jobs 
+    WHERE profile_id = ${profileId} 
+    ORDER BY id DESC 
+    LIMIT 1
+  `;
+
+  console.log('ZZZ jobs', jobs.rows[0]);
+
+  if (jobs.rows.length < 1) {
+    return NextResponse.json({ content: [] }, { status: 404 });
+  } else {
+    return NextResponse.json({ content: jobs.rows[0] });
+  }
 }
 
 export async function POST(request: Request) {

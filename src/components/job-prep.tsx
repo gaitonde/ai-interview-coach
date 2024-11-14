@@ -5,15 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Footer } from './footer'
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import MarkdownRenderer from "./markdown-renderer"
+import MarkdownRenderer from './markdown-renderer'
 
 export function JobPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
-  // const [questionsRetrieved, setQuestionsRetrieved] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false)  
   const [profileId, setProfileId] = useState<string | null>(null);
-  // const hasFetchedQuestions = useRef(false);
   
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId');
@@ -48,7 +46,8 @@ export function JobPrep() {
             return response.json();
           })
           .then(data => {
-            setContent(data.content);
+            console.log('should be setting content', data);
+            setContent('## Company Scoop\n\n' + data.content);
           })
           .catch(error => {
             console.error('Error fetching prep sheet response:', error);
@@ -87,38 +86,47 @@ export function JobPrep() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#111827]">
-      <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="prep-sheet-content">
-            <MarkdownRenderer content={content} />
-
-            <Button
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  const content = document.querySelector('.prep-sheet-content')?.textContent;
-                  if (content) {
-                    navigator.clipboard.writeText(content)
-                      .then(() => alert('Content copied to clipboard!'))
-                      .catch(err => console.error('Failed to copy: ', err));
+    <>
+      {content && (
+        <div className="flex flex-col min-h-screen bg-[#111827]">
+          <main className="flex-grow flex justify-center">
+            <div className="w-full max-w-4xl">
+              <MarkdownRenderer content={content} />
+              
+              <Button
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    const content = document.querySelector('.prep-sheet-content')?.textContent;
+                    if (content) {
+                      navigator.clipboard.writeText(content)
+                        .then(() => alert('Content copied to clipboard!'))
+                        .catch(err => console.error('Failed to copy: ', err));
+                    }
                   }
-                }
-              }}
-              className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors flex items-center justify-center"
-            >
-              <Clipboard className="w-4 h-4 mr-2" />
-              Copy to Clipboard
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              onClick={handleSubmit}
-              className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
-            >
-              Prepare for Interview
-            </Button>
-          </div>
-      </main>
-      <Footer />
-    </div>
+                }}
+                className="hidden w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
+              >
+                <Clipboard className="w-4 h-4 mr-2" />
+                Copy to Clipboard
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                onClick={handleSubmit}
+                className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+              >
+                {isSubmitting ? 'Generating Cheat Sheet...' : 'Prepare for Interview'}
+              </Button>
+              <p className="text-sm text-muted-foreground mt-1 text-center">
+              {isSubmitting && (
+                'Takes about 30 seconds, please be patient. Thank you.'
+              )}
+              </p>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      )}
+    </>
   )
 }

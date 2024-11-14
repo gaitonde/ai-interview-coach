@@ -1,8 +1,6 @@
 import React, { useCallback } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { set } from 'idb-keyval';
-import { useRouter } from "next/navigation";
-
 interface AudioRecorderProps {
   onTranscriptionComplete: (transcript: string, audioUrl: string) => void;
   version: number;
@@ -17,7 +15,6 @@ export default function AudioRecorder({ onTranscriptionComplete, version }: Audi
   const [recordingTime, setRecordingTime] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const router = useRouter();
 
   const startRecording = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -42,7 +39,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version }: Audi
         console.error('Error saving audio blob to IndexedDB:', error);
       }
 
-      console.log('Audio stopped?');
+      console.log('Audio stopped');
 
       try {
         const transcription = await getTranscription(audioBlob);
@@ -74,9 +71,9 @@ export default function AudioRecorder({ onTranscriptionComplete, version }: Audi
   const handleRecordInteraction = useCallback((event: React.MouseEvent | React.TouchEvent) => {
     console.log('in handleRecordInteraction', recorderState);
     // Prevent double triggering on desktop
-    if (event.type === 'touchstart') {
-      event.preventDefault();
-    }
+    // if (event.type === 'touchstart') {
+    //   event.preventDefault();
+    // }
     
     if (recorderState === 'Ready') {
       console.log('Starting recording');
@@ -149,7 +146,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version }: Audi
           onClick={handleRecordInteraction}
           disabled={recorderState === 'Transcribing'}
         >
-          {recorderState === 'Ready' ? 'Record' : recorderState === 'Recording' ? 'Stop' : 'Transcribing...'}
+          {recorderState === 'Ready' ? 'Record Answer' : recorderState === 'Recording' ? 'Stop' : 'Transcribing...'}
         </button>
       </div>
 

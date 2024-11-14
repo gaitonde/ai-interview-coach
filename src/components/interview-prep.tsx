@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Footer } from './footer'
 import { Clipboard } from 'lucide-react'
@@ -10,7 +10,6 @@ import MarkdownRenderer from "./markdown-renderer"
 export default function InterviewPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
-  // const [questionsRetrieved, setQuestionsRetrieved] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)  
 
   useEffect(() => {
@@ -26,7 +25,7 @@ export default function InterviewPrep() {
             return response.json();
           })
           .then(data => {
-            setContent(data.content);
+            setContent('## Awesome Interview Cheat Sheet\n\n' + data.content);
           })
           .catch(error => {
             console.error('Error fetching prep sheet response:', error);
@@ -68,37 +67,45 @@ export default function InterviewPrep() {
   }
 
   return (
+    <>
+    {content && (
     <div className="flex flex-col min-h-screen bg-[#111827]">
-      <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="prep-sheet-content">
-            <MarkdownRenderer content={content} />
-
-            <Button
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  const content = document.querySelector('.prep-sheet-content')?.textContent;
-                  if (content) {
-                    navigator.clipboard.writeText(content)
-                      .then(() => alert('Content copied to clipboard!'))
-                      .catch(err => console.error('Failed to copy: ', err));
-                  }
+      <main className="flex-grow flex justify-center">
+        <div className="w-full max-w-4xl">
+          <MarkdownRenderer content={content} />
+          <Button
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                const content = document.querySelector('.prep-sheet-content')?.textContent;
+                if (content) {
+                  navigator.clipboard.writeText(content)
+                    .then(() => alert('Content copied to clipboard!'))
+                    .catch(err => console.error('Failed to copy: ', err));
                 }
-              }}
-              className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors flex items-center justify-center"
-            >
-              <Clipboard className="w-4 h-4 mr-2" />
-              Copy to Clipboard
-            </Button>
-            <Button
-              disabled={isSubmitting}
-              onClick={handleSubmit}
-              className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
-            >              
-              Practice Interview Now
-            </Button>
+              }
+            }}
+            className="hidden w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
+          >
+            <Clipboard className="w-4 h-4 mr-2" />
+            Copy to Clipboard
+          </Button>
+          <Button
+            disabled={isSubmitting}
+            onClick={handleSubmit}
+            className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+          >              
+            {isSubmitting ? 'Generating questions...' : 'Practice Interview Now'}
+          </Button>
+          <p className="text-sm text-muted-foreground mt-1 text-center">
+              {isSubmitting && (
+                'Takes about 10 seconds, please be patient. Thank you.'
+              )}
+          </p>
           </div>
-      </main>
-      <Footer />
-    </div>
+        </main>
+        <Footer />
+      </div>
+    )}
+    </>
   )
 }

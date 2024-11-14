@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import CircularProgress from "./circular-progress"
-import { Separator } from "./ui/separator"
-import MarkdownRenderer from "./markdown-renderer"
+import { Separator } from './ui/separator'
+import Markdown from 'react-markdown'
 
 interface Category {
   name: string
@@ -57,7 +57,9 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
       }
     };
 
-    if (isExpanded) {
+    console.log('ZZZ suggestionsMarkdown1', suggestionsMarkdown);
+    if (!suggestionsMarkdown) {
+      console.log('ZZZ suggestionsMarkdown2', suggestionsMarkdown);
       fetchSuggestions();
     }
 
@@ -138,7 +140,7 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
         <>
 
           <Separator className="my-8 h-px bg-gray-200" />
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Scoring</h2>
+          <h2 className="markdown-content">Scoring</h2>
             
             {categories.map((category, index) => (
               <div key={index} className="flex items-center mb-4">
@@ -168,8 +170,8 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
 
           {/* Transcript section */}
           {transcript && (
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">Transcript</h2>
+            <div className="markdown-content mb-8">
+              <h2>Transcript</h2>
               <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600">
                 &quot;{transcript}&quot;
               </blockquote>
@@ -193,7 +195,10 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
             </div>
           )}
 
-          <MarkdownRenderer content={suggestionsMarkdown} />
+          <div className="markdown-content text-black">
+            <h2>XXX</h2>
+            <Markdown>{suggestionsMarkdown}</Markdown>
+          </div>
 {/* 
           <div className="text-gray-900">
             <Markdown>{suggestionsMarkdown}</Markdown>
