@@ -32,6 +32,7 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
   const [suggestionsMarkdown, setSuggestionsMarkdown] = useState<string>('');
   const [audioError, setAudioError] = useState<string | null>(null);
   const suggestionRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
     const profileId = localStorage.getItem('profileId');
@@ -57,9 +58,8 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
       }
     };
 
-    console.log('ZZZ suggestionsMarkdown1', suggestionsMarkdown);
-    if (!suggestionsMarkdown) {
-      console.log('ZZZ suggestionsMarkdown2', suggestionsMarkdown);
+    if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
       fetchSuggestions();
     }
 
@@ -67,7 +67,7 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
     categories.forEach(category => {
       suggestionRefs.current[category.name] = React.createRef<HTMLDivElement>();
     });
-  }, [isExpanded, audioUrl, categories]);
+  }, [categories, isExpanded]);
 
   // const overallAverageScore = categories.reduce((sum, category) => sum + category.score, 0) / categories.length;
 
@@ -195,9 +195,8 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
             </div>
           )}
 
-          <div className="markdown-content text-black">
-            <h2>XXX</h2>
-            <Markdown>{suggestionsMarkdown}</Markdown>
+          <div className="markdown-content">
+            <Markdown className="text-black">{suggestionsMarkdown}</Markdown>
           </div>
 {/* 
           <div className="text-gray-900">

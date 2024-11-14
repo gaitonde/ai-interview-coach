@@ -6,7 +6,6 @@ import Scoring from "./scoring";
 import { get } from 'idb-keyval';
 import { useRouter } from 'next/navigation';
 import { Footer } from "./footer";
-// import { content as initialContent } from './content'
 import styles from '../styles/interview-practice.module.css';
 
 type EvaluatingState = 'Ready' | 'Evaluating';
