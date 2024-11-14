@@ -97,30 +97,26 @@ body {
   @apply mb-4;
 }
 
-.markdown-content h2,
 .markdown-content-on-white h2 {
   @apply text-2xl sm:text-3xl font-bold mb-2 text-[#10B981];
 }
 
-.markdown-content h3,
 .markdown-content-on-white h3 {
   @apply text-2xl font-semibold mb-3;
 }
 
-.markdown-content ul,
 .markdown-content-on-white ul {
   @apply list-disc pl-5 mb-4;
 }
 
-.markdown-content li,
 .markdown-content-on-white li {
   @apply mb-1;
 }
 
 /* Color variants */
-.markdown-content {
+/* .markdown-content {
   @apply text-white;
-}
+} */
 
 .markdown-content-on-white {
   @apply text-black;

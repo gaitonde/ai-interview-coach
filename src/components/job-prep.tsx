@@ -18,7 +18,6 @@ export function JobPrep() {
     console.log("Stored Profile ID!!:", storedProfileId);
     setProfileId(storedProfileId);
 
-    console.log("Profile ID:", profileId);
     // console.log("Has Fetched Questions:", hasFetchedQuestions.current);
 
     // if (storedProfileId && !hasFetchedQuestions.current) {
@@ -47,7 +46,7 @@ export function JobPrep() {
           })
           .then(data => {
             console.log('should be setting content', data);
-            setContent('## Company Scoop\n\n' + data.content);
+            setContent('# Company Scoop\n\n' + data.content);
           })
           .catch(error => {
             console.error('Error fetching prep sheet response:', error);

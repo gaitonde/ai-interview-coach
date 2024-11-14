@@ -17,7 +17,7 @@ export default function InterviewPrep() {
     console.log("Stored Profile ID!!:", profileId);
     // Fetch prep sheet response
     if (profileId) {
-        fetch(`/api/generated-prep-sheet?profileId=${profileId}`)
+        fetch(`/api/generated-questions?profileId=${profileId}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('Failed to fetch prep sheet response');
@@ -58,10 +58,8 @@ export default function InterviewPrep() {
   };  
 
   const handleSubmit = async () => {
-    console.log('VVV handleSubmit')
     setIsSubmitting(true)
     const profileId = Number(localStorage.getItem('profileId')) || 0
-    console.log('VVV profileId: ', profileId)
     await generateInterviewQuestions(profileId)
     router.push(`/interview-practice`)
   }

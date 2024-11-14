@@ -171,7 +171,7 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
 
           {/* Transcript section */}
           {transcript && (
-            <div className="markdown-content mb-8">
+            <div className="markdown-content-on-white mb-8">
               <h2>Transcript</h2>
               <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600">
                 &quot;{transcript}&quot;

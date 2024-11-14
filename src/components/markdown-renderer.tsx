@@ -15,7 +15,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             <ReactMarkdown
               rehypePlugins={[rehypeRaw]}
               components={{
-                h1: ({ node, ...props }) => <h1 className="text-2xl sm:text-3xl font-bold text-[#10B981] text-center mb-4" {...props} />,
+                h1: ({ node, ...props }) => <h1 className="text-4xl sm:text-4xl font-bold text-[#10B981] text-center my-4" {...props} />,
                 h2: ({ node, ...props }) => <h2 className="text-xl sm:text-2xl font-semibold text-[#10B981] mt-6 mb-3" {...props} />,
                 h3: ({ node, ...props }) => <h3 className="text-lg font-semibold text-[#D1D5DB] mt-4 mb-2" {...props} />,
                 p: ({ node, ...props }) => <p className="mb-3" {...props} />,

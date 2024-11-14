@@ -29,7 +29,7 @@ export async function GET(request: Request) {
       }
       // const content = result.rows[0].questions_response
 
-      return NextResponse.json({ content: result.rows });
+      return NextResponse.json({ content: result.rows[0].questions_response });
     } finally {
       client.release();
     }
