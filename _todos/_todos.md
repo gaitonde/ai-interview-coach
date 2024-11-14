@@ -27,19 +27,20 @@ interview-practice / Interview Jam Session
 - [x] Interview Practice Page: Fix getting of questions
 - [x] Interview Practice Page: Fix next/previous question buttons
 - [x] Interview Practice Page: Fix disabled state
-- [ ] Interview Practice Page: fix the suggestion thingy
-- [ ] Interview Practice Page: Store suggestions in db
-- [ ] Interview Practice Page: Fix getting of answers
+- [x] Interview Practice Page: fix the suggestion thingy
+- [x] Interview Practice Page: Store suggestions in db
+- [x] Interview Practice Page: Fix getting of answers
+- [x] Interview Prep Page: Fix title; 4 cases (name + role, name only, role only, neither)
+- [x] Interview Prep Page: Add a "Back Question" button
+- [x] Interview Prep Page: Add a "Header" for manual transcript; update button text
+- [x] Interview Prep Page: N2H Show total questions
 
 - [ ] N2H: "interim/wait" page that describes the sections on the job prep
-- [x] Interview Prep Page: Fix title; 4 cases (name + role, name only, role only, neither)
-- [ ] Interview Prep Page: Add a "Back Question" button
-- [ ] Interview Prep Page: Add a "Header" for manual transcript; update button text
-- [ ] Interview Prep Page: N2H Show total questions
 - [ ] Interview Prep Page: Fix/test mobile record button
-- [ ] Check out putting queries up front
+
 
 # Next
+- [ ] Check out putting queries up front
 - [ ] Auth/Login/Signup
 - [ ] Break up profile setup
 - [ ] Discuss Demo Mode (how to show)

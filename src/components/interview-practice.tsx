@@ -318,7 +318,7 @@ TODO: move these nav buttons somewhere
           )}
         </div>
         {versions.map((version, index) => (
-        <div key={version.recordingTimestamp.toISOString()}>
+        <div key={version.recordingTimestamp.toISOString()} className="text-black">
           {showDebug && version.aiScoringResult && (
             <div className="p-4 bg-white rounded-lg shadow">
               <h2 className="text-xl font-semibold mb-2">Raw AI Scoring Result (Version {versions.length - index}):</h2>

@@ -44,7 +44,6 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
 
       try {
         const transcription = await getTranscription(audioBlob);
-        console.log('ZZZ transcription', transcription);
         onTranscriptionComplete(transcription, url);
       } catch (error) {
         console.error('Transcription error in component:', error);
