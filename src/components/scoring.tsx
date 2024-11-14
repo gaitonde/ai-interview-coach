@@ -25,15 +25,31 @@ interface EvaluationRatingProps {
   isExpanded: boolean;
   answerId: string;
   questionId: string;
+  question: string;
   onToggle: () => void;
 }
 
-export default function Scoring({ finalScore, averageScore, definedRound, categories, transcript, audioUrl, recordingTimestamp, versionNumber, isExpanded, onToggle, answerId, questionId }: EvaluationRatingProps) {
+export default function Scoring({ 
+  finalScore, 
+  averageScore, 
+  definedRound, 
+  categories, 
+  transcript, 
+  audioUrl, 
+  recordingTimestamp, 
+  versionNumber, 
+  isExpanded, 
+  onToggle, 
+  answerId, 
+  questionId,
+  question
+}: EvaluationRatingProps) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [suggestionsMarkdown, setSuggestionsMarkdown] = useState<string>('');
   const [audioError, setAudioError] = useState<string | null>(null);
   const suggestionRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
   const hasFetchedRef = useRef(false);
+  const [questionText, setQuestionText] = useState<string>(question);
 
   useEffect(() => {
     const profileId = localStorage.getItem('profileId');
@@ -118,6 +134,7 @@ export default function Scoring({ finalScore, averageScore, definedRound, catego
             <div className="flex flex-col">
               <span className="text-gray-600 text-sm mb-1">{formattedTimestamp}</span>
             </div>
+            <div className="text-gray-600 text-sm mb-1">{questionText}</div>
           </div>
         </div>
         <div className="text-right">

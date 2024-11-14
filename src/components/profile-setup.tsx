@@ -394,7 +394,7 @@ export function ProfileSetup() {
             >
               {isSubmitting ? 'Processing...' : 'Save Profile'}
             </Button>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1 text-center">
               {isSubmitting && (
                 'Takes about 30 seconds, please be patient. Thank you.'
               )}

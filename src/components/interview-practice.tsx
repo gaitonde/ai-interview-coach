@@ -330,6 +330,7 @@ TODO: move these nav buttons somewhere
           {version.aiScoringResult && (
             <Scoring
               answerId={version.answerId}
+              question={question?.question || ''}
               questionId={question?.id?.toString() || ''}
               finalScore={version.aiScoringResult.finalScore}
               averageScore={version.aiScoringResult.averageScore}
