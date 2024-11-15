@@ -71,34 +71,36 @@ export default function InterviewPrep() {
       <main className="flex-grow flex justify-center">
         <div className="w-full max-w-4xl">
           <MarkdownRenderer content={content} />
-          <Button
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                const content = document.querySelector('.prep-sheet-content')?.textContent;
-                if (content) {
-                  navigator.clipboard.writeText(content)
-                    .then(() => alert('Content copied to clipboard!'))
-                    .catch(err => console.error('Failed to copy: ', err));
+          <div className="mx-4 mb-4">
+            <Button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  const content = document.querySelector('.prep-sheet-content')?.textContent;
+                  if (content) {
+                    navigator.clipboard.writeText(content)
+                      .then(() => alert('Content copied to clipboard!'))
+                      .catch(err => console.error('Failed to copy: ', err));
+                  }
                 }
-              }
-            }}
-            className="hidden w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
-          >
-            <Clipboard className="w-4 h-4 mr-2" />
-            Copy to Clipboard
-          </Button>
-          <Button
-            disabled={isSubmitting}
-            onClick={handleSubmit}
-            className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
-          >              
-            {isSubmitting ? 'Generating questions...' : 'Practice Interview Now'}
-          </Button>
-          <p className="text-sm text-muted-foreground mt-1 text-center">
-              {isSubmitting && (
-                'Takes about 10 seconds, please be patient. Thank you.'
-              )}
-          </p>
+              }}
+              className="hidden w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
+            >
+              <Clipboard className="w-4 h-4 mr-2" />
+              Copy to Clipboard
+            </Button>
+            <Button
+              disabled={isSubmitting}
+              onClick={handleSubmit}
+              className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+            >              
+              {isSubmitting ? 'Generating questions...' : 'Practice Interview Now'}
+            </Button>
+            <p className="text-sm text-muted-foreground mt-1 text-center">
+                {isSubmitting && (
+                  'Takes about 10 seconds, please be patient. Thank you.'
+                )}
+            </p>
+            </div>
           </div>
         </main>
         <Footer />

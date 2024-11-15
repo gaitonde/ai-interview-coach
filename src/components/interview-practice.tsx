@@ -230,7 +230,7 @@ export default function InterviewPractice() {
           
         </div>
 
-        <div className="p-4 bg-white rounded-lg shadow">
+        <div className="p-4 bg-white rounded-lg shadow mt-4">
           <div className="mb-4">
             <div className="flex space-x-4">
               <label className="inline-flex items-center">

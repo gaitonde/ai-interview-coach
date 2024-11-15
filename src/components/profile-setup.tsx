@@ -359,7 +359,7 @@ export function ProfileSetup() {
                   id="interviewer_name"
                   name="interviewer_name"
                   type="text"
-                  placeholder="Ira Johnson"
+                  placeholder="eg. Ira Johnson"
                   // defaultValue="Ira Johnson"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
@@ -372,7 +372,7 @@ export function ProfileSetup() {
                   id="interviewer_role"
                   name="interviewer_role"
                   type="text"
-                  placeholder="Senior Product Manager"
+                  placeholder="eg. Senior Product Manager"
                   // defaultValue="Senior Product Manager"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />

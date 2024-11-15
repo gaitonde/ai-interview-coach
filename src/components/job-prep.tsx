@@ -92,6 +92,7 @@ export function JobPrep() {
             <div className="w-full max-w-4xl">
               <MarkdownRenderer content={content} />
               
+              <div className="mx-4 mb-4">
               <Button
                 onClick={() => {
                   if (typeof window !== 'undefined') {
@@ -121,6 +122,7 @@ export function JobPrep() {
                 'Takes about 30 seconds, please be patient. Thank you.'
               )}
               </p>
+              </div>
             </div>
           </main>
           <Footer />
