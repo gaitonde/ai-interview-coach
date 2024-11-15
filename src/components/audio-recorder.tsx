@@ -16,49 +16,120 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
   const [recordingTime, setRecordingTime] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const [selectedMimeType, setSelectedMimeType] = useState<string>('audio/webm;codecs=opus');
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm; codecs=opus' });
+    try {
+      console.log('Requesting media stream...');
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('Media stream obtained:', stream);
+      
+      const mimeTypes = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/ogg;codecs=opus',
+        'audio/ogg',
+        'audio/mp4',
+        'audio/mpeg',
+        'audio/wav',
+        'audio/aac'
+      ];
 
-    mediaRecorder.ondataavailable = (event) => {
-      audioChunksRef.current.push(event.data);
-    };
-
-    mediaRecorder.onstop = async () => {
-      console.log('Recording stopped');
-      setRecorderState('Transcribing');
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm; codecs=opus' });
-      const url = URL.createObjectURL(audioBlob);
-
-      // Save the audio blob to IndexedDB with version in the key
-      try {
-        const key = `audio_v${version}`;
-        await set(key, audioBlob);
-        console.log('Audio blob saved to IndexedDB with key:', key);
-      } catch (error) {
-        console.error('Error saving audio blob to IndexedDB:', error);
+      console.log('Testing MIME type support...');
+      for (const type of mimeTypes) {
+        const isSupported = MediaRecorder.isTypeSupported(type);
+        console.log(`${type}: ${isSupported ? 'supported' : 'not supported'}`);
       }
 
-      console.log('Audio stopped');
-
-      try {
-        const transcription = await getTranscription(audioBlob);
-        onTranscriptionComplete(transcription, url);
-      } catch (error) {
-        console.error('Transcription error in component:', error);
-        onTranscriptionComplete('Transcription failed', url);
-      } finally {
-        setRecorderState('Ready');
-        setRecordingTime(0);
+      const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
+      if (!mimeType) {
+        throw new Error('No supported audio MIME type found');
       }
-    };
 
-    audioChunksRef.current = [];
-    mediaRecorderRef.current = mediaRecorder;
-    mediaRecorder.start();
-    setRecorderState('Recording');
-    setRecordingTime(0);
+      console.log('Selected MIME type:', mimeType);
+      setSelectedMimeType(mimeType);
+
+      const mediaRecorder = new MediaRecorder(stream, { 
+        mimeType,
+        audioBitsPerSecond: 128000 // Try a standard bitrate
+      });
+      console.log('MediaRecorder created');
+
+      mediaRecorder.ondataavailable = (event) => {
+        console.log('Data available:', event.data.size, 'bytes');
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onerror = (event) => {
+        console.error('MediaRecorder error:', event);
+      };
+
+      mediaRecorder.onstop = async () => {
+        console.log('Recording stopped');
+        setRecorderState('Transcribing');
+        
+        try {
+          const audioBlob = new Blob(audioChunksRef.current, { type: selectedMimeType });
+          console.log('Audio blob created:', {
+            size: audioBlob.size,
+            type: audioBlob.type,
+            chunkCount: audioChunksRef.current.length
+          });
+
+          if (audioBlob.size === 0) {
+            throw new Error('Audio blob is empty');
+          }
+
+          const url = URL.createObjectURL(audioBlob);
+          console.log('Blob URL created:', url);
+
+          if (!window.matchMedia('(max-width: 768px)').matches) {
+            const audio = new Audio();
+            
+            audio.onerror = (e) => {
+              console.error('Audio error:', {
+                error: audio.error,
+                code: audio.error?.code,
+                message: audio.error?.message,
+                networkState: audio.networkState,
+                readyState: audio.readyState
+              });
+            };
+
+            audio.onloadstart = () => console.log('Audio loading started');
+            audio.oncanplay = () => console.log('Audio can start playing');
+            audio.oncanplaythrough = () => console.log('Audio can play through');
+
+            audio.src = url;
+          }
+          
+          const key = `audio_v${version}`;
+          await set(key, audioBlob);
+          console.log('Audio saved to IndexedDB:', key);
+
+          const transcription = await getTranscription(audioBlob);
+          onTranscriptionComplete(transcription, url);
+        } catch (error) {
+          console.error('Error in onstop handler:', error);
+          onTranscriptionComplete('Transcription failed', '');
+        } finally {
+          setRecorderState('Ready');
+          setRecordingTime(0);
+        }
+      };
+
+      audioChunksRef.current = [];
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      console.log('Recording started');
+      setRecorderState('Recording');
+      setRecordingTime(0);
+    } catch (error) {
+      console.error('Error in startRecording:', error);
+      // Provide user feedback
+      alert(`Recording failed to start: ${error}`);
+      setRecorderState('Ready');
+    }
   };
 
   const stopRecording = useCallback(() => {
@@ -70,20 +141,28 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
   }, [recorderState]);
 
   const handleRecordInteraction = useCallback((event: React.MouseEvent | React.TouchEvent) => {
-    console.log('in handleRecordInteraction', recorderState);
-    // Prevent double triggering on desktop
-    // if (event.type === 'touchstart') {
-    //   event.preventDefault();
-    // }
-    
-    if (recorderState === 'Ready') {
-      console.log('Starting recording');
-      startRecording();
-    } else if (recorderState === 'Recording') {
-      console.log('Stopping recording');
-      stopRecording();
+    try {
+      console.log('in handleRecordInteraction', recorderState);
+      console.log('Event type:', event.type);
+      
+      // Prevent any default behavior
+      event.preventDefault();
+      
+      if (recorderState === 'Ready') {
+        console.log('Attempting to start recording...');
+        startRecording().catch(error => {
+          console.error('Failed to start recording:', error);
+          alert(`Failed to start recording: ${error.message}`);
+        });
+      } else if (recorderState === 'Recording') {
+        console.log('Attempting to stop recording...');
+        stopRecording();
+      }
+    } catch (error) {
+      console.error('Error in handleRecordInteraction:', error);
+      alert(`Recording interaction failed: ${error}`);
     }
-  }, [recorderState, startRecording, stopRecording]);
+  }, [recorderState, stopRecording]);
 
   const getTranscription = async (audioBlob: Blob): Promise<string> => {
     const profileId = localStorage.getItem('profileId');
@@ -146,6 +225,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
          ${recorderState === 'Recording' ? 'bg-red-600' : 'bg-[#10B981]'}
           `}
           onClick={handleRecordInteraction}
+          onTouchStart={handleRecordInteraction}
           disabled={recorderState === 'Transcribing'}
         >
           {recorderState === 'Ready' ? 'Record Answer' : recorderState === 'Recording' ? 'Stop' : 'Transcribing...'}

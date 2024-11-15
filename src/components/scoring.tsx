@@ -119,7 +119,7 @@ export default function Scoring({
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-5xl mx-auto font-sans">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-5xl mx-auto font-sans my-8">
       <div
         className="flex items-start justify-between mb-6 cursor-pointer"
         onClick={onToggle} // Change this line
@@ -194,7 +194,7 @@ export default function Scoring({
                 &quot;{transcript}&quot;
               </blockquote>
               {audioUrl && (
-                <div>
+                <div className="hidden md:block">
                   <audio
                     key={audioUrl}
                     className="w-full mt-4"
