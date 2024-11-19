@@ -29,18 +29,18 @@ interface EvaluationRatingProps {
   onToggle: () => void;
 }
 
-export default function Scoring({ 
-  finalScore, 
-  averageScore, 
-  definedRound, 
-  categories, 
-  transcript, 
-  audioUrl, 
-  recordingTimestamp, 
-  versionNumber, 
-  isExpanded, 
-  onToggle, 
-  answerId, 
+export default function Scoring({
+  finalScore,
+  averageScore,
+  definedRound,
+  categories,
+  transcript,
+  audioUrl,
+  recordingTimestamp,
+  versionNumber,
+  isExpanded,
+  onToggle,
+  answerId,
   questionId,
   question
 }: EvaluationRatingProps) {
@@ -52,8 +52,22 @@ export default function Scoring({
   const [questionText, setQuestionText] = useState<string>(question);
 
   useEffect(() => {
-    const profileId = localStorage.getItem('profileId');
+    const profileId = localStorage.getItem('profileId')
     const fetchSuggestions = async () => {
+      try {
+        const response = await fetch(`/api/suggestions?profileId=${profileId}&questionId=${questionId}&answerId=${answerId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch suggestions');
+        }
+
+        const data = await response.json();
+        setSuggestionsMarkdown(data.suggestions);
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        // Handle error (e.g., show an error message to the user)
+      }
+    }
+    const generateSuggestions = async () => {
       try {
         const response = await fetch('/api/generate-suggestions', {
           method: 'POST',
@@ -75,9 +89,12 @@ export default function Scoring({
       }
     };
 
-    if (!hasFetchedRef.current) {
+    if (!hasFetchedRef.current &&questionId && answerId) {
       hasFetchedRef.current = true;
       fetchSuggestions();
+    } else if (!hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      generateSuggestions();
     }
 
     // Initialize refs for each category
@@ -101,7 +118,7 @@ export default function Scoring({
     : 'Date not available';
 
   //to satisfy the type checker
-  console.log('finalScore', finalScore);
+  console.debug('finalScore', finalScore);
   console.debug('definedRound', definedRound);
 
   // const scrollToSuggestion = (categoryName: string) => {
@@ -138,17 +155,17 @@ export default function Scoring({
           </div>
         </div>
         <div className="text-right">
-          <svg 
+          <svg
             className={`h-5 w-5 transform transition-transform duration-200 text-[#059669] ${
               isExpanded ? 'rotate-180' : ''
             }`}
             viewBox="0 0 20 20"
             fill="currentColor"
           >
-            <path 
-              fillRule="evenodd" 
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" 
-              clipRule="evenodd" 
+            <path
+              fillRule="evenodd"
+              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+              clipRule="evenodd"
             />
           </svg>
         </div>
@@ -159,7 +176,7 @@ export default function Scoring({
 
           <Separator className="my-8 h-px bg-gray-200" />
           <h2 className="markdown-content">Scoring</h2>
-            
+
             {categories.map((category, index) => (
               <div key={index} className="flex items-center mb-4">
                 <span className="w-1/3 text-sm text-gray-600">{category.name}</span>
@@ -174,9 +191,9 @@ export default function Scoring({
                 </div>
               </div>
             ))}
-          
+
           {/* Total Score */}
-{/* 
+{/*
           <div className="flex items-center justify-between bg-[#10B981] p-4 rounded-lg mt-8 mb-8">
             <span className="font-bold text-lg text-white">Total Score</span>
             <div className="flex items-center">
@@ -216,7 +233,7 @@ export default function Scoring({
           <div className="markdown-content-on-white text-black">
             <Markdown>{suggestionsMarkdown}</Markdown>
           </div>
-{/* 
+{/*
           <div className="text-gray-900">
             <Markdown>{suggestionsMarkdown}</Markdown>
           </div>

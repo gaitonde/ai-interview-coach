@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Footer } from './footer'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FormEvent } from 'react'
 
@@ -15,6 +15,45 @@ export function ProfileSetup() {
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [school, setSchool] = useState<string>('')
+  const [graduationYear, setGraduationYear] = useState<string>('')
+
+  useEffect(() => {
+    const storedProfileId = localStorage.getItem('profileId')
+    const isDemo = localStorage.getItem('mode') === 'demo';
+    if (isDemo && storedProfileId) {
+      loadProfile(storedProfileId);
+    }
+  }, []);
+
+  const loadProfile = async (profileId: string) => {
+    const response = await fetch(`/api/profile?profileId=${profileId}`);
+    const { profile, job } = await response.json();
+
+    // Set select values using state
+    setSchool(profile.school || '')
+    setGraduationYear(profile.graduation_date ? new Date(profile.graduation_date).getFullYear().toString() : '')
+
+    // Populate form fields with profile data
+    if (formRef.current) {
+      const form = formRef.current;
+
+      // Profile fields
+      (form.elements.namedItem('email') as HTMLInputElement).value = profile.email || '';
+      (form.elements.namedItem('major') as HTMLInputElement).value = profile.major || '';
+      (form.elements.namedItem('concentration') as HTMLInputElement).value = profile.concentration || '';
+
+      // Job fields
+      if (job) {
+        (form.elements.namedItem('company_url') as HTMLInputElement).value = job.company_url || '';
+        (form.elements.namedItem('jd_url') as HTMLInputElement).value = job.jd_url || '';
+        (form.elements.namedItem('interviewer_name') as HTMLInputElement).value = job.interviewer_name || '';
+        (form.elements.namedItem('interviewer_role') as HTMLInputElement).value = job.interviewer_role || '';
+      }
+    }
+
+    return profile;
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -127,12 +166,12 @@ export function ProfileSetup() {
 
   const validateForm = (formData: FormData): string | null => {
     const requiredFields = [
-      'email', 
-      'school', 
-      'major', 
-      'graduation_year', 
-      'company_url', 
-      'jd_url',      
+      'email',
+      'school',
+      'major',
+      'graduation_year',
+      'company_url',
+      'jd_url',
     ];
     for (const field of requiredFields) {
       if (!formData.get(field)) {
@@ -162,6 +201,12 @@ export function ProfileSetup() {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+
+    const isDemo = localStorage.getItem('mode') === 'demo';
+    if (isDemo) {
+      router.push(`/job-prep`);
+      return;
+    }
 
     const formData = new FormData(e.currentTarget);
 
@@ -261,8 +306,7 @@ export function ProfileSetup() {
                 <label htmlFor="school" className="block text-sm font-medium text-white">
                   School
                 </label>
-                {/* <Select name="school" defaultValue="Baylor University Hankamer School of Business"> */}
-                <Select name="school">
+                <Select name="school" value={school} onValueChange={setSchool}>
                   <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 mt-1 rounded-md">
                     <SelectValue placeholder="Select your school" />
                   </SelectTrigger>
@@ -310,8 +354,7 @@ export function ProfileSetup() {
                   Graduation Year
                 </label>
                 <div className="mt-1">
-                  {/* <Select name="graduation_year" defaultValue="2025"> */}
-                  <Select name="graduation_year">
+                  <Select name="graduation_year" value={graduationYear} onValueChange={setGraduationYear}>
                     <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 rounded-md">
                       <SelectValue placeholder="Year" />
                     </SelectTrigger>
@@ -377,7 +420,7 @@ export function ProfileSetup() {
                   // defaultValue="Senior Product Manager"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
-              </div>                            
+              </div>
 {/*
               <div>
                 <label htmlFor="current-courses" className="block text-sm font-medium text-white">
@@ -405,7 +448,7 @@ export function ProfileSetup() {
                 'Takes about 30 seconds, please be patient. Thank you.'
               )}
             </p>
-            
+
           </form>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>

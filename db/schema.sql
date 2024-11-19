@@ -192,3 +192,6 @@ CREATE TABLE ai_interview_coach_prod_suggestions (
 CREATE TRIGGER update_suggestions_last_updated_at
 BEFORE UPDATE ON ai_interview_coach_prod_suggestions
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+
+
+ALTER TABLE ai_interview_coach_prod_profiles ADD COLUMN is_demo BOOLEAN DEFAULT FALSE;

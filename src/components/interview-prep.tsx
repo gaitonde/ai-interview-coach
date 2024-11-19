@@ -6,11 +6,12 @@ import { Footer } from './footer'
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import MarkdownRenderer from "./markdown-renderer"
+import { RubricScorer } from "./rubric-scorer"
 
 export default function InterviewPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
-  const [isSubmitting, setIsSubmitting] = useState(false)  
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     const profileId = localStorage.getItem('profileId');
@@ -34,9 +35,9 @@ export default function InterviewPrep() {
     } else {
       router.push('/');
     }
-  }, []);  
-  
-  const generateInterviewQuestions = async (profileId: number) => {
+  }, []);
+
+  const generateInterviewQuestions = async (profileId: string) => {
     console.log('VVV generateInterviewQuestions', profileId)
     try {
       const response = await fetch('/api/generate-interview-questions', {
@@ -57,12 +58,19 @@ export default function InterviewPrep() {
       console.error('Error generating prep sheet:', error);
       throw error;
     }
-  };  
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true)
-    const profileId = Number(localStorage.getItem('profileId')) || 0
-    await generateInterviewQuestions(profileId)
+    const profileId = localStorage.getItem('profileId') || ''
+    if (!profileId) {
+      alert('No profile ID found. Please select a profile.')
+    }
+    const isDemo = localStorage.getItem('mode') === 'demo'
+    if (!isDemo) {
+      await generateInterviewQuestions(profileId)
+    }
+
     router.push(`/interview-practice`)
   }
 
@@ -73,6 +81,15 @@ export default function InterviewPrep() {
       <main className="flex-grow flex justify-center">
         <div className="w-full max-w-4xl prep-sheet-content">
           <MarkdownRenderer content={content} />
+
+          {localStorage.getItem('showScore') && (
+            <RubricScorer
+              profileId={localStorage.getItem('profileId') || ''}
+              promptKey='prompt-interview-prep-rubric'
+              content={content}
+            />
+          )}
+
           <div className="mx-4 mb-4">
             <Button
               onClick={() => {
@@ -94,7 +111,7 @@ export default function InterviewPrep() {
               disabled={isSubmitting}
               onClick={handleSubmit}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
-            >              
+            >
               {isSubmitting ? 'Generating questions...' : 'Practice Interview Now'}
             </Button>
             <p className="text-sm text-muted-foreground mt-1 text-center">

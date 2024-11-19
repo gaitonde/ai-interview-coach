@@ -10,7 +10,6 @@ export async function GET(request: Request) {
   console.log('IN jobs GET');
   const { searchParams } = new URL(request.url);
   const profileId = searchParams.get('profileId');
-  const scope = searchParams.get('scope');
 
   if (!profileId) {
     return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 });
@@ -26,15 +25,15 @@ export async function GET(request: Request) {
   // console.log('ZZZ profileId:', profileId);
   // console.log('ZZZ columns:', columns);
 
-  
+
   // const queryText = `SELECT $1 FROM ai_interview_coach_prod_jobs WHERE profile_id = $2 ORDER BY id DESC LIMIT 1`;
   // const jobs = await sql.query(queryText, [columns, profileId]);
 
   const jobs = await sql`
-    SELECT id, profile_id, interviewer_name, interviewer_role 
-    FROM ai_interview_coach_prod_jobs 
-    WHERE profile_id = ${profileId} 
-    ORDER BY id DESC 
+    SELECT id, profile_id, interviewer_name, interviewer_role
+    FROM ai_interview_coach_prod_jobs
+    WHERE profile_id = ${profileId}
+    ORDER BY id DESC
     LIMIT 1
   `;
 
@@ -49,12 +48,12 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { 
-    profileId, 
-    company_url, 
-    jd_url, 
-    interviewer_name, 
-    interviewer_role 
+  const {
+    profileId,
+    company_url,
+    jd_url,
+    interviewer_name,
+    interviewer_role
   } = body;
 
   //TODO: do these url fetches async
@@ -91,7 +90,7 @@ async function fetchUrlContents(url: string): Promise<string> {
     const response = await fetch(url);
     const html = await response.text();
     const $ = cheerio.load(html);
-    $('script').remove();  
+    $('script').remove();
     $('[onload], [onclick], [onmouseover], [onfocus], [onsubmit], [oninput]').each((_, element) => {
       Object.keys(element.attribs).forEach(attr => {
         if (attr.startsWith('on')) {
@@ -99,7 +98,7 @@ async function fetchUrlContents(url: string): Promise<string> {
         }
       });
     });
-  
+
     // Get the cleaned HTML
     const cleanHtml = $('body').html();
     const markdown = turndownService.turndown(cleanHtml || '');

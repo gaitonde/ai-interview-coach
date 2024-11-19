@@ -6,63 +6,50 @@ import { Footer } from './footer'
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import MarkdownRenderer from './markdown-renderer'
+import { RubricScorer } from './rubric-scorer'
 
 export function JobPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
-  const [isSubmitting, setIsSubmitting] = useState(false)  
-  const [profileId, setProfileId] = useState<string | null>(null);
-  
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId');
     console.log("Stored Profile ID!!:", storedProfileId);
-    setProfileId(storedProfileId);
 
-    // console.log("Has Fetched Questions:", hasFetchedQuestions.current);
-
-    // if (storedProfileId && !hasFetchedQuestions.current) {
-    //   console.log("Generating Questions!!")
-    //   hasFetchedQuestions.current = true;
-    //   (async () => {
-    //     try {
-    //       console.log("Generating Questions2!!")
-    //       await generateQuestions(storedProfileId);
-    //       console.log("DONE Generating Questions3!!")
-    //       setQuestionsRetrieved(true);
-    //     } catch (error) {
-    //       console.error('Error generating questions:', error);
-    //     }
-    //   })();
-    // }    
-
-    // Fetch prep sheet response
     if (storedProfileId) {
-        fetch(`/api/generated-prep-sheet?profileId=${storedProfileId}`)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Failed to fetch prep sheet response');
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('should be setting content', data);
-            setContent('# Company Scoop\n\n' + data.content);
-          })
-          .catch(error => {
-            console.error('Error fetching prep sheet response:', error);
-            setContent('Error loading content. Please try again later.');
-          });
+      fetch(`/api/generated-prep-sheet?profileId=${storedProfileId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch prep sheet response');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('should be setting content', data);
+          setContent('# Company Scoop\n\n' + data.content);
+        })
+        .catch(error => {
+          console.error('Error fetching prep sheet response:', error);
+          setContent('Error loading content. Please try again later.');
+        });
     } else {
       router.push('/');
     }
   }, []);
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);    
-    const profileId = localStorage.getItem('profileId') || '';
-    await generateInterviewPrep(profileId);
+    setIsSubmitting(true);
+    const profileId = localStorage.getItem('profileId') || ''
+    if (!profileId) {
+      alert('No profile ID found. Please select a profile.')
+    }
+    const isDemo = localStorage.getItem('mode') === 'demo'
+    if (!isDemo) {
+      await generateInterviewPrep(profileId);
+    }
     router.push('/interview-prep');
-  }  
+  }
 
   const generateInterviewPrep = async (profileId: string) => {
     try {
@@ -93,7 +80,15 @@ export function JobPrep() {
           <main className="flex-grow flex justify-center">
             <div className="w-full max-w-4xl prep-sheet-content">
               <MarkdownRenderer content={content} />
-              
+
+              {localStorage.getItem('showScore') && (
+                <RubricScorer
+                  profileId={localStorage.getItem('profileId') || ''}
+                  promptKey='prompt-job-prep-rubric'
+                  content={content}
+                />
+              )}
+
               <div className="mx-4 mb-4">
               <Button
                 onClick={() => {
