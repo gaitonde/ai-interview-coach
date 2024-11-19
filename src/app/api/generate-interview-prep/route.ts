@@ -14,8 +14,6 @@ export async function POST(request: Request) {
 
   try {
     const promptData: PromptData = await fetchPrompt(profileId, 'prompt-interview-prep');
-    console.log('CCC userPrompt: ', promptData.userPrompt);
-    console.log('BBB promptData: ', promptData.systemPrompt);
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,
@@ -28,8 +26,6 @@ export async function POST(request: Request) {
     });
     
     const generatedContent = completion.choices[0]?.message?.content; //?.replace('```json', '').replace('```', '');
-
-    console.log('XXX generatedContent: ', generatedContent);
 
     // Upsert operation for questions_response
     await sql`

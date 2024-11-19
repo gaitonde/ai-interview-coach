@@ -31,6 +31,8 @@ export default function InterviewPrep() {
             console.error('Error fetching prep sheet response:', error);
             setContent('Error loading content. Please try again later.');
           });
+    } else {
+      router.push('/');
     }
   }, []);  
   
@@ -69,7 +71,7 @@ export default function InterviewPrep() {
     {content && (
     <div className="flex flex-col min-h-screen bg-[#111827]">
       <main className="flex-grow flex justify-center">
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-4xl prep-sheet-content">
           <MarkdownRenderer content={content} />
           <div className="mx-4 mb-4">
             <Button
@@ -83,7 +85,7 @@ export default function InterviewPrep() {
                   }
                 }
               }}
-              className="hidden w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
+              className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
             >
               <Clipboard className="w-4 h-4 mr-2" />
               Copy to Clipboard

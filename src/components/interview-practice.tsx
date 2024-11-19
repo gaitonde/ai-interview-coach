@@ -133,44 +133,51 @@ export default function InterviewPractice() {
     
     const fetchJob = async () => {
       try {
-        const response = await fetch(`/api/jobs?profileId=${profileId}&scope=interviewer`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch questions');
+        if (profileId) {
+          const response = await fetch(`/api/jobs?profileId=${profileId}&scope=interviewer`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch questions');
+          }
+          const json = await response.json();
+          const data = json.content;
+          let interviewer = '';
+          
+          if (data.interviewer_name && data.interviewer_role) { 
+            interviewer = `${data.interviewer_name} (${data.interviewer_role})`;
+          } else if (data.interviewer_name) {
+            interviewer = `${data.interviewer_name}`;
+          } else if (data.interviewer_role) {
+            interviewer = `${data.interviewer_role}`;
+          }
+          setWhom(interviewer);
+        } else {
+          router.push('/');
         }
-        const json = await response.json();
-        const data = json.content;
-        let interviewer = '';
-        
-        if (data.interviewer_name && data.interviewer_role) { 
-          interviewer = `${data.interviewer_name} (${data.interviewer_role})`;
-        } else if (data.interviewer_name) {
-          interviewer = `${data.interviewer_name}`;
-        } else if (data.interviewer_role) {
-          interviewer = `${data.interviewer_role}`;
-        }
-        setWhom(interviewer);
       } catch (error) {
         console.error('Error fetching questions response:', error);
-        }
+      }
     }    
 
     const fetchQuestions = async () => {
       try {
-        const response = await fetch(`/api/questions?profileId=${profileId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch questions');
+        if (profileId) {
+          const response = await fetch(`/api/questions?profileId=${profileId}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch questions');
+          }
+          const data = await response.json();
+          setQuestions(data);
+          setQuestion(data[0]);
+          setQuestionIndex(0);
+        } else {
+          router.push('/');
         }
-        const data = await response.json();
-        setQuestions(data);
-        setQuestion(data[0]);
-        setQuestionIndex(0);
       } catch (error) {
         console.error('Error fetching questions response:', error);
         }
     }
 
     if (!whom) {
-      console.log('ZZZ fetching job...');
       fetchJob();
     }
     if (questionIndex < 0) {

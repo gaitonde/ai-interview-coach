@@ -1,45 +1,19 @@
-# High Level Plan
-[x] v1 - just text
-[~] v2 - voice (11/15 - J + S)
-[ ] v3 - auth + home page
-
 # Flow
-1. Setup profile - prompted for resume, school stuff, etc
-2. Get job prep page - company overview, job fit, pitch
-3. Setup Interview - Prompted for interviewer name and role
-4. Get interview prep page - questions to ask, questions i'll be asked, stories to tell
-5. Get Practice - get questions, record and get score and feedback
-
-# Pages Flow
-profile-setup
-job-prep / Company Scoop
-interview-prep / Awesome Interview Cheat Sheet
-interview-practice / Interview Jam Session
+1. [Profile Setup] Setup profile (/) - prompted for resume, school stuff, etc + interview: name, role
+2. [Company Scoop] Get job prep page (/job-prep) - company overview, job fit, pitch
+3. [Awesome Interview Cheat Sheet] Get interview prep page (/interview-prep) - questions to ask, questions i'll be asked, stories to tell
+4. [Interview Jam Session] Get Practice (/interview-practice) - get questions, record and get score and feedback
 
 # To Discuss / Triage
-- [ ] Discuss how to test at scale
-- [ ] Wait state on Job Prep page
-- [ ] Unhide copy button on Job Prep page
-- [ ] Add Nav?
 
 ---
 # Now
-- [x] Interview Practice Page: Fix getting of questions
-- [x] Interview Practice Page: Fix next/previous question buttons
-- [x] Interview Practice Page: Fix disabled state
-- [x] Interview Practice Page: fix the suggestion thingy
-- [x] Interview Practice Page: Store suggestions in db
-- [x] Interview Practice Page: Fix getting of answers
-- [x] Interview Prep Page: Fix title; 4 cases (name + role, name only, role only, neither)
-- [x] Interview Prep Page: Add a "Back Question" button
-- [x] Interview Prep Page: Add a "Header" for manual transcript; update button text
-- [x] Interview Prep Page: N2H Show total questions
-
-- [ ] N2H: "interim/wait" page that describes the sections on the job prep
+- [ ] Unhide copy button on Job Prep page
 - [ ] Interview Prep Page: Fix/test mobile record button
 
-
 # Next
+- [ ] Improve testability
+- [ ] N2H: "interim/wait" page that describes the sections on the job prep
 - [ ] Check out putting queries up front
 - [ ] Auth/Login/Signup
 - [ ] Break up profile setup
@@ -48,6 +22,9 @@ interview-practice / Interview Jam Session
 - [ ] Multi-jobs; Use sessions; right now every run is a new profile
 
 # Later
+- [ ] Add Nav
+- [ ] Add Home Page
+- [ ] Wait state on Job Prep page
 - [ ] Look at locking down public access to the resume file
 - [ ] Validation on prompts from webhook
 - [ ] Fix build linter errors
@@ -89,4 +66,13 @@ interview-practice / Interview Jam Session
 - [x] Update prompt to get back questions in json format
 - [x] Add the question to the prompt
 - [x] Debug why the prompt update is not working in prod
-- [ ] 
+- [x] Interview Practice Page: Fix getting of questions
+- [x] Interview Practice Page: Fix next/previous question buttons
+- [x] Interview Practice Page: Fix disabled state
+- [x] Interview Practice Page: fix the suggestion thingy
+- [x] Interview Practice Page: Store suggestions in db
+- [x] Interview Practice Page: Fix getting of answers
+- [x] Interview Prep Page: Fix title; 4 cases (name + role, name only, role only, neither)
+- [x] Interview Prep Page: Add a "Back Question" button
+- [x] Interview Prep Page: Add a "Header" for manual transcript; update button text
+- [x] Interview Prep Page: N2H Show total questions
