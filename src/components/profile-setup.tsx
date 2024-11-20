@@ -8,7 +8,6 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FormEvent } from 'react'
 import { useToast } from "@/hooks/use-toast"
-import Link from "next/link"
 
 export function ProfileSetup() {
   const router = useRouter()
@@ -269,7 +268,8 @@ export function ProfileSetup() {
                     variant: "default",
                     title: "Example Marketing Profile Loaded",
                     description:
-                      "Example data loaded. Click through the app to see how it works."
+                      "Example data loaded. Click through the app to see how it works.",
+                    className: "bg-green-800 text-white border-0"
                   });
                   loadProfile('283');
                   setIsDemoMode(true);
@@ -353,7 +353,7 @@ export function ProfileSetup() {
                     <SelectItem value="Washington University in St. Louis">Washington University in St. Louis</SelectItem>
                     <SelectItem value="UC Berkeley">UC Berkeley</SelectItem>
                     <SelectItem value="USC">USC</SelectItem>
-                    <SelectItem value="Not Listed">Not Listed</SelectItem>
+                    <SelectItem value="Not on this list">Not on this list</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
