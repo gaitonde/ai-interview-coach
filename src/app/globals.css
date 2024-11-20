@@ -4,7 +4,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #ededed;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -120,4 +120,13 @@ body {
 
 .markdown-content-on-white {
   @apply text-black;
+}
+
+/* #10B981 */
+.normal-mode {
+  @apply w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors
+}
+
+.demo-mode {
+  @apply w-full bg-orange-400 text-white hover:bg-orange-600 py-2 px-4 rounded-md transition-colors
 }

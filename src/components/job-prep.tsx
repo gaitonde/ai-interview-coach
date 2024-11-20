@@ -82,7 +82,7 @@ export function JobPrep() {
             <div className="w-full max-w-4xl prep-sheet-content">
               <MarkdownRenderer content={content} />
 
-              {!isDemoMode && localStorage.getItem('showScore') && (
+              {localStorage.getItem('showScore') && (
                 <RubricScorer
                   profileId={localStorage.getItem('profileId') || ''}
                   promptKey='prompt-job-prep-rubric'
