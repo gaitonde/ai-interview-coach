@@ -16,6 +16,9 @@ export function Footer() {
         <Link href="https://forms.gle/BxLHjUy1oyezeADz5" className="text-sm hover:text-[#10B981] transition-colors" target="_blank">
           Feeback Form
         </Link>
+        <Link href="/demo" className="text-sm hover:text-[#10B981] transition-colors">
+          Demo
+        </Link>
       </div>
     </footer>
   )

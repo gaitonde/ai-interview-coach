@@ -12,10 +12,12 @@ export function JobPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDemoMode, setIsDemoMode] = useState(false)
 
   useEffect(() => {
-    const storedProfileId = localStorage.getItem('profileId');
-    console.log("Stored Profile ID!!:", storedProfileId);
+    const storedProfileId = localStorage.getItem('profileId')
+    const isDemo = localStorage.getItem('mode') === 'demo'
+    setIsDemoMode(isDemo)
 
     if (storedProfileId) {
       fetch(`/api/generated-prep-sheet?profileId=${storedProfileId}`)
@@ -44,8 +46,7 @@ export function JobPrep() {
     if (!profileId) {
       alert('No profile ID found. Please select a profile.')
     }
-    const isDemo = localStorage.getItem('mode') === 'demo'
-    if (!isDemo) {
+    if (!isDemoMode) {
       await generateInterviewPrep(profileId);
     }
     router.push('/interview-prep');
@@ -81,7 +82,7 @@ export function JobPrep() {
             <div className="w-full max-w-4xl prep-sheet-content">
               <MarkdownRenderer content={content} />
 
-              {localStorage.getItem('showScore') && (
+              {!isDemoMode && localStorage.getItem('showScore') && (
                 <RubricScorer
                   profileId={localStorage.getItem('profileId') || ''}
                   promptKey='prompt-job-prep-rubric'
@@ -112,7 +113,7 @@ export function JobPrep() {
                 onClick={handleSubmit}
                 className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
               >
-                {isSubmitting ? 'Generating Cheat Sheet...' : 'Prepare for Interview'}
+                {isDemoMode ? 'Next' : isSubmitting ? 'Generating Cheat Sheet...' : 'Prepare for Interview'}
               </Button>
               <p className="text-sm text-muted-foreground mt-1 text-center">
               {isSubmitting && (

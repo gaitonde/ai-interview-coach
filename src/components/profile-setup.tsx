@@ -7,6 +7,8 @@ import { Footer } from './footer'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { FormEvent } from 'react'
+import { useToast } from "@/hooks/use-toast"
+import Link from "next/link"
 
 export function ProfileSetup() {
   const router = useRouter()
@@ -17,6 +19,8 @@ export function ProfileSetup() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [school, setSchool] = useState<string>('')
   const [graduationYear, setGraduationYear] = useState<string>('')
+  const [isDemoMode, setIsDemoMode] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId')
@@ -24,6 +28,7 @@ export function ProfileSetup() {
     if (isDemo && storedProfileId) {
       loadProfile(storedProfileId);
     }
+    setIsDemoMode(isDemo);
   }, []);
 
   const loadProfile = async (profileId: string) => {
@@ -50,6 +55,11 @@ export function ProfileSetup() {
         (form.elements.namedItem('interviewer_name') as HTMLInputElement).value = job.interviewer_name || '';
         (form.elements.namedItem('interviewer_role') as HTMLInputElement).value = job.interviewer_role || '';
       }
+
+      //resume field
+      setFileName(`${profile.email}-resume.pdf`);
+      const mockFile = new File([''], 'sample-resume.pdf', { type: 'application/pdf' });
+      setResumeFile(mockFile);
     }
 
     return profile;
@@ -245,6 +255,31 @@ export function ProfileSetup() {
             <h1 className="text-4xl font-bold text-[#10B981]">AI Interview Coach</h1>
             <h2 className="mt-2 text-3xl font-bold text-white">Profile Setup</h2>
             <p className="mt-2 text-sm text-gray-400">Complete your profile to get started</p>
+            <p className="mt-2 text-sm text-gray-400">
+              (or
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  localStorage.setItem('mode', 'demo');
+                  //TODO: set to proper profileId
+                  localStorage.setItem('profileId', '283');
+
+                  toast({
+                    variant: "default",
+                    title: "Example Marketing Profile Loaded",
+                    description:
+                      "Example data loaded. Click through the app to see how it works."
+                  });
+                  loadProfile('283');
+                  setIsDemoMode(true);
+                }}
+                className="text-[#10B981] hover:text-[#059669] underline mx-1"
+              >
+                view a marketing example
+              </a>
+              instead)
+            </p>
           </div>
           <form
             ref={formRef}
@@ -261,7 +296,6 @@ export function ProfileSetup() {
                   name="email"
                   type="email"
                   placeholder="email@example.com"
-                  // defaultValue="a@b.com"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -332,7 +366,6 @@ export function ProfileSetup() {
                   name="major"
                   type="text"
                   placeholder="e.g. Finance, Marketing, etc."
-                  // defaultValue="Marketing, Management, Entrepreneurship"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -345,7 +378,6 @@ export function ProfileSetup() {
                   name="concentration"
                   type="text"
                   placeholder="e.g. Commercial, Private Equity, International"
-                  // defaultValue="SEO, Consulting"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -378,7 +410,6 @@ export function ProfileSetup() {
                   name="company_url"
                   type="text"
                   placeholder="https://acme.com"
-                  // defaultValue="http://www.apple.com/careers/us/"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -391,7 +422,6 @@ export function ProfileSetup() {
                   name="jd_url"
                   type="text"
                   placeholder="https://careers.example.com/job-description"
-                  // defaultValue="https://jobs.apple.com/en-us/details/200554357/business-marketing-and-g-a-internships?team=STDNT"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -441,7 +471,7 @@ export function ProfileSetup() {
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Processing...' : 'Save Profile'}
+              {isDemoMode ? 'Next' : isSubmitting ? 'Processing...' : 'Save Profile'}
             </Button>
             <p className="text-sm text-muted-foreground mt-1 text-center">
               {isSubmitting && (

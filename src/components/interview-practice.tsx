@@ -230,43 +230,45 @@ export default function InterviewPractice() {
               <h1 className={styles.h1}>Interview Jam Session</h1>
             {whom && <h3 className={styles.h3}>with {whom}</h3>}
             </div>
-            <div className="p-4 bg-white rounded-lg shadow">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-black"><b>Category:</b> {question?.category} Question</h2>
-                <span className="text-black">Question {questionIndex + 1} of {questions.length}</span>
+            {questions.length > 0 && (
+              <div className="p-4 bg-white rounded-lg shadow">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-black"><b>Category:</b> {question?.category} Question</h2>
+                  <span className="text-black">Question {questionIndex + 1} of {questions.length}</span>
+                </div>
+                <h3 className="text-md text-black mb-4">
+                  <b>Question:</b> {question?.question}
+                </h3>
+                <h3 className="text-md text-black mb-4">
+                  <b>Why:</b> {question?.why}
+                </h3>
+                <h3 className="text-md text-black mb-4">
+                  <b>Focus:</b> {question?.focus}
+                </h3>
+                <button
+                  className="text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors mr-4"
+                  disabled={questionIndex === 0}
+                  onClick={() => {
+                    const previousIndex = questionIndex - 1;
+                    setQuestionIndex(previousIndex);
+                    setQuestion(questions[previousIndex]);
+                  }}
+                >
+                  Previous Question
+                </button>
+                <button
+                  className="text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
+                  disabled={questionIndex === questions.length - 1}
+                  onClick={() => {
+                    const nextIndex = questionIndex + 1;
+                    setQuestionIndex(nextIndex);
+                    setQuestion(questions[nextIndex]);
+                  }}
+                >
+                  Next Question
+                </button>
               </div>
-              <h3 className="text-md text-black mb-4">
-                <b>Question:</b> {question?.question}
-              </h3>
-              <h3 className="text-md text-black mb-4">
-                <b>Why:</b> {question?.why}
-              </h3>
-              <h3 className="text-md text-black mb-4">
-                <b>Focus:</b> {question?.focus}
-              </h3>
-              <button
-                className="text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors mr-4"
-                disabled={questionIndex === 0}
-                onClick={() => {
-                  const previousIndex = questionIndex - 1;
-                  setQuestionIndex(previousIndex);
-                  setQuestion(questions[previousIndex]);
-                }}
-              >
-                Previous Question
-              </button>
-              <button
-                className="text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
-                disabled={questionIndex === questions.length - 1}
-                onClick={() => {
-                  const nextIndex = questionIndex + 1;
-                  setQuestionIndex(nextIndex);
-                  setQuestion(questions[nextIndex]);
-                }}
-              >
-                Next Question
-              </button>
-            </div>
+            )}
             {!isDemo && (
             <div className="p-4 bg-white rounded-lg shadow mt-4">
               <div className="mb-4">

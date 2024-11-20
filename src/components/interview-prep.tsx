@@ -12,10 +12,14 @@ export default function InterviewPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDemoMode, setIsDemoMode] = useState(false)
 
   useEffect(() => {
-    const profileId = localStorage.getItem('profileId');
-    console.log("Stored Profile ID!!:", profileId);
+    const profileId = localStorage.getItem('profileId')
+    console.log("Stored Profile ID!!:", profileId)
+    const isDemo = localStorage.getItem('mode') === 'demo'
+    setIsDemoMode(isDemo)
+
     // Fetch prep sheet response
     if (profileId) {
         fetch(`/api/generated-questions?profileId=${profileId}`)
@@ -66,8 +70,7 @@ export default function InterviewPrep() {
     if (!profileId) {
       alert('No profile ID found. Please select a profile.')
     }
-    const isDemo = localStorage.getItem('mode') === 'demo'
-    if (!isDemo) {
+    if (!isDemoMode) {
       await generateInterviewQuestions(profileId)
     }
 
@@ -82,7 +85,7 @@ export default function InterviewPrep() {
         <div className="w-full max-w-4xl prep-sheet-content">
           <MarkdownRenderer content={content} />
 
-          {localStorage.getItem('showScore') && (
+          {!isDemoMode && localStorage.getItem('showScore') && (
             <RubricScorer
               profileId={localStorage.getItem('profileId') || ''}
               promptKey='prompt-interview-prep-rubric'
@@ -112,7 +115,7 @@ export default function InterviewPrep() {
               onClick={handleSubmit}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
             >
-              {isSubmitting ? 'Generating questions...' : 'Practice Interview Now'}
+              {isDemoMode ? 'Next' : isSubmitting ? 'Generating questions...' : 'Practice Interview Now'}
             </Button>
             <p className="text-sm text-muted-foreground mt-1 text-center">
                 {isSubmitting && (
