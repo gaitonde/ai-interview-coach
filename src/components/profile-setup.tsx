@@ -268,7 +268,7 @@ export function ProfileSetup() {
 
               <div>
                 <label htmlFor="resume" className="block text-sm font-medium text-white">
-                  Upload Resume (PDF) *
+                  Upload Resume (PDF)
                 </label>
                 <div className="mt-1 flex items-center">
                   <label
@@ -311,15 +311,15 @@ export function ProfileSetup() {
                     <SelectValue placeholder="Select your school" />
                   </SelectTrigger>
                   <SelectContent className="bg-white text-gray-700 border-gray-300">
-                    <SelectItem value="Baylor University Hankamer School of Business">Baylor University Hankamer School of Business</SelectItem>
+                    <SelectItem value="Baylor University">Baylor University</SelectItem>
                     <SelectItem value="Boston College">Boston College</SelectItem>
                     <SelectItem value="Carnegie Mellon University">Carnegie Mellon University</SelectItem>
                     <SelectItem value="Columbia University">Columbia University</SelectItem>
-                    <SelectItem value="Emory University Goizueta Business School">Emory University Goizueta Business School</SelectItem>
+                    <SelectItem value="Emory University">Emory University</SelectItem>
                     <SelectItem value="Washington University in St. Louis">Washington University in St. Louis</SelectItem>
                     <SelectItem value="UC Berkeley">UC Berkeley</SelectItem>
-                    <SelectItem value="UC Berkeley Haas School of Business">UC Berkeley Haas School of Business</SelectItem>
-                    <SelectItem value="USC Marshall School of Business">USC Marshall School of Business</SelectItem>
+                    <SelectItem value="USC">USC</SelectItem>
+                    <SelectItem value="Not Listed">Not Listed</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

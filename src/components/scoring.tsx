@@ -89,7 +89,9 @@ export default function Scoring({
       }
     };
 
-    if (!hasFetchedRef.current &&questionId && answerId) {
+    const isDemo = localStorage.getItem('mode') === 'demo';
+
+    if (isDemo && !hasFetchedRef.current && questionId && answerId) {
       hasFetchedRef.current = true;
       fetchSuggestions();
     } else if (!hasFetchedRef.current) {

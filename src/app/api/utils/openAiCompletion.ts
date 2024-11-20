@@ -5,8 +5,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function generateCompletion(profileId: string, promptKey: string) {
-  const promptData: PromptData = await fetchPrompt(profileId, promptKey);
+export async function generateCompletion(profileId: string, promptKey: string, content?: string) {
+  const promptData: PromptData = await fetchPrompt(profileId, promptKey, content);
 
   const completion = await openai.chat.completions.create({
     model: promptData.model,

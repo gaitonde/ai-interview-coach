@@ -1,10 +1,9 @@
-# Flow
-1. [Profile Setup] Setup profile (/) - prompted for resume, school stuff, etc + interview: name, role
-2. [Company Scoop] Get job prep page (/job-prep) - company overview, job fit, pitch
-3. [Awesome Interview Cheat Sheet] Get interview prep page (/interview-prep) - questions to ask, questions i'll be asked, stories to tell
-4. [Interview Jam Session] Get Practice (/interview-practice) - get questions, record and get score and feedback
-
 # To Discuss / Triage
+- Fix waiting state on interview practice page
+- Add privacy page
+- Add terms of service page
+- Demo link
+
 
 ---
 # Now
@@ -30,6 +29,13 @@
 - [ ] Fix build linter errors
 
 ---
+# Flow
+1. [Profile Setup] Setup profile (/) - prompted for resume, school stuff, etc + interview: name, role
+2. [Company Scoop] Get job prep page (/job-prep) - company overview, job fit, pitch
+3. [Awesome Interview Cheat Sheet] Get interview prep page (/interview-prep) - questions to ask, questions i'll be asked, stories to tell
+4. [Interview Jam Session] Get Practice (/interview-practice) - get questions, record and get score and feedback
+
+---
 # Done
 - [x] add email to profile setup page
 - [x] Profile Setup Page: Make it real; Pass and save data to db (upload file); parse the pdf for text
@@ -46,7 +52,7 @@
 - [x] Implement Grade logic
 - [x] Move questions call to Questions page
 - [x] Update Prompts
-- [x] Talk about what is desired in "version" in job prep page 
+- [x] Talk about what is desired in "version" in job prep page
 - [x] Store AI response metrics in db
 - [x] Add Initial Interviewer Page and all associated navigation
 - [x] Add Interviewer name and role to model and ui

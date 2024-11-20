@@ -189,9 +189,6 @@ export default function InterviewPractice() {
           setQuestion(uniqueQuestions[0]);
           setQuestionIndex(0);
 
-          console.log('DATA FROM NEW QUESTIONS FETCH!!!', data);
-          console.log('IS DEMO', isDemo);
-
           if (isDemo && data.length > 0) {
             const demoVersions = data.map((item: Question & { answerId: string; answer: string; scores: ScoringResult; recordingTimestamp: string }) => ({
               answerId: item.answerId,

@@ -28,14 +28,14 @@ export interface PromptData {
   maxCompletionTokens: number;
 }
 
-export async function fetchPrompt(profileId: string, promptKey: string, questionId?: string, answerId?: string): Promise<PromptData> {
+export async function fetchPrompt(profileId: string, promptKey: string, questionId?: string, answerId?: string, content?: string): Promise<PromptData> {
   const profileData = await fetchProfileData(profileId, questionId, answerId);
   const rawPromptData = await fetchRawPrompt(promptKey);
 
   return {
     model: rawPromptData.model,
-    systemPrompt: applyVariables(rawPromptData.system_prompt, profileData),
-    userPrompt: applyVariables(rawPromptData.user_prompt, profileData),
+    systemPrompt: applyVariables(rawPromptData.system_prompt, profileData, content),
+    userPrompt: applyVariables(rawPromptData.user_prompt, profileData, content),
     temperature: rawPromptData.temperature,
     maxCompletionTokens: rawPromptData.max_completion_tokens
   };
@@ -64,7 +64,7 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
   const { url: resumeUrl, text: resume } = resumeDetails.rows[0];
   const question = questionId ? questionDetails.rows[0]?.question : null;
   const answer = answerId ? answerDetails.rows[0]?.answer : null;
-  
+
   const gradYear = new Date(graduationDate).getFullYear();
   const gradeClass = await fetchGradeClass(gradYear, todayDate);
   console.debug('gradYear, todayDate, gradeClass:', gradYear, todayDate, gradeClass);
@@ -112,7 +112,7 @@ async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: strin
   return promptData.data;
 }
 
-function applyVariables(prompt: string, data: ProfileData): string {
+function applyVariables(prompt: string, data: ProfileData, content?: string): string {
   return prompt
     .replace('${jobDescription}', data.jobDescription)
     .replace('${companyWebsiteText}', data.companyWebsiteText)
@@ -126,5 +126,6 @@ function applyVariables(prompt: string, data: ProfileData): string {
     .replace('${interviewerName}', data.interviewerName || '')
     .replace('${interviewerRole}', data.interviewerRole || '')
     .replace('${question}', data.question || '')
-    .replace('${transcription}', data.answer || '');
+    .replace('${transcription}', data.answer || '')
+    .replace('${content}', content || '');
 }
