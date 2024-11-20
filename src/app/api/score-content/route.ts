@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Profile ID, prompt key, and content are required' }, { status: 400 });
     }
 
-    const { content: rubric } = await generateCompletion(profileId, promptKey);
+    const { content: rubric } = await generateCompletion(profileId, promptKey, content);
 
     return NextResponse.json({ rubric });
   } catch (error) {

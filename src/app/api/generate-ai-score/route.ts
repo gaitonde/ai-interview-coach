@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       starMethodAdherence: rubricScores.starMethodAdherence,
       confidenceAndProfessionalism: rubricScores.confidenceAndProfessionalism,
       finalScore: parseFloat((finalScore ?? 0).toFixed(2)),
-      averageScore: parseFloat((averageScore ?? 0).toFixed(2))  
+      averageScore: parseFloat((averageScore ?? 0).toFixed(2))
     };
 
     const json = NextResponse.json(result);

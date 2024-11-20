@@ -379,6 +379,7 @@ export default function InterviewPractice() {
           <div className="mb-4">
             <Button
               onClick={() => {
+                localStorage.removeItem('mode');
                 router.push('/');
               }}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
