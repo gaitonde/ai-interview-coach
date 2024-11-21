@@ -80,46 +80,48 @@ export function JobPrep() {
         <div className="flex flex-col min-h-screen bg-[#111827]">
           <main className="flex-grow flex justify-center">
             <div className="w-full max-w-4xl prep-sheet-content">
-              <MarkdownRenderer content={content} />
+              <div className="mx-4">
+                <MarkdownRenderer content={content} />
 
-              {localStorage.getItem('showScore') && (
-                <RubricScorer
-                  profileId={localStorage.getItem('profileId') || ''}
-                  promptKey='prompt-job-prep-rubric'
-                  content={content}
-                />
-              )}
+                {localStorage.getItem('showScore') && (
+                  <RubricScorer
+                    profileId={localStorage.getItem('profileId') || ''}
+                    promptKey='prompt-job-prep-rubric'
+                    content={content}
+                  />
+                )}
 
-              <div className="mx-4 mb-4">
-              <Button
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    const content = document.querySelector('.prep-sheet-content')?.textContent;
-                    if (content) {
-                      navigator.clipboard.writeText(content)
-                        .then(() => alert('Content copied to clipboard!'))
-                        .catch(err => console.error('Failed to copy: ', err));
+                <div className="mx-4 mb-4">
+                <Button
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      const content = document.querySelector('.prep-sheet-content')?.textContent;
+                      if (content) {
+                        navigator.clipboard.writeText(content)
+                          .then(() => alert('Content copied to clipboard!'))
+                          .catch(err => console.error('Failed to copy: ', err));
+                      }
                     }
-                  }
-                }}
-                className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
-              >
-                <Clipboard className="w-4 h-4 mr-2" />
-                Copy to Clipboard
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                onClick={handleSubmit}
-                className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
-              >
-                {isDemoMode ? 'Next' : isSubmitting ? 'Generating Cheat Sheet...' : 'Prepare for Interview'}
-              </Button>
-              <p className="text-sm text-muted-foreground mt-1 text-center">
-              {isSubmitting && (
-                'Takes about 30 seconds, please be patient. Thank you.'
-              )}
-              </p>
+                  }}
+                  className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
+                >
+                  <Clipboard className="w-4 h-4 mr-2" />
+                  Copy to Clipboard
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  onClick={handleSubmit}
+                  className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+                >
+                  {isDemoMode ? 'Next' : isSubmitting ? 'Generating Cheat Sheet...' : 'Prepare for Interview'}
+                </Button>
+                <p className="text-sm text-muted-foreground mt-1 text-center">
+                {isSubmitting && (
+                  'Takes about 30 seconds, please be patient. Thank you.'
+                )}
+                </p>
+                </div>
               </div>
             </div>
           </main>

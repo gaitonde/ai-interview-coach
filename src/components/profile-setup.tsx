@@ -262,24 +262,27 @@ export function ProfileSetup() {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
+                  const demoProfileId = '326';
                   localStorage.setItem('mode', 'demo');
-                  localStorage.setItem('profileId', '312');
+                  localStorage.setItem('profileId', demoProfileId);
 
                   toast({
                     variant: "default",
+                    duration: 2000,
+                    className: "bg-green-800 text-white border-0",
                     title: "Example Marketing Profile Loaded",
                     description:
                       "Example data loaded. Click through the app to see how it works.",
-                    className: "bg-green-800 text-white border-0"
                   });
-                  loadProfile('312');
+
+                  loadProfile(demoProfileId);
                   setIsDemoMode(true);
                 }}
                 className="text-[#10B981] hover:text-[#059669] underline mx-1"
               >
                 view an example
               </a>
-              instead)
+              first)
             </p>
           </div>
           <form
@@ -308,7 +311,7 @@ export function ProfileSetup() {
                 <div className="mt-1 flex items-center">
                   <label
                     htmlFor="resume"
-                    className="cursor-pointer bg-white text-gray-700 px-3 py-2 text-sm rounded-md hover:bg-gray-100 transition-colors"
+                    className="cursor-pointer bg-white text-gray-700 px-3 py-2 text-sm rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
                   >
                     Choose File
                   </label>
@@ -320,7 +323,7 @@ export function ProfileSetup() {
                     onChange={handleFileChange}
                     className="hidden"
                   />
-                  <span className="ml-3 text-sm text-gray-400">{fileName}</span>
+                  <span className="ml-3 text-sm text-gray-400 truncate">{fileName}</span>
                 </div>
               </div>
 {/*

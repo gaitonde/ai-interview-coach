@@ -177,16 +177,23 @@ export default function InterviewPractice() {
             throw new Error('Failed to fetch questions');
           }
           const data = await response.json();
+          console.log('QUESTIONS!!', data);
           // Filter out duplicate questions by questionId
-          const uniqueQuestions = data.reduce((acc: Question[], curr: Question) => {
-            const exists = acc.find(q => q.questionId === curr.questionId);
-            if (!exists) {
-              acc.push(curr);
-            }
-            return acc;
-          }, []);
-          setQuestions(uniqueQuestions);
-          setQuestion(uniqueQuestions[0]);
+          let questions;
+          if (isDemo) {
+            questions = data.reduce((acc: Question[], curr: Question) => {
+              const exists = acc.find(q => q.questionId === curr.questionId);
+              if (!exists) {
+                acc.push(curr);
+              }
+              return acc;
+            }, []);
+          } else {
+            questions = data;
+          }
+          console.log('UNIQUE QUESTIONS!!', questions);
+          setQuestions(questions);
+          setQuestion(questions[0]);
           setQuestionIndex(0);
 
           if (isDemo && data.length > 0) {
@@ -232,9 +239,10 @@ export default function InterviewPractice() {
             </div>
             {questions.length > 0 && (
               <div className="p-4 bg-white rounded-lg shadow">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-black"><b>Category:</b> {question?.category} Question</h2>
-                  <span className="text-black">Question {questionIndex + 1} of {questions.length}</span>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+                  <h2 className="text-black"><b>Category:</b> {question?.category}</h2>
+                  <span className="text-black whitespace-nowrap"><b>Question:</b> {questionIndex + 1} of {questions.length}</span>
+                  <hr className="border-gray-300 w-full sm:hidden" />
                 </div>
                 <h3 className="text-md text-black mb-4">
                   <b>Question:</b> {question?.question}
@@ -245,28 +253,32 @@ export default function InterviewPractice() {
                 <h3 className="text-md text-black mb-4">
                   <b>Focus:</b> {question?.focus}
                 </h3>
-                <button
-                  className="text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors mr-4"
-                  disabled={questionIndex === 0}
-                  onClick={() => {
-                    const previousIndex = questionIndex - 1;
-                    setQuestionIndex(previousIndex);
-                    setQuestion(questions[previousIndex]);
-                  }}
-                >
-                  Previous Question
-                </button>
-                <button
-                  className="text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
-                  disabled={questionIndex === questions.length - 1}
-                  onClick={() => {
-                    const nextIndex = questionIndex + 1;
-                    setQuestionIndex(nextIndex);
-                    setQuestion(questions[nextIndex]);
-                  }}
-                >
-                  Next Question
-                </button>
+                <div className="flex flex-wrap gap-4">
+                  <button
+                    className="flex-1 text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
+                    disabled={questionIndex === 0}
+                    onClick={() => {
+                      const previousIndex = questionIndex - 1;
+                      setQuestionIndex(previousIndex);
+                      setQuestion(questions[previousIndex]);
+                    }}
+                  >
+                    <span className="sm:hidden">Previous</span>
+                    <span className="hidden sm:inline">Previous Question</span>
+                  </button>
+                  <button
+                    className="flex-1 text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
+                    disabled={questionIndex === questions.length - 1}
+                    onClick={() => {
+                      const nextIndex = questionIndex + 1;
+                      setQuestionIndex(nextIndex);
+                      setQuestion(questions[nextIndex]);
+                    }}
+                  >
+                    <span className="sm:hidden">Next</span>
+                    <span className="hidden sm:inline">Next Question</span>
+                  </button>
+                </div>
               </div>
             )}
             {!isDemo && (
@@ -376,7 +388,7 @@ export default function InterviewPractice() {
           )}
           </div>
           ))}
-          {questions.length > 0 && (<div className="mb-4">
+          {questions.length > 0 && (<div className="my-4">
             <Button
               onClick={() => {
                 localStorage.removeItem('mode');

@@ -89,7 +89,9 @@ export function Demo() {
                   }
                   toast({
                     variant: "default",
+                    duration: 2000,
                     title: checked ? "Prompt Rubrics Enabled" : "Prompt Rubrics Disabled",
+                    className: "bg-green-800 text-white border-0",
                     description: checked
                       ? "You will now see scoring rubrics for each prompt."
                       : "Scoring rubrics are now hidden.",

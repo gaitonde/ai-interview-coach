@@ -140,8 +140,8 @@ export default function Scoring({
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg max-w-5xl mx-auto font-sans my-8">
       <div
-        className="flex items-start justify-between mb-6 cursor-pointer"
-        onClick={onToggle} // Change this line
+        className="flex flex-col gap-2"
+        onClick={onToggle}
       >
         <div className="flex items-center">
           <CircularProgress
@@ -149,28 +149,28 @@ export default function Scoring({
             size={88}
           />
           <div className="ml-4">
-            <h2 className="text-3xl font-bold text-gray-800 mb-1">Attempt #{versionNumber}</h2>
-            <div className="flex flex-col">
-              <span className="text-gray-600 text-sm mb-1">{formattedTimestamp}</span>
-            </div>
-            <div className="text-gray-600 text-sm mb-1">{questionText}</div>
+            <h2 className="text-xl md:text-2xl md:font-bold text-gray-800">{`Attempt #${versionNumber}`}</h2>
+          </div>
+          <div className="ml-auto">
+            <svg
+              className={`h-5 w-5 transform transition-transform duration-200 text-[#059669] ${
+                isExpanded ? 'rotate-180' : ''
+              }`}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
           </div>
         </div>
-        <div className="text-right">
-          <svg
-            className={`h-5 w-5 transform transition-transform duration-200 text-[#059669] ${
-              isExpanded ? 'rotate-180' : ''
-            }`}
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </div>
+
+        <div className="text-gray-600 text-sm">{formattedTimestamp}</div>
+
+        <div className="text-gray-600 text-sm break-words">{questionText}</div>
       </div>
 
       {isExpanded && (

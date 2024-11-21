@@ -42,7 +42,6 @@ export default function InterviewPrep() {
   }, []);
 
   const generateInterviewQuestions = async (profileId: string) => {
-    console.log('VVV generateInterviewQuestions', profileId)
     try {
       const response = await fetch('/api/generate-interview-questions', {
         method: 'POST',
