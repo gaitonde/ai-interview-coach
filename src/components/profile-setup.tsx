@@ -42,10 +42,17 @@ export function ProfileSetup() {
     if (formRef.current) {
       const form = formRef.current;
 
-      // Profile fields
-      (form.elements.namedItem('email') as HTMLInputElement).value = profile.email || '';
-      (form.elements.namedItem('major') as HTMLInputElement).value = profile.major || '';
-      (form.elements.namedItem('concentration') as HTMLInputElement).value = profile.concentration || '';
+      if (profile) {
+        // Profile fields
+        (form.elements.namedItem('email') as HTMLInputElement).value = profile.email || '';
+        (form.elements.namedItem('major') as HTMLInputElement).value = profile.major || '';
+        (form.elements.namedItem('concentration') as HTMLInputElement).value = profile.concentration || '';
+
+        //resume field
+        setFileName(`${profile.email}-resume.pdf`);
+        const mockFile = new File([''], 'sample-resume.pdf', { type: 'application/pdf' });
+        setResumeFile(mockFile);
+      }
 
       // Job fields
       if (job) {
@@ -54,11 +61,6 @@ export function ProfileSetup() {
         (form.elements.namedItem('interviewer_name') as HTMLInputElement).value = job.interviewer_name || '';
         (form.elements.namedItem('interviewer_role') as HTMLInputElement).value = job.interviewer_role || '';
       }
-
-      //resume field
-      setFileName(`${profile.email}-resume.pdf`);
-      const mockFile = new File([''], 'sample-resume.pdf', { type: 'application/pdf' });
-      setResumeFile(mockFile);
     }
 
     return profile;
@@ -270,7 +272,6 @@ export function ProfileSetup() {
                       "Example data loaded. Click through the app to see how it works.",
                     className: "bg-green-800 text-white border-0"
                   });
-                  //TODO: fix this
                   loadProfile('312');
                   setIsDemoMode(true);
                 }}
