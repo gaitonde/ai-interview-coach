@@ -376,7 +376,7 @@ export default function InterviewPractice() {
           )}
           </div>
           ))}
-          <div className="mb-4">
+          {questions.length > 0 && (<div className="mb-4">
             <Button
               onClick={() => {
                 localStorage.removeItem('mode');
@@ -387,6 +387,7 @@ export default function InterviewPractice() {
               Home
             </Button>
           </div>
+          )}
           </div>
         </main>
         <Footer />

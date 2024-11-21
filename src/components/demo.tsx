@@ -72,7 +72,7 @@ export function Demo() {
   return (
     <div className="flex flex-col min-h-screen bg-[#111827]">
       <main className="flex-grow flex flex-col items-center">
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-6xl">
           <h2 className="text-2xl font-bold my-4 mx-4">Testing</h2>
 
           <div className="mx-4 mb-4">
@@ -106,7 +106,7 @@ export function Demo() {
             </div>
           </div>
         </div>
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-6xl">
           <h2 className="text-2xl font-bold my-4 mx-4">Example Student Profiles</h2>
 
           <div className="flex flex-wrap gap-4 mx-4 mb-6">

@@ -35,8 +35,8 @@ export function ProfileSetup() {
     const { profile, job } = await response.json();
 
     // Set select values using state
-    setSchool(profile.school || '')
-    setGraduationYear(profile.graduation_date ? new Date(profile.graduation_date).getFullYear().toString() : '')
+    setSchool(profile?.school || '')
+    setGraduationYear(profile?.graduation_date ? new Date(profile?.graduation_date).getFullYear().toString() : '')
 
     // Populate form fields with profile data
     if (formRef.current) {
@@ -261,8 +261,7 @@ export function ProfileSetup() {
                 onClick={(e) => {
                   e.preventDefault();
                   localStorage.setItem('mode', 'demo');
-                  //TODO: set to proper profileId
-                  localStorage.setItem('profileId', '283');
+                  localStorage.setItem('profileId', '312');
 
                   toast({
                     variant: "default",
@@ -271,12 +270,13 @@ export function ProfileSetup() {
                       "Example data loaded. Click through the app to see how it works.",
                     className: "bg-green-800 text-white border-0"
                   });
-                  loadProfile('283');
+                  //TODO: fix this
+                  loadProfile('312');
                   setIsDemoMode(true);
                 }}
                 className="text-[#10B981] hover:text-[#059669] underline mx-1"
               >
-                view a marketing example
+                view an example
               </a>
               instead)
             </p>
