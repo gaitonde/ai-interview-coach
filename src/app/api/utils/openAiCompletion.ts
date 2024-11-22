@@ -6,7 +6,7 @@ const openai = new OpenAI({
 });
 
 export async function generateCompletion(profileId: string, promptKey: string, content?: string) {
-  const promptData: PromptData = await fetchPrompt(profileId, promptKey, content);
+  const promptData: PromptData = await fetchPrompt(profileId, promptKey, undefined, undefined, content);
 
   const completion = await openai.chat.completions.create({
     model: promptData.model,

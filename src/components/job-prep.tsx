@@ -50,7 +50,7 @@ export function JobPrep() {
     const interval = setInterval(() => {
       currentIndex = (currentIndex + 1) % messages.length
       setStatusMessage(messages[currentIndex])
-    }, 3000)
+    }, 5000)
 
     return () => clearInterval(interval)
   }, [isSubmitting])
