@@ -20,6 +20,7 @@ export function ProfileSetup() {
   const [graduationYear, setGraduationYear] = useState<string>('')
   const [isDemoMode, setIsDemoMode] = useState(false)
   const { toast } = useToast()
+  const [statusMessage, setStatusMessage] = useState('Thinking...')
 
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId')
@@ -29,6 +30,20 @@ export function ProfileSetup() {
     }
     setIsDemoMode(isDemo);
   }, []);
+
+  useEffect(() => {
+    if (!isSubmitting) return
+
+    const messages = ['Thinking...', 'Researching...', 'Analyzing...', 'Generating...']
+    let currentIndex = 0
+
+    const interval = setInterval(() => {
+      currentIndex = (currentIndex + 1) % messages.length
+      setStatusMessage(messages[currentIndex])
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [isSubmitting])
 
   const loadProfile = async (profileId: string) => {
     const response = await fetch(`/api/profile?profileId=${profileId}`);
@@ -475,7 +490,7 @@ export function ProfileSetup() {
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isDemoMode ? 'Next' : isSubmitting ? 'Processing...' : 'Save Profile'}
+              {isSubmitting ? statusMessage : 'Next'}
             </Button>
             <p className="text-sm text-muted-foreground mt-1 text-center">
               {isSubmitting && (

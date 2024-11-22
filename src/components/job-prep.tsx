@@ -13,6 +13,7 @@ export function JobPrep() {
   const [content, setContent] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDemoMode, setIsDemoMode] = useState(false)
+  const [statusMessage, setStatusMessage] = useState('Thinking...')
 
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId')
@@ -39,6 +40,20 @@ export function JobPrep() {
       router.push('/');
     }
   }, []);
+
+  useEffect(() => {
+    if (!isSubmitting) return
+
+    const messages = ['Thinking...', 'Researching...', 'Analyzing...', 'Generating...']
+    let currentIndex = 0
+
+    const interval = setInterval(() => {
+      currentIndex = (currentIndex + 1) % messages.length
+      setStatusMessage(messages[currentIndex])
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [isSubmitting])
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -114,7 +129,7 @@ export function JobPrep() {
                   onClick={handleSubmit}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
-                  {isDemoMode ? 'Next' : isSubmitting ? 'Generating Cheat Sheet...' : 'Prepare for Interview'}
+                  {isSubmitting ? statusMessage : 'Next'}
                 </Button>
                 <p className="text-sm text-muted-foreground mt-1 text-center">
                 {isSubmitting && (
