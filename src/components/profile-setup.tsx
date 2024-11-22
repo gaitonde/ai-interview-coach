@@ -36,7 +36,7 @@ export function ProfileSetup() {
 
     // Set select values using state
     setSchool(profile?.school || '')
-    setGraduationYear(profile?.graduation_date ? new Date(profile?.graduation_date).getFullYear().toString() : '')
+    setGraduationYear(profile?.graduation_date ? new Date(profile?.graduation_date).getUTCFullYear().toString() : '')
 
     // Populate form fields with profile data
     if (formRef.current) {
