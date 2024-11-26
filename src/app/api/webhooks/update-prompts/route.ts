@@ -33,6 +33,7 @@ export async function GET() {
     await doc.loadInfo();
 
     const title = (process.env.NODE_ENV === 'production') ? 'Prompts' : 'Prompts-preview';
+    console.log('Environment: ', process.env.NODE_ENV);
     console.log('Getting prompts from this sheet: ', title);
 
     const sheet = doc.sheetsByTitle[title];
