@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { PromptData } from "../utils/fetchPrompt";
 import { fetchPrompt } from "../utils/fetchPrompt";
 import { sql } from '@vercel/postgres';
+import { getTable } from "@/lib/db";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -99,13 +100,14 @@ export async function POST(req: NextRequest) {
   }
 }
 
-
+const TABLE = getTable('ai_interview_coach_prod_answer_scores');
 
 async function insertScore(profileId: string, answerId: string, finalScore: number, scores: ScoringResult) {
-  await sql`
-  INSERT INTO ai_interview_coach_prod_answer_scores (profile_id, answer_id, total_score, scores)
-  VALUES (${profileId}, ${answerId}, ${finalScore}, ${JSON.stringify(scores)})
-  ON CONFLICT (profile_id, answer_id)
-  DO UPDATE SET total_score = EXCLUDED.total_score, scores = EXCLUDED.scores;
-`;
+  const query = `
+    INSERT INTO ${TABLE} (profile_id, answer_id, total_score, scores)
+    VALUES ($1, $2, $3, $4)
+    ON CONFLICT (profile_id, answer_id)
+    DO UPDATE SET total_score = EXCLUDED.total_score, scores = EXCLUDED.scores;
+  `;
+  await sql.query(query, [profileId, answerId, finalScore, JSON.stringify(scores)]);
 }

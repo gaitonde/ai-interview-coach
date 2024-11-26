@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
+import { getTable } from "@/lib/db";
+
+const TABLE = getTable('ai_interview_coach_prod_prompts');
 
 export async function GET(request: Request) {
   console.log('Fetching prompts');
-  
+
   try {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
 
-    const result = await sql`
-      SELECT * FROM ai_interview_coach_prod_prompts
-      WHERE key = ${key}
-      LIMIT 1
-    `;
+    const result = await sql.query(
+      `SELECT * FROM ${TABLE} WHERE key = $1 LIMIT 1`,
+      [key]
+    );
 
     let prompt = result.rows[0];
     if (prompt) {

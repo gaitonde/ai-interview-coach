@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 
+import { getTable } from "@/lib/db";
+
+const TABLE = getTable('ai_interview_coach_prod_airesponses');
+
 // Create a new pool using the connection string from your environment variables
 const pool = new Pool({
   connectionString: process.env.POSTGRES_PRISMA_URL,
@@ -19,7 +23,7 @@ export async function GET(request: Request) {
     try {
       const result = await client.query(`
         SELECT prep_sheet_response
-        FROM ai_interview_coach_prod_airesponses
+        FROM ${TABLE}
         WHERE profile_id = $1
         ORDER BY created_at DESC
         LIMIT 1

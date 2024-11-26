@@ -2,18 +2,16 @@ import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob'
 import { sql } from '@vercel/postgres';
 import PDFParser from 'pdf2json';
+import { getTable } from "@/lib/db";
 
 export async function POST(request: Request) {
   console.log('POST request received for resume');
   try {
-    const formData = await request.formData();    
+    const formData = await request.formData();
 
     const profileId = formData.get('profileId') as string;
     const resume = formData.get('resume') as File;
-    console.log('profileId: ', profileId);
-    console.log('resume type: ', resume.type);
     const parsedResume = await parseResume(resume);
-    console.log('parsedResume: ', parsedResume);
     //TODO: protect url
     const resumeUrl = await uploadResume(resume);
     //TODO: right now overriding with resume content; need to create new column for resume content
@@ -44,11 +42,15 @@ async function uploadResume(file: File): Promise<string> {
 }
 
 async function updateProfileWithResumeUrl(profileId: string, resumeUrl: string, resumeContent: string): Promise<void> {
+  const table = getTable('ai_interview_coach_prod_resumes');
+  const query = `
+    INSERT INTO ${table} (profile_id, url, text)
+    VALUES (${profileId}, '${resumeUrl}', '${resumeContent}')
+  `;
+  console.log('OOO query:', query);
+
   try {
-    await sql`
-      INSERT INTO ai_interview_coach_prod_resumes (profile_id, url, text)
-      VALUES (${profileId}, ${resumeUrl}, ${resumeContent})
-    `;
+    await sql.query(query);
     console.log(`For profile ${profileId} inserted new resume URL: ${resumeUrl}`);
   } catch (error) {
     console.error('Error updating profile with resume URL:', error);
@@ -60,11 +62,8 @@ async function updateProfileWithResumeUrl(profileId: string, resumeUrl: string, 
 async function parseResume(resume: File): Promise<string> {
   let parsedText = '';
 
-  console.log('Uploaded file:', resume);
-
     // Convert ArrayBuffer to Buffer
     const fileBuffer = Buffer.from(await resume.arrayBuffer());
-    console.log('fileBuffer')
 
     // Create a Promise to handle the async PDF parsing
     const parsePDF = () => {
@@ -95,8 +94,8 @@ async function parseResume(resume: File): Promise<string> {
         .replace(/\f/g, '\n\n') // Replace form feeds with double newlines
         .trim(); // Remove leading/trailing whitespace
     } catch (error) {
-      throw new Error('Failed to parse PDF');      
-    }  
-  
+      throw new Error('Failed to parse PDF');
+    }
+
     return parsedText;
 }

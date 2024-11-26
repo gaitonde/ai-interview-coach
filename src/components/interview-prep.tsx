@@ -88,7 +88,7 @@ export default function InterviewPrep() {
       await generateInterviewQuestions(profileId)
     }
 
-    router.push(`/interview-practice`)
+    router.push(`/interview-ready`)
   }
 
   return (

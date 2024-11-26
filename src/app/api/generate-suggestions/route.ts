@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { fetchPrompt, PromptData } from "../utils/fetchPrompt";
 import { sql } from "@vercel/postgres";
+import { getTable } from "@/lib/db";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -45,17 +46,19 @@ export async function POST(req: NextRequest) {
       max_completion_tokens: promptData.maxCompletionTokens,
       temperature: promptData.temperature,
     });
-    
+
     const suggestions = completion.choices[0]?.message?.content;
     // console.log('Suggestions :', suggestions);
 
     if (suggestions) {
-      await sql`
-        INSERT INTO ai_interview_coach_prod_suggestions 
+      const table = getTable('ai_interview_coach_prod_suggestions');
+      const query = `
+        INSERT INTO ${table}
         (profile_id, question_id, answer_id, suggestion_content)
-        VALUES 
-        (${profileId}, ${questionId}, ${answerId}, ${suggestions})
+        VALUES
+        ($1, $2, $3, $4)
       `;
+      await sql.query(query, [profileId, questionId, answerId, suggestions]);
     }
 
     return NextResponse.json({ suggestions });

@@ -3,8 +3,11 @@ import { NextResponse } from "next/server";
 import TurndownService from 'turndown';
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
+import { getTable } from "@/lib/db";
 
 const turndownService = new TurndownService();
+
+const TABLE = getTable('ai_interview_coach_prod_jobs');
 
 export async function GET(request: Request) {
   console.log('IN jobs GET');
@@ -29,14 +32,14 @@ export async function GET(request: Request) {
   // const queryText = `SELECT $1 FROM ai_interview_coach_prod_jobs WHERE profile_id = $2 ORDER BY id DESC LIMIT 1`;
   // const jobs = await sql.query(queryText, [columns, profileId]);
 
-  const jobs = await sql`
+  const query = `
     SELECT id, profile_id, interviewer_name, interviewer_role
-    FROM ai_interview_coach_prod_jobs
-    WHERE profile_id = ${profileId}
+    FROM ${TABLE}
+    WHERE profile_id = $1
     ORDER BY id DESC
     LIMIT 1
   `;
-
+  const jobs = await sql.query(query, [profileId]);
   console.log('ZZZ jobs', jobs.rows[0]);
 
   if (jobs.rows.length < 1) {
@@ -60,27 +63,32 @@ export async function POST(request: Request) {
   const company_md = await fetchUrlContents(company_url);
   const jd_md = await fetchUrlContents(jd_url);
 
-  const jobs = await sql`INSERT INTO
-  ai_interview_coach_prod_jobs (
-    profile_id,
+  const query = `
+    INSERT INTO "${TABLE}" (
+      profile_id,
+      company_url,
+      company_text,
+      jd_url,
+      jd_text,
+      interviewer_name,
+      interviewer_role
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    RETURNING *
+  `;
+
+  const values = [
+    profileId,
     company_url,
-    company_text,
+    company_md,
     jd_url,
-    jd_text,
+    jd_md,
     interviewer_name,
     interviewer_role
-  )
-  VALUES (
-    ${profileId},
-    ${company_url},
-    ${company_md},
-    ${jd_url},
-    ${jd_md},
-    ${interviewer_name},
-    ${interviewer_role}
-  )`;
+  ];
 
-  return NextResponse.json(jobs);
+  const jobs = await sql.query(query, values);
+  return NextResponse.json(jobs.rows[0]);
 }
 
 async function fetchUrlContents(url: string): Promise<string> {

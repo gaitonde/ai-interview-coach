@@ -4,6 +4,7 @@ import React from 'react'
 import { Frown, Meh, Smile, AlertCircle, Calendar, User, Briefcase, Target } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { useRouter } from 'next/navigation'
 
 type Category = {
   name: string
@@ -52,6 +53,8 @@ const getScoreInfo = (score: number | null): { icon: React.ReactNode; text: stri
 }
 
 export function InterviewReadinessComponent() {
+  const router = useRouter()
+
   return (
     <div className="min-h-screen bg-[#1a1f2b] py-8 px-4">
       <div className="max-w-4xl mx-auto bg-[#252b3b] rounded-lg shadow-xl overflow-hidden">
@@ -102,11 +105,12 @@ export function InterviewReadinessComponent() {
                   </div>
                 </div>
               </div>
-              <Button
-                className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm"
-              >
-                Practice All Interview Questions
-              </Button>
+                <Button
+                  className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm"
+                  onClick={() => router.push('/interview-practice')}
+                >
+                  Practice All Interview Questions
+                </Button>
             </CardContent>
           </Card>
 

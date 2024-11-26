@@ -1,3 +1,4 @@
+import { getTable } from "@/lib/db";
 import { sql } from '@vercel/postgres';
 
 interface ProfileData {
@@ -45,17 +46,45 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
   const todayDate = new Date();
   const todayDateFormatted = todayDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
+  const PROFILES_TABLE = getTable('ai_interview_coach_prod_profiles');
+  const JOBS_TABLE = getTable('ai_interview_coach_prod_jobs');
+  const RESUMES_TABLE = getTable('ai_interview_coach_prod_resumes');
+  const QUESTIONS_TABLE = getTable('ai_interview_coach_prod_job_questions');
+  const ANSWERS_TABLE = getTable('ai_interview_coach_prod_job_question_answers');
+
+  const PROFILE_QUERY = `SELECT school, major, concentration, graduation_date
+      FROM "${PROFILES_TABLE}"
+      WHERE id = $1`;
+
+  const JOB_QUERY = `SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role
+      FROM "${JOBS_TABLE}"
+      WHERE profile_id = $1
+      ORDER BY created_at DESC LIMIT 1`;
+
+  const RESUME_QUERY = `SELECT url, text
+      FROM "${RESUMES_TABLE}"
+      WHERE profile_id = $1
+      ORDER BY created_at DESC LIMIT 1`;
+
   const [profileDetails, jobDetails, resumeDetails, questionDetails, answerDetails] = await Promise.all([
-    sql`SELECT school, major, concentration, graduation_date FROM ai_interview_coach_prod_profiles WHERE id = ${profileId}`,
-    sql`SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role FROM ai_interview_coach_prod_jobs WHERE profile_id = ${profileId}`,
-    sql`SELECT url, text FROM ai_interview_coach_prod_resumes WHERE profile_id = ${profileId}`,
-    sql`SELECT question FROM ai_interview_coach_prod_job_questions WHERE profile_id = ${profileId} and id = ${questionId}`,
-    sql`SELECT answer FROM ai_interview_coach_prod_job_question_answers WHERE profile_id = ${profileId} and id = ${answerId}`
+    sql.query(PROFILE_QUERY, [profileId]),
+    sql.query(JOB_QUERY, [profileId]),
+    sql.query(RESUME_QUERY, [profileId]),
+    questionId
+      ? sql.query(`SELECT question FROM "${QUESTIONS_TABLE}" WHERE profile_id = $1 AND id = $2`, [profileId, questionId])
+      : Promise.resolve({ rows: [] }),
+    answerId
+      ? sql.query(`SELECT answer FROM "${ANSWERS_TABLE}" WHERE profile_id = $1 AND id = $2`, [profileId, answerId])
+      : Promise.resolve({ rows: [] })
   ]);
 
-  if (profileDetails.rows.length === 0) throw new Error("Profile not found");
-  if (jobDetails.rows.length === 0) throw new Error("Job not found");
-  if (resumeDetails.rows.length === 0) throw new Error("Resume not found");
+  console.log('Profile rows:', profileDetails.rows.length);
+  console.log('Job rows:', jobDetails.rows.length);
+  console.log('Resume rows:', resumeDetails.rows.length);
+
+  if (profileDetails.rows.length === 0) throw new Error(`Profile not found for ID: ${profileId}`);
+  if (jobDetails.rows.length === 0) throw new Error(`Job not found for profile ID: ${profileId}`);
+  if (resumeDetails.rows.length === 0) throw new Error(`Resume not found for profile ID: ${profileId}`);
   if (questionId && questionDetails.rows.length === 0) throw new Error("Question not found");
   if (answerId && answerDetails.rows.length === 0) throw new Error("Answers not found");
 

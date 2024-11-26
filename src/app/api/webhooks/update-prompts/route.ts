@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 import { sql } from '@vercel/postgres';
+import { getTable } from "@/lib/db";
 
 let serviceAccountAuth: JWT | null = null;
 
@@ -31,7 +32,9 @@ export async function GET() {
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID as string, auth);
     await doc.loadInfo();
 
-    const sheet = doc.sheetsByTitle['Prompts'];
+    const TITLE = (process.env.NODE_ENV === 'production') ? 'Prompts' : 'Prompts-preview';
+
+    const sheet = doc.sheetsByTitle[TITLE];
     const rows = await sheet.getRows();
     const prompts = [];
 
@@ -72,24 +75,40 @@ export async function GET() {
 }
 
 async function deleteAllPrompts() {
-  await sql`DELETE FROM ai_interview_coach_prod_prompts`;
+  const TABLE = getTable('ai_interview_coach_prod_prompts');
+  await sql.query(`DELETE FROM ${TABLE}`);
 }
 
 async function insertPrompt(prompt: any) {
-  await sql`INSERT INTO ai_interview_coach_prod_prompts 
-    (id, key, model, temperature, max_completion_tokens, system_prompt, user_prompt) 
-    VALUES (${prompt.id}, ${prompt.key}, ${prompt.model}, ${prompt.temperature}, ${prompt.max_completion_tokens}, ${prompt.system_prompt}, ${prompt.user_prompt})`;
+  const table = getTable('ai_interview_coach_prod_prompts');
+  const query = `
+    INSERT INTO "${table}"
+    (id, key, model, temperature, max_completion_tokens, system_prompt, user_prompt)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+  `;
+
+  const values = [
+    prompt.id,
+    prompt.key,
+    prompt.model,
+    prompt.temperature,
+    prompt.max_completion_tokens,
+    prompt.system_prompt,
+    prompt.user_prompt
+  ];
+
+  await sql.query(query, values);
 }
 
 async function insertPrompts(prompts: any[]) {
   console.log('inserting prompts.length: ', prompts.length);
-  
+
   if (prompts.length === 0) {
     console.log('No prompts to insert');
     return;
   }
 
-  const values = prompts.map((_, index) => 
+  const values = prompts.map((_, index) =>
     `($${index * 7 + 1}, $${index * 7 + 2}, $${index * 7 + 3}, $${index * 7 + 4}, $${index * 7 + 5}, $${index * 7 + 6}, $${index * 7 + 7})`
   ).join(', ');
 
@@ -104,17 +123,19 @@ async function insertPrompts(prompts: any[]) {
     prompt.system_prompt,
     prompt.user_prompt
   ]);
-  
+
   console.debug('flattenedValues: ', flattenedValues);
 
+  const TABLE = getTable('ai_interview_coach_prod_prompts');
+
   const query = `
-    INSERT INTO ai_interview_coach_prod_prompts (
-      id, 
-      key, 
-      model, 
-      temperature, 
-      max_completion_tokens, 
-      system_prompt, 
+    INSERT INTO ${TABLE} (
+      id,
+      key,
+      model,
+      temperature,
+      max_completion_tokens,
+      system_prompt,
       user_prompt
     ) VALUES ${values}
   `;
