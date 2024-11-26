@@ -277,7 +277,7 @@ export function ProfileSetup() {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  const demoProfileId = '326';
+                  const demoProfileId = '353';
                   localStorage.setItem('mode', 'demo');
                   localStorage.setItem('profileId', demoProfileId);
 
