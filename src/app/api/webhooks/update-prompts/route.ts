@@ -32,9 +32,10 @@ export async function GET() {
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID as string, auth);
     await doc.loadInfo();
 
-    const TITLE = (process.env.NODE_ENV === 'production') ? 'Prompts' : 'Prompts-preview';
+    const title = (process.env.NODE_ENV === 'production') ? 'Prompts' : 'Prompts-preview';
+    console.log('Getting prompts from this sheet: ', title);
 
-    const sheet = doc.sheetsByTitle[TITLE];
+    const sheet = doc.sheetsByTitle[title];
     const rows = await sheet.getRows();
     const prompts = [];
 

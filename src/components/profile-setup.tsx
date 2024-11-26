@@ -284,11 +284,11 @@ export function ProfileSetup() {
 
                   toast({
                     variant: "default",
-                    duration: 2000,
+                    duration: 4000,
                     className: "bg-green-800 text-white border-0",
-                    title: "Example Marketing Profile Loaded",
+                    title: "Example Loaded - Marketing Profile",
                     description:
-                      "Example data loaded. Click through the app to see how it works.",
+                      "Scroll down and keep clicking 'Next' through the app to see example data and get a feel for how it works.",
                   });
 
                   loadProfile(demoProfileId);
