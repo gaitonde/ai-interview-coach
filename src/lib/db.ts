@@ -28,3 +28,17 @@ export const db = {
     }
   },
 }
+
+export function getTable(tableName: string) {
+  const env = process.env.VERCEL_ENV;
+  const isProd = env === 'production';
+
+  if (isProd) {
+    return tableName;
+  } else {
+    // ai_interview_coach_prod_profiles
+    tableName = tableName.replace('prod_', '');
+    return `${tableName}_preview`;
+  }
+
+}
