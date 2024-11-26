@@ -185,6 +185,7 @@ CREATE TABLE ai_interview_coach_suggestions_preview (
     answer_id INTEGER NOT NULL,
     suggestion_content TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (profile_id) REFERENCES ai_interview_coach_profiles_preview(id) ON DELETE CASCADE,
     FOREIGN KEY (answer_id) REFERENCES ai_interview_coach_job_question_answers_preview(id) ON DELETE CASCADE
 );
