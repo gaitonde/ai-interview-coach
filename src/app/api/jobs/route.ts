@@ -1,51 +1,49 @@
-import { sql } from '@vercel/postgres';
-import { NextResponse } from "next/server";
-import TurndownService from 'turndown';
-import fetch from 'node-fetch';
-import * as cheerio from 'cheerio';
-import { getTable } from "@/lib/db";
+import { QueryResult, sql } from '@vercel/postgres'
+import { NextResponse } from "next/server"
+import TurndownService from 'turndown'
+import fetch from 'node-fetch'
+import * as cheerio from 'cheerio'
+import { getTable } from '@/lib/db'
 
-const turndownService = new TurndownService();
+const TABLE = getTable('ai_interview_coach_prod_jobs')
 
-const TABLE = getTable('ai_interview_coach_prod_jobs');
+const turndownService = new TurndownService()
 
 export async function GET(request: Request) {
-  console.log('IN jobs GET');
-  const { searchParams } = new URL(request.url);
-  const profileId = searchParams.get('profileId');
+  console.log('IN jobs GET')
+  const { searchParams } = new URL(request.url)
+  const profileId = searchParams.get('profileId')
+  const jobId = searchParams.get('jobId')
 
   if (!profileId) {
-    return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 });
+    return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 })
   }
 
-  //TODO: fix dynamic columns
-  // let columns: string;
-  // if (interviewer) {
-  //   columns = 'id, profile_id, interviewer_name, interviewer_role';
-  // } else {
-  //   columns = '*';
-  // }
-  // console.log('ZZZ profileId:', profileId);
-  // console.log('ZZZ columns:', columns);
+  if (jobId) {
+    const query = `
+    SELECT id, profile_id, company_name, role_name, interviewer_name, interviewer_role, interview_date, readiness
+    FROM ${TABLE}
+    WHERE profile_id = $1
+    AND id = $2
+    ORDER BY id DESC
+  `
+    const jobs = await sql.query(query, [profileId, jobId])
+    return NextResponse.json({ content: jobs.rows[0] })
 
-
-  // const queryText = `SELECT $1 FROM ai_interview_coach_prod_jobs WHERE profile_id = $2 ORDER BY id DESC LIMIT 1`;
-  // const jobs = await sql.query(queryText, [columns, profileId]);
-
-  const query = `
-    SELECT id, profile_id, interviewer_name, interviewer_role
+  } else {
+    const query = `
+    SELECT id, profile_id, company_name, role_name, interviewer_name, interviewer_role, interview_date, readiness
     FROM ${TABLE}
     WHERE profile_id = $1
     ORDER BY id DESC
-    LIMIT 1
-  `;
-  const jobs = await sql.query(query, [profileId]);
-  console.log('ZZZ jobs', jobs.rows[0]);
+  `
+    const jobs = await sql.query(query, [profileId])
 
-  if (jobs.rows.length < 1) {
-    return NextResponse.json({ content: [] }, { status: 404 });
-  } else {
-    return NextResponse.json({ content: jobs.rows[0] });
+    if (jobs.rows.length < 1) {
+      return NextResponse.json({ content: [] }, { status: 404 })
+    } else {
+      return NextResponse.json({ content: jobs.rows })
+    }
   }
 }
 
@@ -92,7 +90,7 @@ export async function POST(request: Request) {
 }
 
 async function fetchUrlContents(url: string): Promise<string> {
-  console.log('url', url);
+  console.log('url', url)
 
   try {
     const response = await fetch(url);

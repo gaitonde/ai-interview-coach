@@ -33,8 +33,6 @@ export async function GET() {
     await doc.loadInfo();
 
     const title = (process.env.VERCEL_ENV === 'production') ? 'Prompts' : 'Prompts-preview';
-    console.log('Environment: ', process.env.VERCEL_ENV);
-    console.log('Environment is prod: ', process.env.VERCEL_ENV === 'production');
     console.log('Getting prompts from this sheet: ', title);
 
     const sheet = doc.sheetsByTitle[title];

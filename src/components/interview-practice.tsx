@@ -392,7 +392,7 @@ export default function InterviewPractice() {
             <Button
               onClick={() => {
                 localStorage.removeItem('mode');
-                router.push('/');
+                router.push('/dashboard');
               }}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
             >

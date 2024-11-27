@@ -1,53 +1,51 @@
 'use client'
 
-import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Plus, Trash2, FileText, Menu, SmilePlus, Smile, Meh, Frown, MehIcon } from 'lucide-react'
+import { AlertCircle, FileText, Frown, Meh, Plus, Smile, User } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { Footer } from './footer'
+// import { signOut } from "next-auth/react"
 
 type InterviewAnalysis = {
   id: string
   date: string
   company: string
   role: string
-  mockInterviewer: string
-  overallScore: string
+  interviewer: string
+  interviewerRole: string
+  readiness: string
 }
 
 const mockData: InterviewAnalysis[] = [
-  { id: '1', date: '2024-05-01', company: 'Google', role: 'Product Manager', mockInterviewer: 'Tech Lead', overallScore: 'Crushed it!' },
-  { id: '2', date: '2024-04-15', company: 'Amazon', role: 'Principal Product Manager', mockInterviewer: 'Senior PM', overallScore: 'Smooth sailing!' },
-  { id: '3', date: '2024-03-30', company: 'Microsoft', role: 'Product Manager', mockInterviewer: 'Design Lead', overallScore: 'Got through it.' },
-  { id: '4', date: '2024-03-10', company: 'Apple', role: 'Senior Product Manager', mockInterviewer: 'Engineering Manager', overallScore: 'A bit wobbly.' },
-  { id: '5', date: '2024-02-20', company: 'Facebook', role: 'Product Manager', mockInterviewer: 'Product Director', overallScore: 'Learning experience!' },
+//   { id: '1', date: '2024-05-01', company: 'Google', role: 'Product Manager', interviewer: 'Tallis Tech Lead', interviewerRole: 'Tech Lead', readiness: 'Ready' },
+//   { id: '3', date: '2024-03-30', company: 'Microsoft', role: 'Product Manager', interviewer: 'David Design Lead', interviewerRole: 'Design Lead', readiness: 'Kinda Ready' },
+//   { id: '5', date: '2024-02-20', company: 'Facebook', role: 'Product Manager', interviewer: 'Frank Product Director', interviewerRole: 'Product Director', readiness: 'Not Ready' },
 ]
 
 const getScoreIcon = (score: string) => {
   switch (score) {
-    case 'Crushed it!':
-      return <SmilePlus className="w-5 h-5 text-green-500" />;
-    case 'Smooth sailing!':
-      return <Smile className="w-5 h-5 text-green-300" />;
-    case 'Got through it.':
-      return <Meh className="w-5 h-5 text-yellow-500" />;
-    case 'A bit wobbly.':
-      return <MehIcon className="w-5 h-5 text-orange-500" />;
-    case 'Learning experience!':
+    case 'Ready':
+      return <Smile className="w-5 h-5 text-green-500" />;
+    case 'Kinda Ready':
+      return <Meh className="w-5 h-5 text-yellow-500" />
+    case 'Not Ready':
       return <Frown className="w-5 h-5 text-red-500" />;
     default:
-      return null;
+      return <AlertCircle className="w-6 h-6 text-yellow-500" />
   }
 };
 
 export default function Dashboard() {
+  const router = useRouter()
   const [analyses, setAnalyses] = useState<InterviewAnalysis[]>(mockData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()))
   const [searchTerm, setSearchTerm] = useState('')
   const [sortColumn, setSortColumn] = useState<keyof InterviewAnalysis>('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  // const [interviewData, setInterviewData] = useState<InterviewData | null>(null)
 
   const handleSort = (column: keyof InterviewAnalysis) => {
     if (column === sortColumn) {
@@ -67,43 +65,77 @@ export default function Dashboard() {
   const filteredAnalyses = sortedAnalyses.filter(
     analysis => analysis.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 analysis.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                analysis.mockInterviewer.toLowerCase().includes(searchTerm.toLowerCase())
+                analysis.interviewer.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleDelete = (id: string) => {
-    setAnalyses(analyses.filter(analysis => analysis.id !== id))
-  }
+  // console.log('filteredAnalyses', filteredAnalyses);
+
+  useEffect(() => {
+    const storedProfileId = localStorage.getItem('profileId')
+    fetch(`/api/jobs?profileId=${storedProfileId}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch interview data');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Raw API response:', data.content);
+
+      const mappedAnalyses: InterviewAnalysis[] = data.content.map((item: any) => ({
+        id: item.id || String(Math.random()),
+        date: item.interview_date || new Date().toISOString().split('T')[0],
+        company: item.company_name || '',
+        role: item.role_name || '',
+        interviewer: item.interviewer_name || '',
+        interviewerRole: item.interviewer_role || '',
+        readiness: item.readiness || 'No Data'
+      }));
+
+      console.log('mappedAnalyses', mappedAnalyses);
+      setAnalyses(mappedAnalyses);
+    })
+    .catch(error => {
+      console.error('Error fetching interview data:', error);
+      setAnalyses(mockData);
+    });
+  }, [])
 
   return (
     <div className="flex flex-col min-h-screen bg-[#1a1f2b]">
       <div className="flex-grow p-4 md:p-8 font-sans">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-6 md:mb-8">
-            <div className="flex items-center">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#1a1f2b] border-2 border-[#10B981] flex items-center justify-center text-white text-lg md:text-xl font-bold mr-3 md:mr-4">
-                LM
-              </div>
-              <h1 className="text-white text-lg md:text-xl font-bold">Lucy</h1>
+            <div className="flex items-center ml-auto">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#1a1f2b] border-2 border-[#10B981] flex items-center justify-center text-white cursor-pointer hover:bg-[#252b3b]">
+                    <User className="w-6 h-6 md:w-7 md:h-7" />
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-[#252b3b] text-[#F9FAFB] border-[#374151]">
+                  <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer hover:bg-[#374151]">
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/billing')} className="cursor-pointer hover:bg-[#374151]">
+                    Billing
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/')} className="cursor-pointer hover:bg-[#374151]">
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
           <div className="bg-[#252b3b] rounded-lg shadow p-4 md:p-6">
-            <div className="flex flex-col space-y-4 mb-4">
-              <Link href="/job-information-setup" className="block w-fit">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-[#F9FAFB] text-xl md:text-[22px] font-bold">Interviews</h2>
+              <Link href="/interview-setup" className="block">
                 <Button className="bg-[#10B981] text-[#F9FAFB] hover:bg-[#059669] text-sm md:text-base font-bold">
-                  <Plus className="mr-2 h-4 w-4" /> Start New Interview Prep
+                  <Plus className="mr-2 h-4 w-4" /> Add Interview
                 </Button>
               </Link>
-              <h2 className="text-[#F9FAFB] text-xl md:text-[22px] font-bold">History</h2>
-            </div>
-            <div className="mb-4">
-              <Input
-                type="text"
-                placeholder="Search by company, role, or interviewer..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-[#D1D5DB] text-[#111827] placeholder-[#6B7280] text-sm md:text-base"
-              />
             </div>
             <div className="overflow-x-auto">
               <Table>
@@ -111,9 +143,10 @@ export default function Dashboard() {
                   <TableRow>
                     <TableHead onClick={() => handleSort('date')} className="cursor-pointer text-[#F9FAFB] text-xs md:text-sm">Date</TableHead>
                     <TableHead onClick={() => handleSort('company')} className="cursor-pointer text-[#F9FAFB] text-xs md:text-sm">Company</TableHead>
-                    <TableHead onClick={() => handleSort('role')} className="cursor-pointer text-[#F9FAFB] text-xs md:text-sm">Role</TableHead>
-                    <TableHead onClick={() => handleSort('mockInterviewer')} className="cursor-pointer text-[#F9FAFB] text-xs md:text-sm">Mock Interviewer</TableHead>
-                    <TableHead onClick={() => handleSort('overallScore')} className="cursor-pointer text-[#F9FAFB] text-xs md:text-sm">Overall Score</TableHead>
+                    <TableHead onClick={() => handleSort('role')} className="cursor-pointer text-[#F9FAFB] text-xs md:text-sm">Target Job</TableHead>
+                    <TableHead onClick={() => handleSort('interviewer')} className="cursor-pointer text-[#F9FAFB] text-xs md:text-sm">Interviewer</TableHead>
+                    <TableHead onClick={() => handleSort('interviewerRole')} className="cursor-pointer text-[#F9FAFB] text-xs md:text-sm">Interviewer Role</TableHead>
+                    <TableHead onClick={() => handleSort('readiness')} className="cursor-pointer text-[#F9FAFB] text-xs md:text-sm">Overall Readiness</TableHead>
                     <TableHead className="text-[#F9FAFB] text-xs md:text-sm">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -123,39 +156,31 @@ export default function Dashboard() {
                       <TableCell className="text-[#F9FAFB] py-2 text-xs md:text-sm">{new Date(analysis.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</TableCell>
                       <TableCell className="text-[#F9FAFB] py-2 text-xs md:text-sm">{analysis.company}</TableCell>
                       <TableCell className="text-[#F9FAFB] py-2 text-xs md:text-sm">{analysis.role}</TableCell>
-                      <TableCell className="text-[#F9FAFB] py-2 text-xs md:text-sm">{analysis.mockInterviewer}</TableCell>
+                      <TableCell className="text-[#F9FAFB] py-2 text-xs md:text-sm">{analysis.interviewer}</TableCell>
+                      <TableCell className="text-[#F9FAFB] py-2 text-xs md:text-sm">{analysis.interviewerRole}</TableCell>
                       <TableCell className="text-[#F9FAFB] py-2 text-xs md:text-sm">
                         <div className="flex items-center">
-                          {getScoreIcon(analysis.overallScore)}
-                          <span className="ml-2">{analysis.overallScore}</span>
+                          {getScoreIcon(analysis.readiness)}
+                          <span className="ml-2">{analysis.readiness}</span>
                         </div>
                       </TableCell>
                       <TableCell className="py-2">
                         <div className="flex space-x-1 md:space-x-2">
-                          <Link href={`/post-interview-analysis/${analysis.id}`}>
+                          <Link href={`/job-prep`}>
                             <Button variant="ghost" size="sm" className="p-1 md:p-2">
                               <FileText className="h-3 w-3 md:h-4 md:w-4 text-[#10B981]" />
                             </Button>
                           </Link>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm" className="p-1 md:p-2">
-                                <Trash2 className="h-3 w-3 md:h-4 md:w-4 text-red-500" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-[#252b3b] text-[#F9FAFB]">
-                              <DialogHeader>
-                                <DialogTitle>Confirm Deletion</DialogTitle>
-                                <DialogDescription className="text-[#D1D5DB]">
-                                  Are you sure you want to delete this interview analysis? This action cannot be undone.
-                                </DialogDescription>
-                              </DialogHeader>
-                              <DialogFooter>
-                                <Button variant="outline" onClick={() => {}} className="text-[#F9FAFB] border-[#F9FAFB]">Cancel</Button>
-                                <Button variant="destructive" onClick={() => handleDelete(analysis.id)} className="bg-red-500 text-[#F9FAFB]">Delete</Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
+                          <Link href={`/interview-prep`}>
+                            <Button variant="ghost" size="sm" className="p-1 md:p-2">
+                              <FileText className="h-3 w-3 md:h-4 md:w-4 text-[#10B981]" />
+                            </Button>
+                          </Link>
+                          <Link href={`/interview-ready?analysisId=${analysis.id}`}>
+                            <Button variant="ghost" size="sm" className="p-1 md:p-2">
+                              <FileText className="h-3 w-3 md:h-4 md:w-4 text-[#10B981]" />
+                            </Button>
+                          </Link>
                         </div>
                       </TableCell>
                     </TableRow>

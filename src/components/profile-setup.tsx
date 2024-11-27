@@ -421,56 +421,7 @@ export function ProfileSetup() {
                   </Select>
                 </div>
               </div>
-              <div>
-                <label htmlFor="company_url" className="block text-sm font-medium text-white">
-                  Company URL
-                </label>
-                <Input
-                  id="company_url"
-                  name="company_url"
-                  type="text"
-                  placeholder="https://acme.com"
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-                />
-              </div>
-              <div>
-                <label htmlFor="jd_url" className="block text-sm font-medium text-white">
-                  Job Description URL
-                </label>
-                <Input
-                  id="jd_url"
-                  name="jd_url"
-                  type="text"
-                  placeholder="https://careers.example.com/job-description"
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-                />
-              </div>
-              <div>
-                <label htmlFor="interviewer_name" className="block text-sm font-medium text-white">
-                  Interviewer Name (Optional)
-                </label>
-                <Input
-                  id="interviewer_name"
-                  name="interviewer_name"
-                  type="text"
-                  placeholder="eg. Ira Johnson"
-                  // defaultValue="Ira Johnson"
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-                />
-              </div>
-              <div>
-                <label htmlFor="interviewer_role" className="block text-sm font-medium text-white">
-                  Interviewer Role (Optional)
-                </label>
-                <Input
-                  id="interviewer_role"
-                  name="interviewer_role"
-                  type="text"
-                  placeholder="eg. Senior Product Manager"
-                  // defaultValue="Senior Product Manager"
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-                />
-              </div>
+
 {/*
               <div>
                 <label htmlFor="current-courses" className="block text-sm font-medium text-white">
@@ -498,7 +449,6 @@ export function ProfileSetup() {
                 'Takes about 30 seconds, please be patient. Thank you.'
               )}
             </p>
-
           </form>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>

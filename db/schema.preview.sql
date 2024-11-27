@@ -194,5 +194,8 @@ CREATE TRIGGER update_suggestions_last_updated_at
 BEFORE UPDATE ON ai_interview_coach_suggestions_preview
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
-
 ALTER TABLE ai_interview_coach_profiles_preview ADD COLUMN is_demo BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE ai_interview_coach_jobs_preview ADD COLUMN role_name VARCHAR(255);
+ALTER TABLE ai_interview_coach_jobs_preview ADD COLUMN interview_date  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE ai_interview_coach_jobs_preview ADD COLUMN readiness VARCHAR(255);

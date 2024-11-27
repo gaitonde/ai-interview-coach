@@ -1,10 +1,19 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Frown, Meh, Smile, AlertCircle, Calendar, User, Briefcase, Target } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
+
+type Interview = {
+  interviewer_name: string
+  interviewer_role: string
+  interview_date: string
+  company_name: string
+  role_name: string
+}
+
 
 type Category = {
   name: string
@@ -52,8 +61,36 @@ const getScoreInfo = (score: number | null): { icon: React.ReactNode; text: stri
   return { icon: <Frown className="w-6 h-6" />, text: "Not Ready", color: "text-red-500" }
 }
 
+
 export function InterviewReadinessComponent() {
   const router = useRouter()
+
+  const [interview, setInterview] = useState<Interview | null>(null)
+
+  useEffect(() => {
+    const storedProfileId = localStorage.getItem('profileId')
+    const jobId = localStorage.getItem('jobId')
+    fetch(`/api/jobs?profileId=${storedProfileId}&jobId=${jobId}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch interview data');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Raw API response:', data.content);
+      setInterview({
+        interviewer_name: data.content.interviewer_name,
+        interviewer_role: data.content.interviewer_role,
+        interview_date: data.content.interview_date,
+        company_name: data.content.company_name,
+        role_name: data.content.role_name
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching interview data:', error)
+    });
+  }, [])
 
   return (
     <div className="min-h-screen bg-[#1a1f2b] py-8 px-4">
@@ -70,14 +107,14 @@ export function InterviewReadinessComponent() {
                     <User className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
                     <div>
                       <p className="text-sm font-semibold">Interviewer</p>
-                      <p className="text-sm text-gray-300">Anjali Gupte</p>
+                      <p className="text-sm text-gray-300">{interview?.interviewer_name}</p>
                     </div>
                   </div>
                   <div className="flex items-start">
                     <User className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
                     <div>
                       <p className="text-sm font-semibold">Interviewer Role</p>
-                      <p className="text-sm text-gray-300">Director of Marketing</p>
+                      <p className="text-sm text-gray-300">{interview?.interviewer_role}</p>
                     </div>
                   </div>
                 </div>
@@ -85,7 +122,7 @@ export function InterviewReadinessComponent() {
                     <Calendar className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
                     <div>
                       <p className="text-sm font-semibold">Interview Date</p>
-                      <p className="text-sm text-gray-300">May 15, 2023</p>
+                      <p className="text-sm text-gray-300">{interview?.interview_date}</p>
                   </div>
                 </div>
                 <div className="flex flex-col space-y-4">
@@ -93,14 +130,14 @@ export function InterviewReadinessComponent() {
                     <Briefcase className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
                     <div>
                       <p className="text-sm font-semibold">Company</p>
-                      <p className="text-sm text-gray-300">Apple Inc</p>
+                      <p className="text-sm text-gray-300">{interview?.company_name}</p>
                     </div>
                   </div>
                   <div className="flex items-start">
                     <Target className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
                     <div>
                       <p className="text-sm font-semibold">Target Job</p>
-                      <p className="text-sm text-gray-300">Marketing Intern</p>
+                      <p className="text-sm text-gray-300">{interview?.role_name}</p>
                     </div>
                   </div>
                 </div>
@@ -173,6 +210,7 @@ export function InterviewReadinessComponent() {
             <Button
               variant="outline"
               className="border-[#10B981] text-[#10B981] hover:bg-[#10B981] hover:text-white font-medium py-2 rounded-lg text-sm"
+              onClick={() => router.push('/dashboard')}
             >
               Back to Dashboard
             </Button>
