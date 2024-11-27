@@ -11,6 +11,8 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^5.0.69",
+    "@clerk/nextjs": "^6.5.1",
     "@google-cloud/speech": "^6.7.0",
     "@hookform/resolvers": "^3.9.0",
     "@mozilla/readability": "^0.5.0",
