@@ -200,3 +200,5 @@ ALTER TABLE ai_interview_coach_prod_jobs ADD COLUMN role_name VARCHAR(255);
 ALTER TABLE ai_interview_coach_prod_jobs ADD COLUMN interview_date  TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE ai_interview_coach_prod_jobs ADD COLUMN readiness VARCHAR(255);
 ALTER TABLE ai_interview_coach_prod_profiles ADD COLUMN clerk_id VARCHAR(255);
+ALTER TABLE ai_interview_coach_prod_profiles ALTER COLUMN school DROP NOT NULL;
+ALTER TABLE ai_interview_coach_prod_profiles ALTER COLUMN major DROP NOT NULL;

@@ -1,9 +1,11 @@
 // import { createUser } from "@/app/actions";
 import { NextResponse } from "next/server";
-import { clerkClient } from '@clerk/clerk-sdk-node';
+// import { clerkClient } from '@clerk/clerk-sdk-node';
 import { createProfile } from "@/app/actions/create-profile";
 // import  Mixpanel  from 'mixpanel';
+import { createClerkClient } from '@clerk/backend'
 
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 // const mixpanel = Mixpanel.init(`${process.env.MIX_PANEL_TOKEN}`);
 
 //TODO: do more/better validation to ensure request is coming in from Clerk
@@ -12,31 +14,29 @@ export async function POST(request: Request) {
 
   try {
     const json = await request.json();
-    console.debug('in webhook json', json)
+    console.debug('XX in webhook json', json)
     const eventType = json.type;
-    console.debug('in webhook json', eventType)
+    console.debug('XX in webhook json', eventType)
     if (eventType === "user.created") {
-      console.debug('in webhook have user created')
+      console.debug('XX in webhook have user created')
       const data = json.data;
-      console.debug('in webhook data', data)
+      console.debug('XX in webhook data', data)
 
-      const { id, public_metadata, email_addresses } = data;
-      const { first_name, last_name } = public_metadata;
-      console.debug('in webhook name', first_name, last_name);
+      const { id, email_addresses } = data;
       const email = email_addresses[0].email_address;
-      console.debug('in webhook email', email);
+      console.debug('XX in webhook email', email);
 
-      // TODO: do upsert instead?
-      const userId = await createProfile(email, id);
+      const profileId = await createProfile(email, id);
 
-      console.debug('in webhook userId', userId);
+      console.debug('XX in webhook created profile with id: ', profileId);
 
       try {
         await clerkClient.users.updateUserMetadata(id, {
           unsafeMetadata: {
-            userId: userId
+            profileId: profileId
           }
         });
+        console.debug('XX in webhook updated clerk user metadata');
 
         // await clerkClient.users.updateUser(id, {
         //   firstName: data.public_metadata.first_name,
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
         console.error('couldnt update metadata', error);
       }
 
-      return NextResponse.json({}, { status: 200 });
+      return NextResponse.json({ success: true }, { status: 200 });
     }
     else if (eventType === "session.created") {
       console.debug('session created!!!')
