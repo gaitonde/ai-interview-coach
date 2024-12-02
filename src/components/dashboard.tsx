@@ -102,33 +102,10 @@ export default function Dashboard() {
   }, [])
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#1a1f2b]">
-      <div className="flex-grow p-4 md:p-8 font-sans">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-6 md:mb-8">
-            <div className="flex items-center ml-auto">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#1a1f2b] border-2 border-[#10B981] flex items-center justify-center text-white cursor-pointer hover:bg-[#252b3b]">
-                    <User className="w-6 h-6 md:w-7 md:h-7" />
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#252b3b] text-[#F9FAFB] border-[#374151]">
-                  <DropdownMenuItem onClick={() => router.push('/profile')} className="cursor-pointer hover:bg-[#374151]">
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/billing')} className="cursor-pointer hover:bg-[#374151]">
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/')} className="cursor-pointer hover:bg-[#374151]">
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-
-          <div className="bg-[#252b3b] rounded-lg shadow p-4 md:p-6">
+    <div className="h-[80vh]">
+      <div className="h-full p-4 md:p-8 font-sans">
+        <div className="h-full max-w-7xl mx-auto">
+          <div className="h-full bg-[#252b3b] rounded-lg shadow p-4 md:p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[#F9FAFB] text-xl md:text-[22px] font-bold">Interviews</h2>
               <Link href="/interview-setup" className="block">
@@ -191,7 +168,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

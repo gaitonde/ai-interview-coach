@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-const TABLE = getTable('ai_interview_coach_prod_answer_scores');
+const TABLE = getTable('aic_answer_scores');
 
 async function insertScore(profileId: string, answerId: string, finalScore: number, scores: ScoringResult) {
   const query = `

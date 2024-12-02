@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Footer } from './footer'
-import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { FormEvent } from 'react'
 import { useToast } from "@/hooks/use-toast"
+import { useRouter } from 'next/navigation'
+import { FormEvent, useEffect, useRef, useState } from 'react'
+import { Footer } from './footer'
+import Cookies from 'js-cookie'
 
 export function ProfileSetup() {
   const router = useRouter()
@@ -15,51 +15,39 @@ export function ProfileSetup() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [school, setSchool] = useState<string>('')
-  const [graduationYear, setGraduationYear] = useState<string>('')
+  const [resumeFile, setResumeFile] = useState<File | null>(null)
+  const [school, setSchool] = useState<string | undefined>(undefined)
+  const [graduationYear, setGraduationYear] = useState<string | undefined>(undefined)
   const [isDemoMode, setIsDemoMode] = useState(false)
   const { toast } = useToast()
-  const [statusMessage, setStatusMessage] = useState('Thinking...')
 
   useEffect(() => {
-    const storedProfileId = localStorage.getItem('profileId')
-    const isDemo = localStorage.getItem('mode') === 'demo';
+    const storedProfileId = localStorage.getItem('profileId') || Cookies.get('profileId')
+    const isDemo = (localStorage.getItem('mode') || Cookies.get('mode')) === 'demo'
+
     if (isDemo && storedProfileId) {
-      loadProfile(storedProfileId);
+      loadProfile(storedProfileId)
     }
-    setIsDemoMode(isDemo);
-  }, []);
+    console.log('isDemo: ', isDemo)
+    setIsDemoMode(isDemo)
+  }, [])
 
-  useEffect(() => {
-    if (!isSubmitting) return
-
-    const messages = ['Thinking...', 'Researching...', 'Analyzing...', 'Generating...']
-    let currentIndex = 0
-
-    const interval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % messages.length
-      setStatusMessage(messages[currentIndex])
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [isSubmitting])
 
   const loadProfile = async (profileId: string) => {
-    const response = await fetch(`/api/profile?profileId=${profileId}`);
-    const { profile, job } = await response.json();
+    const response = await fetch(`/api/profile?profileId=${profileId}`)
+    const { profile } = await response.json()
 
     // Set select values using state
-    setSchool(profile?.school || '')
+    setSchool(profile?.school || undefined)
     setGraduationYear(profile?.graduation_date ? new Date(profile?.graduation_date).getUTCFullYear().toString() : '')
 
     // Populate form fields with profile data
     if (formRef.current) {
-      const form = formRef.current;
+      const form = formRef.current
 
       if (profile) {
         // Profile fields
-        (form.elements.namedItem('email') as HTMLInputElement).value = profile.email || '';
+        // (form.elements.namedItem('email') as HTMLInputElement).value = profile.email || '';
         (form.elements.namedItem('major') as HTMLInputElement).value = profile.major || '';
         (form.elements.namedItem('concentration') as HTMLInputElement).value = profile.concentration || '';
 
@@ -70,12 +58,12 @@ export function ProfileSetup() {
       }
 
       // Job fields
-      if (job) {
-        (form.elements.namedItem('company_url') as HTMLInputElement).value = job.company_url || '';
-        (form.elements.namedItem('jd_url') as HTMLInputElement).value = job.jd_url || '';
-        (form.elements.namedItem('interviewer_name') as HTMLInputElement).value = job.interviewer_name || '';
-        (form.elements.namedItem('interviewer_role') as HTMLInputElement).value = job.interviewer_role || '';
-      }
+      // if (job) {
+      //   (form.elements.namedItem('company_url') as HTMLInputElement).value = job.company_url || ''
+      //   (form.elements.namedItem('jd_url') as HTMLInputElement).value = job.jd_url || ''
+      //   (form.elements.namedItem('interviewer_name') as HTMLInputElement).value = job.interviewer_name || ''
+      //   (form.elements.namedItem('interviewer_role') as HTMLInputElement).value = job.interviewer_role || ''
+      // }
     }
 
     return profile;
@@ -93,7 +81,7 @@ export function ProfileSetup() {
 
   const saveProfile = async (formData: FormData) => {
     const profileAttributes = {
-      email: formData.get('email'),
+      // email: formData.get('email'),
       school: formData.get('school'),
       major: formData.get('major'),
       concentration: formData.get('concentration'),
@@ -140,64 +128,60 @@ export function ProfileSetup() {
     return false;
   }
 
-  const saveJob = async (profileId: number, formData: FormData) => {
-    try {
-      const response = await fetch(`/api/jobs?profileId=${profileId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          profileId,
-          company_url: formData.get('company_url'),
-          jd_url: formData.get('jd_url'),
-          interviewer_name: formData.get('interviewer_name'),
-          interviewer_role: formData.get('interviewer_role')
-        }),
-      });
+  // const saveJob = async (profileId: number, formData: FormData) => {
+  //   try {
+  //     const response = await fetch(`/api/jobs?profileId=${profileId}`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         profileId,
+  //         company_url: formData.get('company_url'),
+  //         jd_url: formData.get('jd_url'),
+  //         interviewer_name: formData.get('interviewer_name'),
+  //         interviewer_role: formData.get('interviewer_role')
+  //       }),
+  //     });
 
-      if (!response.ok) {
-        throw new Error('Failed to create job record');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Failed to create job record');
+  //     }
 
-      const result = await response.json();
-      return result.jobId;
-    } catch (error) {
-      console.error('Error creating job record:', error);
-      throw error;
-    }
-  };
+  //     const result = await response.json();
+  //     return result.jobId;
+  //   } catch (error) {
+  //     console.error('Error creating job record:', error);
+  //     throw error;
+  //   }
+  // };
 
-  const generateJobPrep = async (profileId: number) => {
-    try {
-      const response = await fetch('/api/generate-job-prep', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ profileId }),
-      });
+  // const generateJobPrep = async (profileId: number) => {
+  //   try {
+  //     const response = await fetch('/api/generate-job-prep', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ profileId }),
+  //     });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate prep sheet');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Failed to generate prep sheet');
+  //     }
 
-      const result = await response.json();
-      return result.content;
-    } catch (error) {
-      console.error('Error generating prep sheet:', error);
-      throw error;
-    }
-  };
+  //     const result = await response.json();
+  //     return result.content;
+  //   } catch (error) {
+  //     console.error('Error generating prep sheet:', error);
+  //     throw error;
+  //   }
+  // };
 
   const validateForm = (formData: FormData): string | null => {
     const requiredFields = [
-      'email',
-      'school',
-      'major',
-      'graduation_year',
-      'company_url',
-      'jd_url',
+      // 'email',
+      'major'
     ];
     for (const field of requiredFields) {
       if (!formData.get(field)) {
@@ -205,70 +189,84 @@ export function ProfileSetup() {
       }
     }
 
+    // Add specific validation for school dropdown
+    const school = formData.get('school') as string
+    console.log('school: ', school)
+    if (!school) {
+      return 'Please select your school'
+    }
+
+    // Add specific validation for graduation year dropdown
+    const graduationYear = formData.get('graduation_year') as string
+    console.log('graduationYear: ', graduationYear)
+    if (!graduationYear) {
+      return 'Please select your graduation year'
+    }
+
     if (!resumeFile) {
       return 'Resume is required';
     }
 
-    const urlFields = ['company_url', 'jd_url'];
-    for (const field of urlFields) {
-      let value = formData.get(field) as string;
-      if (value) {
-        if (!value.startsWith('http://') && !value.startsWith('https://')) {
-          value = `http://${value}`;
-          formData.set(field, value);
-        }
-      }
-    }
+    // const urlFields = ['company_url', 'jd_url'];
+    // for (const field of urlFields) {
+    //   let value = formData.get(field) as string;
+    //   if (value) {
+    //     if (!value.startsWith('http://') && !value.startsWith('https://')) {
+    //       value = `http://${value}`;
+    //       formData.set(field, value);
+    //     }
+    //   }
+    // }
 
     return null;
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    console.log('in handleSubmit')
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
 
-    const isDemo = localStorage.getItem('mode') === 'demo';
-    if (isDemo) {
-      router.push(`/job-prep`);
+    if (isDemoMode) {
+      router.push(`/job-prep`)
       return;
     }
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(e.currentTarget)
+    console.log('formData: ', formData)
 
-    const validationError = validateForm(formData);
+    const validationError = validateForm(formData)
     if (validationError) {
-      setError(validationError);
-      setIsSubmitting(false);
+      setError(validationError)
+      setIsSubmitting(false)
       return;
     }
 
     try {
-      const profileId = await saveProfile(formData);
-      localStorage.setItem('profileId', profileId);
+      const profileId = await saveProfile(formData)
+      console.log('Profile ID: ', profileId)
+      localStorage.setItem('profileId', profileId)
 
-      await saveJob(profileId, formData);
+      // await saveJob(profileId, formData)
 
-      const resumeFile = formData.get('resume') as File;
-      await uploadResume(profileId, resumeFile);
+      // TODO: uncomment this
+      const resumeFile = formData.get('resume') as File
+      await uploadResume(profileId, resumeFile)
 
-      await generateJobPrep(profileId);
-
-      router.push(`/job-prep`);
+      router.push(`/interview-setup`)
     } catch (error) {
-      console.error('Error during submission:', error);
-      setError('An error occurred. Please try again.');
+      console.error('Error during submission:', error)
+      setError('An error occurred. Please try again.')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#1a1f2b]">
+    <>
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="w-full max-w-md space-y-8 bg-[#252b3b] p-8 rounded-lg shadow-lg my-4">
+        <div className="w-full max-w-md space-y-8 bg-[#252b3b] px-8 py-4 rounded-lg shadow-lg my-4">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-[#10B981]">AI Interview Coach</h1>
             <h2 className="mt-2 text-3xl font-bold text-white">Profile Setup</h2>
             <p className="mt-2 text-sm text-gray-400">Complete your profile to get started</p>
             <p className="mt-2 text-sm text-gray-400">
@@ -277,10 +275,14 @@ export function ProfileSetup() {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
-                  const demoProfileId = process.env.NEXT_PUBLIC_DEMO_PROFILE_ID as string;
-                  console.log('Demo profile ID: ', demoProfileId);
-                  localStorage.setItem('mode', 'demo');
-                  localStorage.setItem('profileId', demoProfileId);
+                  const demoProfileId = process.env.NEXT_PUBLIC_DEMO_PROFILE_ID as string
+                  console.log('Demo profile ID: ', demoProfileId)
+
+                  // Set both localStorage and cookies
+                  localStorage.setItem('mode', 'demo')
+                  localStorage.setItem('profileId', demoProfileId)
+                  Cookies.set('mode', 'demo', { expires: 7 }) // Expires in 7 days
+                  Cookies.set('profileId', demoProfileId, { expires: 7 })
 
                   toast({
                     variant: "default",
@@ -289,10 +291,10 @@ export function ProfileSetup() {
                     title: "Example Loaded - Marketing Profile",
                     description:
                       "Scroll down and keep clicking 'Next' through the app to see example data and get a feel for how it works.",
-                  });
+                  })
 
-                  loadProfile(demoProfileId);
-                  setIsDemoMode(true);
+                  loadProfile(demoProfileId)
+                  setIsDemoMode(true)
                 }}
                 className="text-[#10B981] hover:text-[#059669] underline mx-1"
               >
@@ -307,6 +309,7 @@ export function ProfileSetup() {
             onSubmit={handleSubmit}
           >
             <div className="space-y-4">
+{/*
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-white">
                   Email
@@ -319,7 +322,7 @@ export function ProfileSetup() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
-
+ */}
               <div>
                 <label htmlFor="resume" className="block text-sm font-medium text-white">
                   Upload Resume (PDF)
@@ -442,18 +445,12 @@ export function ProfileSetup() {
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? statusMessage : 'Next'}
+              {isSubmitting ? 'Saving...' : 'Next'}
             </Button>
-            <p className="text-sm text-muted-foreground mt-1 text-center">
-              {isSubmitting && (
-                'Takes about 30 seconds, please be patient. Thank you.'
-              )}
-            </p>
           </form>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
       </main>
-      <Footer />
-    </div>
+    </>
   )
 }

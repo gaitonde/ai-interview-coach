@@ -6,7 +6,7 @@ export async function createProfile(
   clerk_id: string
 ): Promise<number> {
   try {
-    const table = getTable('ai_interview_coach_prod_profiles');
+    const table = getTable('aic_profiles');
     const result = await sql.query(`
       INSERT INTO ${table} (email, clerk_id)
       VALUES ('${email}', '${clerk_id}')

@@ -15,12 +15,12 @@ export async function POST(request: Request) {
 
   try {
     const { content, usage } = await generateCompletion(profileId, 'prompt-job-prep');
-    const aiResponsesTable = getTable('ai_interview_coach_prod_airesponses');
+    const aiResponsesTable = getTable('aic_airesponses');
     const query = `
-      INSERT INTO ${aiResponsesTable} (profile_id, job_id, prep_sheet_response, usage)
+      INSERT INTO ${aiResponsesTable} (profile_id, job_id, generated_company_info, usage)
       VALUES ($1, $2, $3, $4)
-      ON CONFLICT (profile_id)
-      DO UPDATE SET prep_sheet_response = EXCLUDED.prep_sheet_response, usage = EXCLUDED.usage;
+      ON CONFLICT (profile_id, job_id)
+      DO UPDATE SET generated_company_info = EXCLUDED.generated_company_info, usage = EXCLUDED.usage;
     `;
 
     await sql.query(query, [profileId, jobId, content, usage]);
@@ -29,13 +29,18 @@ export async function POST(request: Request) {
     const companyName = companyMatch ? companyMatch[1].trim() : null;
     console.log('company: ', companyName);
 
-    const jobsTable = getTable('ai_interview_coach_prod_jobs');
+    const roleMatch = content?.match(/\*\*Position\*\*:\s*([^\n]*)/);
+    const roleName = roleMatch ? roleMatch[1].trim() : null;
+    console.log('roleName: ', roleName);
+
+    const jobsTable = getTable('aic_jobs');
     const query2 = `
       UPDATE ${jobsTable}
-      SET company_name = $1
-      WHERE profile_id = $2;
+      SET company_name = $1, role_name = $2
+      WHERE profile_id = $3
+      AND id = $4;
     `;
-    await sql.query(query2, [companyName, profileId]);
+    await sql.query(query2, [companyName, roleName, profileId, jobId]);
 
     return NextResponse.json({ content });
   } catch (error) {

@@ -68,13 +68,14 @@ export default function Scoring({
       }
     }
     const generateSuggestions = async () => {
+      const jobId = localStorage.getItem('jobId')
       try {
         const response = await fetch('/api/generate-suggestions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ profileId, answerId, questionId, categories }),
+          body: JSON.stringify({ profileId, jobId, answerId, questionId, categories }),
         });
 
         if (!response.ok) {

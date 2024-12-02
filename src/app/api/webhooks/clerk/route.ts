@@ -1,7 +1,7 @@
 // import { createUser } from "@/app/actions";
 import { NextResponse } from "next/server";
 // import { clerkClient } from '@clerk/clerk-sdk-node';
-import { createProfile } from "@/app/actions/create-profile";
+import { createProfile } from "@/app/actions/x";
 // import  Mixpanel  from 'mixpanel';
 import { createClerkClient } from '@clerk/backend'
 
@@ -64,8 +64,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true }, { status: 200 });
     }
     else if (eventType === "session.created") {
+      //TODO: needed? do something here?
       console.debug('session created!!!')
-      return NextResponse.json({}, { status: 200 });
+      return NextResponse.json({ success: true }, { status: 200 });
     }
     else {
       return NextResponse.json({ success: false, message: "Invalid event type" }, { status: 500 })

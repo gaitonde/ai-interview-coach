@@ -5,7 +5,7 @@ import fetch from 'node-fetch'
 import * as cheerio from 'cheerio'
 import { getTable } from '@/lib/db'
 
-const TABLE = getTable('ai_interview_coach_prod_jobs')
+const TABLE = getTable('aic_jobs')
 
 const turndownService = new TurndownService()
 
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       interviewer_role
     )
     VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING *
+    RETURNING id
   `;
 
   const values = [
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
   ];
 
   const jobs = await sql.query(query, values);
-  return NextResponse.json(jobs.rows[0]);
+  return NextResponse.json({ id: jobs.rows[0].id });
 }
 
 async function fetchUrlContents(url: string): Promise<string> {

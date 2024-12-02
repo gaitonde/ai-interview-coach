@@ -3,8 +3,6 @@ import { Pool } from 'pg';
 
 import { getTable } from "@/lib/db";
 
-const TABLE = getTable('ai_interview_coach_prod_airesponses');
-
 // Create a new pool using the connection string from your environment variables
 const pool = new Pool({
   connectionString: process.env.POSTGRES_PRISMA_URL,
@@ -21,19 +19,20 @@ export async function GET(request: Request) {
 
     const client = await pool.connect();
     try {
+      const table = getTable('aic_airesponses');
       const result = await client.query(`
-        SELECT prep_sheet_response
-        FROM ${TABLE}
+        SELECT generated_company_info
+        FROM ${table}
         WHERE profile_id = $1
         ORDER BY created_at DESC
         LIMIT 1
       `, [profileId]);
 
       if (result.rows.length === 0) {
-        return NextResponse.json({ error: 'No prep sheet response found' }, { status: 404 });
+        return NextResponse.json({ error: 'No company info found' }, { status: 404 });
       }
 
-      return NextResponse.json({ content: result.rows[0].prep_sheet_response });
+      return NextResponse.json({ content: result.rows[0].generated_company_info });
     } finally {
       client.release();
     }

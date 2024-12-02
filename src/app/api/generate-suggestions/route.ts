@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { fetchPrompt, PromptData } from "../utils/fetchPrompt";
 import { sql } from "@vercel/postgres";
 import { getTable } from "@/lib/db";
+import { upsertOutOfDateReadinessRecord } from '../utils/readiness'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     //TODO: need better protection here
-    const { profileId, questionId, answerId, categories } = body;
+    const { profileId, jobId, questionId, answerId, categories } = body;
 
     if (!categories || !Array.isArray(categories)) {
       return NextResponse.json({ error: 'Categories are required and must be an array' }, { status: 400 });
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     // console.log('Suggestions :', suggestions);
 
     if (suggestions) {
-      const table = getTable('ai_interview_coach_prod_suggestions');
+      const table = getTable('aic_suggestions');
       const query = `
         INSERT INTO ${table}
         (profile_id, question_id, answer_id, suggestion_content)
@@ -59,6 +60,18 @@ export async function POST(req: NextRequest) {
         ($1, $2, $3, $4)
       `;
       await sql.query(query, [profileId, questionId, answerId, suggestions]);
+
+      // Update readiness records to mark them as out of date
+      const table2 = getTable('aic_job_questions')
+      console.log('table2', table2)
+      console.log('XX questionId', questionId)
+      const query2 = `
+        SELECT category FROM ${table2} WHERE id = $1
+      `
+      const questionCategory = await sql.query(query2, [questionId]);
+      console.log('XX questionCategory', questionCategory, questionId)
+
+      await upsertOutOfDateReadinessRecord(profileId, jobId, questionCategory.rows[0].category);
     }
 
     return NextResponse.json({ suggestions });

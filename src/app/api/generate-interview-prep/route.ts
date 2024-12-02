@@ -8,12 +8,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const TABLE = getTable('ai_interview_coach_prod_airesponses');
-
 export async function POST(request: Request) {
-  console.log('in BE with request for generating questions');
-  const body = await request.json();
-  const profileId = body.profileId;
+  console.log('in BE with request for generating questions')
+  const body = await request.json()
+  const { profileId, jobId } = body
 
   try {
     const promptData: PromptData = await fetchPrompt(profileId, 'prompt-interview-prep');
@@ -30,14 +28,22 @@ export async function POST(request: Request) {
 
     const generatedContent = completion.choices[0]?.message?.content; //?.replace('```json', '').replace('```', '');
 
-    // Upsert operation for questions_response
+    // Modified upsert operation
+    const table = getTable('aic_airesponses');
     const query = `
-      INSERT INTO ${TABLE} (profile_id, questions_response)
-      VALUES ($1, $2)
-      ON CONFLICT (profile_id)
-      DO UPDATE SET questions_response = EXCLUDED.questions_response;
+      WITH upsert AS (
+        UPDATE ${table}
+        SET generated_interview_prep_info = $3
+        WHERE profile_id = $1 AND job_id = $2
+        RETURNING *
+      )
+      INSERT INTO ${table} (profile_id, job_id, generated_interview_prep_info)
+      SELECT $1, $2, $3
+      WHERE NOT EXISTS (
+        SELECT * FROM upsert
+      );
     `;
-    await sql.query(query, [profileId, generatedContent]);
+    await sql.query(query, [profileId, jobId, generatedContent]);
 
     return NextResponse.json({ content: generatedContent });
   } catch (error) {

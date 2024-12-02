@@ -165,7 +165,6 @@ export function Demo() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   )
 }

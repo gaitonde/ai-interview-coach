@@ -1,33 +1,30 @@
-import { NextResponse } from 'next/server';
-import { sql } from "@vercel/postgres";
-// import { Pool } from 'pg';
-import { getTable } from "@/lib/db";
-
-const TABLE = getTable('ai_interview_coach_prod_airesponses');
+import { NextResponse } from 'next/server'
+import { sql } from "@vercel/postgres"
+import { getTable } from "@/lib/db"
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const profileId = searchParams.get('profileId');
-
+    const jobId = searchParams.get('jobId');
     if (!profileId) {
       return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 });
     }
 
-    console.log('ZZZXXX profileId:', TABLE);
+    const table = getTable('aic_airesponses')
     const result = await sql.query(`
-      SELECT questions_response
-      FROM ${TABLE}
+      SELECT generated_interview_prep_info
+      FROM ${table}
       WHERE profile_id = $1
+      AND job_id = $2
       ORDER BY created_at DESC
-    `, [profileId]);
+    `, [profileId, jobId]);
 
     if (result.rows.length < 1) {
       return NextResponse.json({ error: 'No questions found' }, { status: 404 });
     }
 
-
-    return NextResponse.json({ content: result.rows[0].questions_response });
+    return NextResponse.json({ content: result.rows[0].generated_interview_prep_info });
   } catch (error) {
     console.error('Error fetching prep sheet response:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

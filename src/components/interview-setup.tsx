@@ -28,8 +28,6 @@ export function InterviewSetup() {
     return () => clearInterval(interval)
   }, [isSubmitting])
 
-
-
   const saveJob = async (profileId: string, formData: FormData) => {
     try {
       const response = await fetch(`/api/jobs?profileId=${profileId}`, {
@@ -50,8 +48,8 @@ export function InterviewSetup() {
         throw new Error('Failed to create job record');
       }
 
-      const result = await response.json();
-      return result.jobId;
+      const result = await response.json()
+      return result.id
     } catch (error) {
       console.error('Error creating job record:', error);
       throw error;
@@ -60,7 +58,7 @@ export function InterviewSetup() {
 
   const generateJobPrep = async (profileId: string, jobId: string) => {
     try {
-      const response = await fetch('/api/generate-job-prep', {
+      const response = await fetch('/api/generate-company-info', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +126,8 @@ export function InterviewSetup() {
     try {
       const profileId = localStorage.getItem('profileId') as string
       const jobId = await saveJob(profileId, formData)
-      console.log('jobId: ', jobId);
+      console.log('jobId: ', jobId)
+      localStorage.setItem('jobId', jobId)
       await generateJobPrep(profileId, jobId)
 
       router.push(`/job-prep`);
@@ -141,11 +140,10 @@ export function InterviewSetup() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#1a1f2b]">
+    <>
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-[#252b3b] p-8 rounded-lg shadow-lg my-4">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-[#10B981]">AI Interview Coach</h1>
             <h2 className="mt-2 text-3xl font-bold text-white">Interview Setup</h2>
             <p className="mt-2 text-sm text-gray-400">Add your interview</p>
           </div>
@@ -221,7 +219,6 @@ export function InterviewSetup() {
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
       </main>
-      <Footer />
-    </div>
+    </>
   )
 }

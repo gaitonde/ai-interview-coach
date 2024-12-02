@@ -21,7 +21,7 @@ export function JobPrep() {
     setIsDemoMode(isDemo)
 
     if (storedProfileId) {
-      fetch(`/api/generated-prep-sheet?profileId=${storedProfileId}`)
+      fetch(`/api/generated-company-info?profileId=${storedProfileId}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch prep sheet response');
@@ -69,12 +69,13 @@ export function JobPrep() {
 
   const generateInterviewPrep = async (profileId: string) => {
     try {
+      const jobId = localStorage.getItem('jobId') || ''
       const response = await fetch('/api/generate-interview-prep', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profileId }),
+        body: JSON.stringify({ profileId, jobId }),
       });
 
       if (!response.ok) {
@@ -94,9 +95,11 @@ export function JobPrep() {
       {content && (
         <div className="flex flex-col min-h-screen bg-[#111827]">
           <main className="flex-grow flex justify-center">
-            <div className="w-full max-w-4xl prep-sheet-content">
+            <div className="w-full max-w-4xl prep-sheet-content overflow-hidden">
               <div className="mx-4">
-                <MarkdownRenderer content={content} />
+                <div className="prose prose-invert max-w-none">
+                  <MarkdownRenderer content={content} />
+                </div>
 
                 {localStorage.getItem('showScore') && (
                   <RubricScorer
@@ -113,7 +116,7 @@ export function JobPrep() {
                       const content = document.querySelector('.prep-sheet-content')?.textContent;
                       if (content) {
                         navigator.clipboard.writeText(content)
-                          .then(() => alert('Content copied to clipboard!'))
+                          .then(() => alert('Content copied to clipboard!')) //TODO: replace with toas
                           .catch(err => console.error('Failed to copy: ', err));
                       }
                     }
@@ -140,7 +143,6 @@ export function JobPrep() {
               </div>
             </div>
           </main>
-          <Footer />
         </div>
       )}
     </>

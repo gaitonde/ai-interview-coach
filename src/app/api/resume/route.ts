@@ -42,12 +42,11 @@ async function uploadResume(file: File): Promise<string> {
 }
 
 async function updateProfileWithResumeUrl(profileId: string, resumeUrl: string, resumeContent: string): Promise<void> {
-  const table = getTable('ai_interview_coach_prod_resumes');
+  const table = getTable('aic_resumes');
   const query = `
     INSERT INTO ${table} (profile_id, url, text)
     VALUES (${profileId}, '${resumeUrl}', '${resumeContent}')
   `;
-  console.log('OOO query:', query);
 
   try {
     await sql.query(query);

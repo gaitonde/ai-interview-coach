@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Profile ID, Question ID, and Answer ID are all required' }, { status: 400 });
   }
 
-  const table = getTable('ai_interview_coach_prod_suggestions');
+  const table = getTable('aic_suggestions');
   const query = `
       SELECT id, suggestion_content
       FROM ${table}

@@ -2,18 +2,19 @@ import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 import { getTable } from "@/lib/db";
 
-const PROFILES_TABLE = getTable('ai_interview_coach_prod_profiles');
-const JOBS_TABLE = getTable('ai_interview_coach_prod_jobs');
+const PROFILES_TABLE = getTable('aic_profiles');
+const JOBS_TABLE = getTable('aic_jobs');
 
 export async function GET(request: Request) {
+  console.debug('in profile route GET');
   try {
     const { searchParams } = new URL(request.url);
     const profileId = searchParams.get('profileId');
 
     const profile = await sql.query(`SELECT * FROM ${PROFILES_TABLE} WHERE id = ${profileId} AND is_demo = true`);
-    const job = await sql.query(`SELECT company_url, jd_url, interviewer_name, interviewer_role FROM ${JOBS_TABLE} WHERE profile_id = ${profileId}`);
+    // const job = await sql.query(`SELECT company_url, jd_url, interviewer_name, interviewer_role FROM ${JOBS_TABLE} WHERE profile_id = ${profileId}`);
 
-    return NextResponse.json({ profile: profile.rows[0], job: job.rows[0] });
+    return NextResponse.json({ profile: profile.rows[0] });
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json({ content: "unable to get profile" }, { status: 500 });

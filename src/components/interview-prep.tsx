@@ -17,16 +17,15 @@ export default function InterviewPrep() {
 
   useEffect(() => {
     const profileId = localStorage.getItem('profileId')
-    console.log("Stored Profile ID!!:", profileId)
     const isDemo = localStorage.getItem('mode') === 'demo'
     setIsDemoMode(isDemo)
 
-    // Fetch prep sheet response
     if (profileId) {
-        fetch(`/api/generated-questions?profileId=${profileId}`)
-          .then(response => {
+      const jobId = localStorage.getItem('jobId') || ''
+      fetch(`/api/generated-questions?profileId=${profileId}&jobId=${jobId}`)
+        .then(response => {
             if (!response.ok) {
-              throw new Error('Failed to fetch prep sheet response');
+              throw new Error('Failed to fetch generated questions response');
             }
             return response.json();
           })
@@ -58,12 +57,13 @@ export default function InterviewPrep() {
 
   const generateInterviewQuestions = async (profileId: string) => {
     try {
+      const jobId = localStorage.getItem('jobId')
       const response = await fetch('/api/generate-interview-questions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profileId }),
+        body: JSON.stringify({ profileId, jobId }),
       });
 
       if (!response.ok) {
@@ -139,7 +139,6 @@ export default function InterviewPrep() {
             </div>
           </div>
         </main>
-        <Footer />
       </div>
     )}
     </>

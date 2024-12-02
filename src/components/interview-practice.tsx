@@ -4,7 +4,7 @@ import AudioRecorder from "@/components/audio-recorder";
 import { useState, useEffect } from 'react';
 import Scoring from "./scoring";
 import { get } from 'idb-keyval';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Footer } from "./footer";
 import styles from '../styles/interview-practice.module.css';
 import { Button } from "./ui/button";
@@ -33,6 +33,8 @@ interface ScoringResult {
   };
 
 export default function InterviewPractice() {
+  const searchParams = useSearchParams();
+  const category = searchParams.get('category');
   const router = useRouter();
   const [versions, setVersions] = useState<Array<{
     answerId: string;
@@ -172,7 +174,10 @@ export default function InterviewPractice() {
     const fetchQuestions = async () => {
       try {
         if (profileId) {
-          const response = await fetch(`/api/questions?profileId=${profileId}&mode=${mode}`);
+          const jobId = localStorage.getItem('jobId')
+          const categoryParam = category ? `&category=${encodeURIComponent(category)}` : '';
+          console.log('CATEGORY PARAM', categoryParam);
+          const response = await fetch(`/api/questions?profileId=${profileId}&jobId=${jobId}&mode=${mode}${categoryParam}`);
           if (!response.ok) {
             throw new Error('Failed to fetch questions');
           }
@@ -402,7 +407,6 @@ export default function InterviewPractice() {
           )}
           </div>
         </main>
-        <Footer />
       </div>
     </>
   );
