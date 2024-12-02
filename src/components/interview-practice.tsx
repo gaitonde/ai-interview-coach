@@ -1,11 +1,10 @@
 'use client';
 
 import AudioRecorder from "@/components/audio-recorder";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Scoring from "./scoring";
 import { get } from 'idb-keyval';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Footer } from "./footer";
+import { useRouter, useSearchParams } from 'next/navigation'
 import styles from '../styles/interview-practice.module.css';
 import { Button } from "./ui/button";
 
@@ -32,7 +31,7 @@ interface ScoringResult {
   averageScore: number;
   };
 
-export default function InterviewPractice() {
+export function InterviewPracticeContent() {
   const searchParams = useSearchParams();
   const category = searchParams.get('category');
   const router = useRouter();
@@ -410,4 +409,12 @@ export default function InterviewPractice() {
       </div>
     </>
   );
+}
+
+export default function InterviewPractice() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <InterviewPracticeContent />
+    </Suspense>
+  )
 }
