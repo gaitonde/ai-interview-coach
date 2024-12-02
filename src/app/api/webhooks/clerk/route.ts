@@ -1,7 +1,7 @@
 // import { createUser } from "@/app/actions";
 import { NextResponse } from "next/server";
 // import { clerkClient } from '@clerk/clerk-sdk-node';
-import { createProfile } from "@/app/actions/x";
+import { createProfile } from "@/app/actions/create-profile"
 // import  Mixpanel  from 'mixpanel';
 import { createClerkClient } from '@clerk/backend'
 
