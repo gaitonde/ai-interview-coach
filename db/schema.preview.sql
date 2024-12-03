@@ -28,7 +28,8 @@ CREATE TABLE aic_profiles_preview (
     is_demo BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES aic_users_preview(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES aic_users_preview(id) ON DELETE CASCADE,
+    CONSTRAINT unique_profile_user UNIQUE (id, user_id)
 );
 
 CREATE TRIGGER update_profiles_last_updated_at

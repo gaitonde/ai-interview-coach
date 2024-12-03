@@ -1,14 +1,11 @@
 'use client'
 
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { AlertCircle, FileText, Frown, Meh, Plus, Smile, User } from 'lucide-react'
+import { AlertCircle, FileText, Frown, Meh, Plus, Smile } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Footer } from './footer'
-// import { signOut } from "next-auth/react"
 
 type InterviewAnalysis = {
   id: string
@@ -19,12 +16,6 @@ type InterviewAnalysis = {
   interviewerRole: string
   readiness: string
 }
-
-const mockData: InterviewAnalysis[] = [
-//   { id: '1', date: '2024-05-01', company: 'Google', role: 'Product Manager', interviewer: 'Tallis Tech Lead', interviewerRole: 'Tech Lead', readiness: 'Ready' },
-//   { id: '3', date: '2024-03-30', company: 'Microsoft', role: 'Product Manager', interviewer: 'David Design Lead', interviewerRole: 'Design Lead', readiness: 'Kinda Ready' },
-//   { id: '5', date: '2024-02-20', company: 'Facebook', role: 'Product Manager', interviewer: 'Frank Product Director', interviewerRole: 'Product Director', readiness: 'Not Ready' },
-]
 
 const getScoreIcon = (score: string) => {
   switch (score) {
@@ -41,7 +32,7 @@ const getScoreIcon = (score: string) => {
 
 export default function Dashboard() {
   const router = useRouter()
-  const [analyses, setAnalyses] = useState<InterviewAnalysis[]>(mockData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()))
+  const [analyses, setAnalyses] = useState<InterviewAnalysis[]>()
   const [searchTerm, setSearchTerm] = useState('')
   const [sortColumn, setSortColumn] = useState<keyof InterviewAnalysis>('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
@@ -56,11 +47,11 @@ export default function Dashboard() {
     }
   }
 
-  const sortedAnalyses = [...analyses].sort((a, b) => {
+  const sortedAnalyses = analyses?.sort((a, b) => {
     if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1
     if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1
     return 0
-  })
+  }) || []
 
   const filteredAnalyses = sortedAnalyses.filter(
     analysis => analysis.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -72,10 +63,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId')
+    if (!storedProfileId) {
+      router.push('/profile-setup')
+      return
+    }
     fetch(`/api/jobs?profileId=${storedProfileId}`)
     .then(response => {
       if (!response.ok) {
-        throw new Error('Failed to fetch interview data');
+        throw new Error('Failed to fetch job data');
       }
       return response.json();
     })
@@ -96,8 +91,7 @@ export default function Dashboard() {
       setAnalyses(mappedAnalyses);
     })
     .catch(error => {
-      console.error('Error fetching interview data:', error);
-      setAnalyses(mockData);
+      console.error('Error fetching interview data:', error)
     });
   }, [])
 

@@ -10,7 +10,7 @@ export function Header() {
 
   return (
     <header className="p-4 md:p-8">
-      <div className={`max-w-7xl mx-auto ${userId ? 'flex justify-between' : 'text-center'} items-center`}>
+      <div className={`max-w-7xl mx-auto ${!userId ? 'text-left' : 'flex justify-between'} items-center`}>
         <Link href="/">
           <h1 className="text-2xl font-bold text-[#10B981]">AI Interview Coach</h1>
         </Link>

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Footer } from './footer'
 import { useRouter } from 'next/navigation'
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@vercel/postgres'
-import { getTable } from '@/lib/db'
+import { getTable } from "@/lib/db"
 
 const PROFILES_TABLE = getTable('aic_profiles')
 const JOBS_TABLE = getTable('aic_jobs')
@@ -28,6 +28,7 @@ export async function GET(request: Request) {
           ORDER BY created_at DESC
         `
       }
+
     } else {
       query = `
         SELECT * FROM ${PROFILES_TABLE}

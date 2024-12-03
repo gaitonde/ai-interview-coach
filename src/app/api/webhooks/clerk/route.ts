@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const json = await request.json()
     console.debug('XX in webhook json', json)
     const eventType = json.type
-    console.debug('XX in webhook json', eventType)
+    console.debug('XX in webhook eventType', eventType)
     if (eventType === "user.created") {
       console.debug('XX in webhook have user created')
       const data = json.data
@@ -42,11 +42,6 @@ export async function POST(request: Request) {
         console.error('couldnt update metadata', error)
       }
 
-      return NextResponse.json({ success: true }, { status: 200 })
-    }
-    else if (eventType === "session.created") {
-      //TODO: needed? do something here?
-      console.debug('session created!!!')
       return NextResponse.json({ success: true }, { status: 200 })
     }
     else {

@@ -111,7 +111,7 @@ export function InterviewReadinessComponent() {
     fetch(`/api/jobs?profileId=${storedProfileId}&jobId=${jobId}`)
     .then(response => {
       if (!response.ok) {
-        throw new Error('Failed to fetch interview data');
+        throw new Error('Failed to fetch job data');
       }
       return response.json();
     })
@@ -131,10 +131,9 @@ export function InterviewReadinessComponent() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#1a1f2b] py-8 px-4">
+    <div className="min-h-screen bg-[#1a1f2b] px-4">
       <div className="max-w-4xl mx-auto bg-[#252b3b] rounded-lg shadow-xl overflow-hidden">
         <div className="p-6 sm:p-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-center text-[#10B981]">AI Interview Coach</h1>
           <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-6 text-center text-white">Interview Readiness</h2>
 
           <Card className="bg-[#1a1f2b] text-white mb-6">

@@ -6,8 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { Footer } from './footer'
-import Cookies from 'js-cookie'
+// import Cookies from 'js-cookie'
 
 export function ProfileSetup() {
   const router = useRouter()
@@ -19,23 +18,29 @@ export function ProfileSetup() {
   const [school, setSchool] = useState<string | undefined>(undefined)
   const [graduationYear, setGraduationYear] = useState<string | undefined>(undefined)
   const [isDemoMode, setIsDemoMode] = useState(false)
+  const [includeResume, setIncludeResume] = useState(false)
   const { toast } = useToast()
+  const [userId] = useState<string | null>(localStorage.getItem('userId'))
 
   useEffect(() => {
-    const storedProfileId = localStorage.getItem('profileId') || Cookies.get('profileId')
-    const isDemo = (localStorage.getItem('mode') || Cookies.get('mode')) === 'demo'
-
-    if (isDemo && storedProfileId) {
-      loadProfile(storedProfileId)
-    }
+    const storedProfileId = localStorage.getItem('profileId')
+    const isDemo = localStorage.getItem('mode') || false
+    console.log('storedProfileId: ', storedProfileId)
     console.log('isDemo: ', isDemo)
-    setIsDemoMode(isDemo)
+
+    if (isDemo || storedProfileId) {
+      loadProfile(storedProfileId!)
+    } else {
+      setIncludeResume(true)
+    }
+    setIsDemoMode(isDemo === 'true')
   }, [])
 
 
   const loadProfile = async (profileId: string) => {
     const response = await fetch(`/api/profile?profileId=${profileId}`)
-    const { profile } = await response.json()
+    const { profiles } = await response.json()
+    const profile = profiles[0]
 
     // Set select values using state
     setSchool(profile?.school || undefined)
@@ -81,7 +86,7 @@ export function ProfileSetup() {
 
   const saveProfile = async (formData: FormData) => {
     const profileAttributes = {
-      // email: formData.get('email'),
+      userId: userId,
       school: formData.get('school'),
       major: formData.get('major'),
       concentration: formData.get('concentration'),
@@ -207,6 +212,11 @@ export function ProfileSetup() {
       return 'Resume is required';
     }
 
+    // Add userId validation
+    if (!userId) {
+      return 'User ID not found. Please log in again.';
+    }
+
     // const urlFields = ['company_url', 'jd_url'];
     // for (const field of urlFields) {
     //   let value = formData.get(field) as string;
@@ -249,9 +259,10 @@ export function ProfileSetup() {
 
       // await saveJob(profileId, formData)
 
-      // TODO: uncomment this
-      const resumeFile = formData.get('resume') as File
-      await uploadResume(profileId, resumeFile)
+      if (includeResume) {
+        const resumeFile = formData.get('resume') as File
+        await uploadResume(profileId, resumeFile)
+      }
 
       router.push(`/interview-setup`)
     } catch (error) {
@@ -269,6 +280,7 @@ export function ProfileSetup() {
           <div className="text-center">
             <h2 className="mt-2 text-3xl font-bold text-white">Profile Setup</h2>
             <p className="mt-2 text-sm text-gray-400">Complete your profile to get started</p>
+{/*
             <p className="mt-2 text-sm text-gray-400">
               (or
               <a
@@ -278,11 +290,11 @@ export function ProfileSetup() {
                   const demoProfileId = process.env.NEXT_PUBLIC_DEMO_PROFILE_ID as string
                   console.log('Demo profile ID: ', demoProfileId)
 
-                  // Set both localStorage and cookies
+                  // Set both localStorage
                   localStorage.setItem('mode', 'demo')
                   localStorage.setItem('profileId', demoProfileId)
-                  Cookies.set('mode', 'demo', { expires: 7 }) // Expires in 7 days
-                  Cookies.set('profileId', demoProfileId, { expires: 7 })
+                  // Cookies.set('mode', 'demo', { expires: 7 }) // Expires in 7 days
+                  // Cookies.set('profileId', demoProfileId, { expires: 7 })
 
                   toast({
                     variant: "default",
@@ -302,6 +314,7 @@ export function ProfileSetup() {
               </a>
               first)
             </p>
+             */}
           </div>
           <form
             ref={formRef}
@@ -323,9 +336,10 @@ export function ProfileSetup() {
                 />
               </div>
  */}
-              <div>
-                <label htmlFor="resume" className="block text-sm font-medium text-white">
-                  Upload Resume (PDF)
+              {includeResume && (
+                <div>
+                  <label htmlFor="resume" className="block text-sm font-medium text-white">
+                    Upload Resume (PDF)
                 </label>
                 <div className="mt-1 flex items-center">
                   <label
@@ -343,8 +357,9 @@ export function ProfileSetup() {
                     className="hidden"
                   />
                   <span className="ml-3 text-sm text-gray-400 truncate">{fileName}</span>
+                  </div>
                 </div>
-              </div>
+              )}
 {/*
               <div>
                 <label htmlFor="linkedin" className="block text-sm font-medium text-white">
@@ -381,6 +396,26 @@ export function ProfileSetup() {
                 </Select>
               </div>
               <div>
+                <label htmlFor="graduation_year" className="block text-sm font-medium text-white">
+                  Graduation Year
+                </label>
+                <div className="mt-1">
+                  <Select name="graduation_year" value={graduationYear} onValueChange={setGraduationYear}>
+                    <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 rounded-md">
+                      <SelectValue placeholder="Year" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white text-gray-700 border-gray-300">
+                      <SelectItem value="2023">2023</SelectItem>
+                      <SelectItem value="2024">2024</SelectItem>
+                      <SelectItem value="2025">2025</SelectItem>
+                      <SelectItem value="2026">2026</SelectItem>
+                      <SelectItem value="2027">2027</SelectItem>
+                      <SelectItem value="2028">2028</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
                 <label htmlFor="major" className="block text-sm font-medium text-white">
                   Major
                 </label>
@@ -404,26 +439,6 @@ export function ProfileSetup() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
-              <div>
-                <label htmlFor="graduation_year" className="block text-sm font-medium text-white">
-                  Graduation Year
-                </label>
-                <div className="mt-1">
-                  <Select name="graduation_year" value={graduationYear} onValueChange={setGraduationYear}>
-                    <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 rounded-md">
-                      <SelectValue placeholder="Year" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white text-gray-700 border-gray-300">
-                      <SelectItem value="2023">2023</SelectItem>
-                      <SelectItem value="2024">2024</SelectItem>
-                      <SelectItem value="2025">2025</SelectItem>
-                      <SelectItem value="2026">2026</SelectItem>
-                      <SelectItem value="2027">2027</SelectItem>
-                      <SelectItem value="2028">2028</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
 
 {/*
               <div>
@@ -445,7 +460,7 @@ export function ProfileSetup() {
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Saving...' : 'Next'}
+              {isSubmitting ? 'Saving...' : 'Save'}
             </Button>
           </form>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
