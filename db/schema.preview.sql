@@ -7,20 +7,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Users
+DROP TABLE IF EXISTS aic_users_preview CASCADE;
+CREATE TABLE aic_users_preview (
+    id SERIAL PRIMARY KEY,
+    clerk_id VARCHAR(255),
+    email VARCHAR(255)
+);
+
 -- Profiles
 DROP TABLE IF EXISTS aic_profiles_preview CASCADE;
 
 CREATE TABLE aic_profiles_preview (
     id SERIAL PRIMARY KEY,
-    clerk_id VARCHAR(255),
-    email VARCHAR(255),
+    user_id INTEGER NOT NULL,
     school VARCHAR(255),
     major VARCHAR(255),
     concentration VARCHAR(255),
     graduation_date DATE,
     is_demo BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES aic_users_preview(id) ON DELETE CASCADE
 );
 
 CREATE TRIGGER update_profiles_last_updated_at

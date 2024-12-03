@@ -1,9 +1,9 @@
 "use client"
 
-import { useRouter } from 'next/navigation'
-import { SignInButton, SignedIn, SignedOut } from '@clerk/nextjs'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { SignedIn, SignOutButton } from '@clerk/nextjs'
 import { User } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 export function UserMenu() {
   const router = useRouter()
@@ -24,15 +24,16 @@ export function UserMenu() {
             <DropdownMenuItem onClick={() => router.push('/billing')} className="cursor-pointer hover:bg-[#374151]">
               Billing
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push('/')} className="cursor-pointer hover:bg-[#374151]">
-              Sign out
-            </DropdownMenuItem>
+            <SignOutButton>
+              <DropdownMenuItem
+                className="cursor-pointer hover:bg-[#374151]"
+              >
+                Sign out
+              </DropdownMenuItem>
+            </SignOutButton>
           </DropdownMenuContent>
         </DropdownMenu>
       </SignedIn>
-      <SignedOut>
-        <SignInButton />
-      </SignedOut>
     </>
   )
 }
