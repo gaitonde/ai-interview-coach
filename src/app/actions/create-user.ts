@@ -6,7 +6,7 @@ export async function createUser(
   clerk_id: string
 ): Promise<number> {
   try {
-    const table = getTable('aic_users');
+    const table = getTable('users');
     const result = await sql.query(`
       INSERT INTO ${table} (email, clerk_id)
       VALUES ('${email}', '${clerk_id}')

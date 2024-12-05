@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   const body = await request.json();
   const { profileId, questionId, transcript } = body;
 
-  const table = getTable('aic_job_question_answers');
+  const table = getTable('answers');
   const query =
     `INSERT INTO ${table}
     (profile_id, question_id, answer)

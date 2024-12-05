@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Footer } from './footer'
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import MarkdownRenderer from "./markdown-renderer"
@@ -21,23 +20,23 @@ export default function InterviewPrep() {
     setIsDemoMode(isDemo)
 
     if (profileId) {
-      const jobId = localStorage.getItem('jobId') || ''
-      fetch(`/api/generated-questions?profileId=${profileId}&jobId=${jobId}`)
+      const interviewId = localStorage.getItem('interviewId') || ''
+      fetch(`/api/generated-questions?profileId=${profileId}&interviewId=${interviewId}`)
         .then(response => {
             if (!response.ok) {
-              throw new Error('Failed to fetch generated questions response');
+              throw new Error('Failed to fetch generated questions response')
             }
-            return response.json();
+            return response.json()
           })
           .then(data => {
-            setContent('# Awesome Interview Cheat Sheet\n\n' + data.content);
+            setContent('# Awesome Interview Cheat Sheet\n\n' + data.content)
           })
           .catch(error => {
-            console.error('Error fetching prep sheet response:', error);
-            setContent('Error loading content. Please try again later.');
-          });
+            console.error('Error fetching prep sheet response:', error)
+            setContent('Error loading content. Please try again later.')
+          })
     } else {
-      router.push('/');
+      router.push('/')
     }
   }, []);
 
@@ -57,13 +56,13 @@ export default function InterviewPrep() {
 
   const generateInterviewQuestions = async (profileId: string) => {
     try {
-      const jobId = localStorage.getItem('jobId')
+      const interviewId = localStorage.getItem('interviewId')
       const response = await fetch('/api/generate-interview-questions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profileId, jobId }),
+        body: JSON.stringify({ profileId, interviewId }),
       });
 
       if (!response.ok) {
@@ -79,12 +78,12 @@ export default function InterviewPrep() {
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true)
     const profileId = localStorage.getItem('profileId') || ''
     if (!profileId) {
       alert('No profile ID found. Please select a profile.')
     }
     if (!isDemoMode) {
+      setIsSubmitting(true)
       await generateInterviewQuestions(profileId)
     }
 
@@ -111,7 +110,7 @@ export default function InterviewPrep() {
             <Button
               onClick={() => {
                 if (typeof window !== 'undefined') {
-                  const content = document.querySelector('.prep-sheet-content')?.textContent;
+                  const content = document.querySelector('.prep-sheet-content')?.textContent
                   if (content) {
                     navigator.clipboard.writeText(content)
                       .then(() => alert('Content copied to clipboard!'))

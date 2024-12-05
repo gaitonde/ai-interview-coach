@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import { sql } from '@vercel/postgres'
 import { getTable } from "@/lib/db"
 
-const PROFILES_TABLE = getTable('aic_profiles')
-const JOBS_TABLE = getTable('aic_jobs')
+const PROFILES_TABLE = getTable('profiles')
+const JOBS_TABLE = getTable('interviews')
 
 export async function GET(request: Request) {
   console.debug('in profile route GET')
@@ -70,10 +70,12 @@ async function createProfile(
   graduation_date: Date
 ): Promise<number> {
   try {
+    console.log('in createProfile...')
+    // ON CONFLICT ON CONSTRAINT unique_user_id
     const result = await sql.query(`
       INSERT INTO ${PROFILES_TABLE} (user_id, school, major, concentration, graduation_date)
       VALUES (${userId}, '${school}', '${major}', '${concentration}', '${graduation_date.toISOString()}')
-      ON CONFLICT (id, user_id)
+      ON CONFLICT (user_id)
       DO UPDATE SET
         school = EXCLUDED.school,
         major = EXCLUDED.major,

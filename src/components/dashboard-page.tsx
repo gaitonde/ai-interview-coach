@@ -1,17 +1,27 @@
-import Dashboard from '@/components/dashboard'
-import { redirect } from 'next/navigation'
-import { getProfile } from '@/app/actions/get-profile'
+'use client'
 
-export default async function DashboardPage({
-  profileId,
-}: {
-  profileId: string
-}) {
-  const profile = await getProfile(profileId)
+import { useEffect, useState } from "react"
+import { getProfileX } from "@/app/actions/get-profile"
+import Dashboard from "@/components/dashboard"
+import { useRouter } from "next/navigation"
 
-  if (!profile) {
-    redirect('/profile-setup')
-  }
+export default function DashboardPage({ profileId }: { profileId: string }) {
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const profile = await getProfileX(profileId)
+
+      if (!profile) {
+        router.push('/profile-setup')
+        return
+      }
+
+    }
+
+    fetchProfile()
+  }, [profileId, router])
 
   return (
     <main>

@@ -46,11 +46,11 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
   const todayDate = new Date();
   const todayDateFormatted = todayDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-  const PROFILES_TABLE = getTable('aic_profiles');
-  const JOBS_TABLE = getTable('aic_jobs');
-  const RESUMES_TABLE = getTable('aic_resumes');
-  const QUESTIONS_TABLE = getTable('aic_job_questions');
-  const ANSWERS_TABLE = getTable('aic_job_question_answers');
+  const PROFILES_TABLE = getTable('profiles');
+  const JOBS_TABLE = getTable('interviews');
+  const RESUMES_TABLE = getTable('resumes');
+  const QUESTIONS_TABLE = getTable('questions');
+  const ANSWERS_TABLE = getTable('answers');
 
   const PROFILE_QUERY = `SELECT school, major, concentration, graduation_date
       FROM "${PROFILES_TABLE}"

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { sql } from '@vercel/postgres';
 import { getTable } from "@/lib/db";
 
-const TABLE = getTable('aic_prompts');
+const TABLE = getTable('prompts');
 
 export async function GET(request: Request) {
   console.log('Fetching prompts');

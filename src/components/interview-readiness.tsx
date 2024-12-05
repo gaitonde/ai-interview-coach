@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Frown, Meh, Smile, AlertCircle, Calendar, User, Briefcase, Target } from 'lucide-react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 
 type Interview = {
@@ -67,19 +67,25 @@ const getScoreInfo = (score?: string): { icon: React.ReactNode; text: string; co
 
 export function InterviewReadinessComponent() {
   const router = useRouter()
-
+  const searchParams = useSearchParams()
   const [interview, setInterview] = useState<Interview | null>(null)
   const [categoryResponses, setCategoryResponses] = useState<Record<string, CategoryResponse>>({});
 
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId')
-    const jobId = localStorage.getItem('jobId')
+    const interviewId = searchParams.get('interviewId')
+    console.log('interviewId', interviewId)
+    console.log('storedProfileId', storedProfileId)
+    if (!interviewId || !storedProfileId) {
+      console.error('Missing interviewId or profileId')
+      return
+    }
 
     const categoriesToFetch = ['Overall', 'Behavioral', 'Technical', 'Role', 'Case'];
 
     Promise.all(
       categoriesToFetch.map(category =>
-        fetch(`/api/interview-eval?profileId=${storedProfileId}&jobId=${jobId}&category=${category}`)
+        fetch(`/api/interview-readiness?profileId=${storedProfileId}&interviewId=${interviewId}&category=${category}`)
           .then(response => {
             if (!response.ok) throw new Error(`Failed to fetch ${category} evaluation`);
             return response.json();
@@ -103,12 +109,17 @@ export function InterviewReadinessComponent() {
     .catch(error => {
       console.error('Error fetching evaluations:', error);
     });
-  }, [])
+  }, [searchParams])
 
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId')
-    const jobId = localStorage.getItem('jobId')
-    fetch(`/api/jobs?profileId=${storedProfileId}&jobId=${jobId}`)
+    const interviewId = searchParams.get('interviewId')
+    if (!interviewId || !storedProfileId) {
+      console.error('Missing interviewId or profileId')
+      return
+    }
+
+    fetch(`/api/interviews?profileId=${storedProfileId}&interviewId=${interviewId}`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Failed to fetch job data');
@@ -128,7 +139,7 @@ export function InterviewReadinessComponent() {
     .catch(error => {
       console.error('Error fetching interview data:', error)
     });
-  }, [])
+  }, [searchParams])
 
   return (
     <div className="min-h-screen bg-[#1a1f2b] px-4">
@@ -185,62 +196,65 @@ export function InterviewReadinessComponent() {
                   </div>
                 </div>
               </div>
-                <Button
-                  className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm"
-                  onClick={() => router.push('/interview-practice')}
-                >
-                  Practice All Interview Questions
-                </Button>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#1a1f2b] text-white mb-6">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <ReadinessIndicator readiness={categoryResponses.Overall?.readiness_rating ?? null} />
-              </div>
-              <ReactMarkdown
-                components={{
-                  ul: ({node, ...props}) => (
-                    <ul className="list-disc pl-4 space-y-1 mb-4" {...props} />
-                  )
-                }}
-              >{categoryResponses.Overall?.readiness_text ?? ''}</ReactMarkdown>
-            </CardContent>
-          </Card>
-
-          {categories.map((category) => {
-            const categoryResponse = categoryResponses[category.name];
-            console.log('XXX Category Response:', categoryResponse);
-            const { icon, text, color } = getScoreInfo(categoryResponse?.readiness_rating);
-            return (
-              <Card key={category.name} className="bg-[#1a1f2b] text-white mb-4">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h2 className="text-lg font-semibold">{category.displayName}</h2>
-                      <p className="text-sm text-gray-400 italic mt-1">{category.description}</p>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <div className="flex items-center">
-                        <span className={`mr-2 ${color}`}>{icon}</span>
-                        <span className={`text-sm ${color}`}>{text}</span>
-                      </div>
-                    </div>
+          {categoryResponses.Overall?.readiness_rating && (
+            <>
+              <Card className="bg-[#1a1f2b] text-white mb-6">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <ReadinessIndicator readiness={categoryResponses.Overall.readiness_rating} />
                   </div>
-                  <p className="text-sm text-gray-300 mt-3 mb-4">
-                    {categoryResponse?.readiness_text ?? 'Loading...'}
-                  </p>
+                  <ReactMarkdown
+                    components={{
+                      ul: ({node, ...props}) => (
+                        <ul className="list-disc pl-4 space-y-1 mb-4" {...props} />
+                      )
+                    }}
+                  >{categoryResponses.Overall.readiness_text ?? ''}</ReactMarkdown>
                   <Button
-                    className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm"
-                    onClick={() => router.push(`/interview-practice?category=${category.name.toLowerCase()}`)}
+                    className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm mt-4"
+                    onClick={() => router.push('/interview-practice')}
                   >
-                    Practice {category.name} Questions
+                    Practice All Interview Questions
                   </Button>
                 </CardContent>
               </Card>
-            );
-          })}
+
+              {categories.map((category) => {
+                const categoryResponse = categoryResponses[category.name];
+                const { icon, text, color } = getScoreInfo(categoryResponse?.readiness_rating);
+                return (
+                  <Card key={category.name} className="bg-[#1a1f2b] text-white mb-4">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h2 className="text-lg font-semibold">{category.displayName}</h2>
+                          <p className="text-sm text-gray-400 italic mt-1">{category.description}</p>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <div className="flex items-center">
+                            <span className={`mr-2 ${color}`}>{icon}</span>
+                            <span className={`text-sm ${color}`}>{text}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-300 mt-3 mb-4">
+                        {categoryResponse?.readiness_text ?? 'Loading...'}
+                      </p>
+                      <Button
+                        className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm"
+                        onClick={() => router.push(`/interview-practice?category=${category.name.toLowerCase()}`)}
+                      >
+                        Practice {category.name} Questions
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </>
+          )}
 
           <div className="mt-6 flex justify-center">
             <Button

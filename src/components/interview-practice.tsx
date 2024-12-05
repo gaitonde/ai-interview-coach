@@ -146,7 +146,7 @@ export function InterviewPracticeContent() {
     const fetchJob = async () => {
       try {
         if (profileId) {
-          const response = await fetch(`/api/jobs?profileId=${profileId}`);
+          const response = await fetch(`/api/interviews?profileId=${profileId}`);
           if (!response.ok) {
             throw new Error('Failed to fetch questions');
           }
@@ -173,10 +173,11 @@ export function InterviewPracticeContent() {
     const fetchQuestions = async () => {
       try {
         if (profileId) {
-          const jobId = localStorage.getItem('jobId')
+          const interviewId = localStorage.getItem('interviewId')
           const categoryParam = category ? `&category=${encodeURIComponent(category)}` : '';
+          const modeParam = mode ? `&mode=${encodeURIComponent(mode)}` : '';
           console.log('CATEGORY PARAM', categoryParam);
-          const response = await fetch(`/api/questions?profileId=${profileId}&jobId=${jobId}&mode=${mode}${categoryParam}`);
+          const response = await fetch(`/api/questions?profileId=${profileId}&interviewId=${interviewId}${modeParam}${categoryParam}`);
           if (!response.ok) {
             throw new Error('Failed to fetch questions');
           }
@@ -395,12 +396,11 @@ export function InterviewPracticeContent() {
           {questions.length > 0 && (<div className="my-4">
             <Button
               onClick={() => {
-                localStorage.removeItem('mode');
-                router.push('/dashboard');
+                router.push('/interview-ready')
               }}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
             >
-              Home
+              Back - {versions.length} versions
             </Button>
           </div>
           )}

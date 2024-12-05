@@ -56,7 +56,6 @@ export async function POST(req: NextRequest) {
     });
 
 
-    console.log('XXX AI SCORE completion: ', completion.choices[0].message.content);
     const aiScores = completion.choices[0].message.content?.split(',').map(Number);
 
     if (!aiScores || aiScores.length !== 7) {
@@ -100,7 +99,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-const TABLE = getTable('aic_answer_scores');
+const TABLE = getTable('scores');
 
 async function insertScore(profileId: string, answerId: string, finalScore: number, scores: ScoringResult) {
   const query = `

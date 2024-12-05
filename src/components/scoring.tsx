@@ -8,7 +8,7 @@ interface Category {
   score: number
 }
 
-interface Suggestion {
+interface Feedback {
   category: string;
   text: string;
 }
@@ -44,48 +44,48 @@ export default function Scoring({
   questionId,
   question
 }: EvaluationRatingProps) {
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [suggestionsMarkdown, setSuggestionsMarkdown] = useState<string>('');
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [feedbackMarkdown, setFeedbackMarkdown] = useState<string>('');
   const [audioError, setAudioError] = useState<string | null>(null);
-  const suggestionRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
+  const feedbackRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
   const hasFetchedRef = useRef(false);
   const [questionText, setQuestionText] = useState<string>(question);
 
   useEffect(() => {
     const profileId = localStorage.getItem('profileId')
-    const fetchSuggestions = async () => {
+    const fetchFeedback = async () => {
       try {
-        const response = await fetch(`/api/suggestions?profileId=${profileId}&questionId=${questionId}&answerId=${answerId}`);
+        const response = await fetch(`/api/feedback?profileId=${profileId}&questionId=${questionId}&answerId=${answerId}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch suggestions');
+          throw new Error('Failed to fetch feedback');
         }
 
         const data = await response.json();
-        setSuggestionsMarkdown(data.suggestions);
+        setFeedbackMarkdown(data.feedback);
       } catch (error) {
-        console.error('Error fetching suggestions:', error);
+        console.error('Error fetching feedback:', error);
         // Handle error (e.g., show an error message to the user)
       }
     }
-    const generateSuggestions = async () => {
-      const jobId = localStorage.getItem('jobId')
+    const generateFeedback = async () => {
+      const interviewId = localStorage.getItem('interviewId')
       try {
-        const response = await fetch('/api/generate-suggestions', {
+        const response = await fetch('/api/generate-feedback', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ profileId, jobId, answerId, questionId, categories }),
+          body: JSON.stringify({ profileId, interviewId, answerId, questionId, categories }),
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch suggestions');
+          throw new Error('Failed to fetch feedback');
         }
 
         const data = await response.json();
-        setSuggestionsMarkdown(data.suggestions);
+        setFeedbackMarkdown(data.feedback);
       } catch (error) {
-        console.error('Error fetching suggestions:', error);
+        console.error('Error fetching feedback:', error);
         // Handle error (e.g., show an error message to the user)
       }
     };
@@ -94,15 +94,15 @@ export default function Scoring({
 
     if (isDemo && !hasFetchedRef.current && questionId && answerId) {
       hasFetchedRef.current = true;
-      fetchSuggestions();
+      fetchFeedback();
     } else if (!hasFetchedRef.current) {
       hasFetchedRef.current = true;
-      generateSuggestions();
+      generateFeedback();
     }
 
     // Initialize refs for each category
     categories.forEach(category => {
-      suggestionRefs.current[category.name] = React.createRef<HTMLDivElement>();
+      feedbackRefs.current[category.name] = React.createRef<HTMLDivElement>();
     });
   }, [categories, isExpanded]);
 
@@ -124,12 +124,6 @@ export default function Scoring({
   console.debug('finalScore', finalScore);
   console.debug('definedRound', definedRound);
 
-  // const scrollToSuggestion = (categoryName: string) => {
-  //   const ref = suggestionRefs.current[categoryName];
-  //   if (ref && ref.current) {
-  //     ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  //   }
-  // };
 
   // Add this CSS class to your existing styles
   const chevronStyles = {
@@ -234,27 +228,27 @@ export default function Scoring({
           )}
 
           <div className="markdown-content-on-white text-black">
-            <Markdown>{suggestionsMarkdown}</Markdown>
+            <Markdown>{feedbackMarkdown}</Markdown>
           </div>
 {/*
           <div className="text-gray-900">
-            <Markdown>{suggestionsMarkdown}</Markdown>
+            <Markdown>{feedbackMarkdown}</Markdown>
           </div>
            */}
-          {/* Suggestions section */}
-          {suggestions.length > 0 ? (
+          {/* Feedback section */}
+          {feedback.length > 0 ? (
             <div className="mt-8">
               <h2 className="font-bold text-3xl text-gray-800 mb-4">Suggestions for Improvement</h2>
               {categories.map((category, index) => {
-                const categorySuggestions = suggestions.filter(s => s.category === category.name);
-                if (categorySuggestions.length === 0) return null;
+                const categoryFeedback = feedback.filter(s => s.category === category.name);
+                if (categoryFeedback.length === 0) return null;
 
                 return (
-                  <div key={index} className="mb-6" ref={suggestionRefs.current[category.name]}>
+                  <div key={index} className="mb-6" ref={feedbackRefs.current[category.name]}>
                     <h4 className="font-semibold text-xl text-gray-700 mb-2">{category.name}</h4>
                     <ul className="list-disc pl-5">
-                      {categorySuggestions.map((suggestion, sIndex) => (
-                        <li key={sIndex} className="text-gray-600 mb-1">{suggestion.text}</li>
+                      {categoryFeedback.map((feedback, fIndex) => (
+                        <li key={fIndex} className="text-gray-600 mb-1">{feedback.text}</li>
                       ))}
                     </ul>
                   </div>

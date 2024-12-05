@@ -1,5 +1,5 @@
 import { Footer } from "@/components/footer"
-import { Header } from "@/components/header"
+import { ConditionalHeader } from "@/components/conditional-header"
 import { Toaster } from "@/components/ui/toaster"
 import {
   ClerkProvider
@@ -8,6 +8,7 @@ import { Analytics } from '@vercel/analytics/react'
 import type { Metadata } from "next"
 import localFont from "next/font/local"
 import "./globals.css"
+import { auth } from "@clerk/nextjs/server"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,25 +26,20 @@ export const metadata: Metadata = {
   description: "Nail your first interview!",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { userId } = await auth()
+
   return (
     <ClerkProvider>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}>
           <div className="min-h-screen flex flex-col">
             <div className="max-w-7xl mx-auto w-full bg-[#1a1f2b]">
-              <Header />
-{/*
-              <div className="flex justify-between">
-                <SignOutButton />
-                <Link href="/sign-in">Sign In</Link>
-                <Link href="/sign-up">Sign Up</Link>
-              </div>
-               */}
+              <ConditionalHeader userId={userId} />
               {children}
               <Footer />
             </div>

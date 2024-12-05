@@ -9,17 +9,17 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-interface Suggestion {
-  category: string;
-  text: string;
-}
+// interface Suggestion {
+//   category: string;
+//   text: string;
+// }
 
 export async function POST(req: NextRequest) {
-  console.log('Generating suggestions...');
+  console.log('Generating feedback...');
   try {
     const body = await req.json();
     //TODO: need better protection here
-    const { profileId, jobId, questionId, answerId, categories } = body;
+    const { profileId, interviewId, questionId, answerId, categories } = body;
 
     if (!categories || !Array.isArray(categories)) {
       return NextResponse.json({ error: 'Categories are required and must be an array' }, { status: 400 });
@@ -29,14 +29,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Question ID and Answer ID are required' }, { status: 400 });
     }
 
-    console.log('PPP  IN generate-suggestions', profileId, questionId, answerId);
+    console.log('IN generate-feedback', profileId, questionId, answerId);
 
-    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-generate-suggestions', questionId, answerId);
+    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-generate-feedback', questionId, answerId);
     // const scoredCategories = categories.map(cat => `${cat.name}: ${cat.score}/10`).join('\n');
     // promptData.userPrompt = promptData.userPrompt.replace('${scoredCategories}', scoredCategories);
 
-    // console.log('PPP  IN generate-suggestions system promptData', promptData.systemPrompt);
-    console.log('PPP  IN generate-suggestions user promptData', promptData.userPrompt);
+    // console.log('PPP  IN generate-feedback system promptData', promptData.systemPrompt);
+    console.log('IN generate-feedback user promptData', promptData.userPrompt);
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,
@@ -48,21 +48,21 @@ export async function POST(req: NextRequest) {
       temperature: promptData.temperature,
     });
 
-    const suggestions = completion.choices[0]?.message?.content;
-    // console.log('Suggestions :', suggestions);
+    const feedback = completion.choices[0]?.message?.content;
+    // console.log('Feedback :', feedback);
 
-    if (suggestions) {
-      const table = getTable('aic_suggestions');
+    if (feedback) {
+      const table = getTable('feedback');
       const query = `
         INSERT INTO ${table}
-        (profile_id, question_id, answer_id, suggestion_content)
+        (profile_id, question_id, answer_id, feedback)
         VALUES
         ($1, $2, $3, $4)
       `;
-      await sql.query(query, [profileId, questionId, answerId, suggestions]);
+      await sql.query(query, [profileId, questionId, answerId, feedback]);
 
       // Update readiness records to mark them as out of date
-      const table2 = getTable('aic_job_questions')
+      const table2 = getTable('questions')
       console.log('table2', table2)
       console.log('XX questionId', questionId)
       const query2 = `
@@ -71,10 +71,10 @@ export async function POST(req: NextRequest) {
       const questionCategory = await sql.query(query2, [questionId]);
       console.log('XX questionCategory', questionCategory, questionId)
 
-      await upsertOutOfDateReadinessRecord(profileId, jobId, questionCategory.rows[0].category);
+      await upsertOutOfDateReadinessRecord(profileId, interviewId, questionCategory.rows[0].category);
     }
 
-    return NextResponse.json({ suggestions });
+    return NextResponse.json({ feedback });
   } catch (error) {
     console.error('Error processing request:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

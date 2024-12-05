@@ -19,21 +19,23 @@ export function ProfileSetup() {
   const [graduationYear, setGraduationYear] = useState<string | undefined>(undefined)
   const [isDemoMode, setIsDemoMode] = useState(false)
   const [includeResume, setIncludeResume] = useState(false)
-  const { toast } = useToast()
-  const [userId] = useState<string | null>(localStorage.getItem('userId'))
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
+    setUserId(localStorage.getItem('userId'))
+
     const storedProfileId = localStorage.getItem('profileId')
-    const isDemo = localStorage.getItem('mode') || false
+    const mode = localStorage.getItem('mode')
+    const isDemo = mode === 'demo'
     console.log('storedProfileId: ', storedProfileId)
-    console.log('isDemo: ', isDemo)
+    console.log('mode: ', mode)
 
     if (isDemo || storedProfileId) {
       loadProfile(storedProfileId!)
     } else {
       setIncludeResume(true)
     }
-    setIsDemoMode(isDemo === 'true')
+    setIsDemoMode(isDemo)
   }, [])
 
 
@@ -52,7 +54,6 @@ export function ProfileSetup() {
 
       if (profile) {
         // Profile fields
-        // (form.elements.namedItem('email') as HTMLInputElement).value = profile.email || '';
         (form.elements.namedItem('major') as HTMLInputElement).value = profile.major || '';
         (form.elements.namedItem('concentration') as HTMLInputElement).value = profile.concentration || '';
 
@@ -61,14 +62,6 @@ export function ProfileSetup() {
         const mockFile = new File([''], 'sample-resume.pdf', { type: 'application/pdf' });
         setResumeFile(mockFile);
       }
-
-      // Job fields
-      // if (job) {
-      //   (form.elements.namedItem('company_url') as HTMLInputElement).value = job.company_url || ''
-      //   (form.elements.namedItem('jd_url') as HTMLInputElement).value = job.jd_url || ''
-      //   (form.elements.namedItem('interviewer_name') as HTMLInputElement).value = job.interviewer_name || ''
-      //   (form.elements.namedItem('interviewer_role') as HTMLInputElement).value = job.interviewer_role || ''
-      // }
     }
 
     return profile;
@@ -133,56 +126,6 @@ export function ProfileSetup() {
     return false;
   }
 
-  // const saveJob = async (profileId: number, formData: FormData) => {
-  //   try {
-  //     const response = await fetch(`/api/jobs?profileId=${profileId}`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         profileId,
-  //         company_url: formData.get('company_url'),
-  //         jd_url: formData.get('jd_url'),
-  //         interviewer_name: formData.get('interviewer_name'),
-  //         interviewer_role: formData.get('interviewer_role')
-  //       }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Failed to create job record');
-  //     }
-
-  //     const result = await response.json();
-  //     return result.jobId;
-  //   } catch (error) {
-  //     console.error('Error creating job record:', error);
-  //     throw error;
-  //   }
-  // };
-
-  // const generateJobPrep = async (profileId: number) => {
-  //   try {
-  //     const response = await fetch('/api/generate-job-prep', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ profileId }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error('Failed to generate prep sheet');
-  //     }
-
-  //     const result = await response.json();
-  //     return result.content;
-  //   } catch (error) {
-  //     console.error('Error generating prep sheet:', error);
-  //     throw error;
-  //   }
-  // };
-
   const validateForm = (formData: FormData): string | null => {
     const requiredFields = [
       // 'email',
@@ -217,30 +160,22 @@ export function ProfileSetup() {
       return 'User ID not found. Please log in again.';
     }
 
-    // const urlFields = ['company_url', 'jd_url'];
-    // for (const field of urlFields) {
-    //   let value = formData.get(field) as string;
-    //   if (value) {
-    //     if (!value.startsWith('http://') && !value.startsWith('https://')) {
-    //       value = `http://${value}`;
-    //       formData.set(field, value);
-    //     }
-    //   }
-    // }
-
     return null;
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     console.log('in handleSubmit')
     e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
+
+    console.log('isDemoMode: ', isDemoMode)
 
     if (isDemoMode) {
-      router.push(`/job-prep`)
-      return;
+      router.push(`/interview-setup`)
+      return
     }
+
+    setIsSubmitting(true)
+    setError(null)
 
     const formData = new FormData(e.currentTarget)
     console.log('formData: ', formData)
@@ -249,7 +184,7 @@ export function ProfileSetup() {
     if (validationError) {
       setError(validationError)
       setIsSubmitting(false)
-      return;
+      return
     }
 
     try {
@@ -460,7 +395,7 @@ export function ProfileSetup() {
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Saving...' : 'Save'}
+              {isSubmitting ? 'Saving...' : isDemoMode ? 'Next' : 'Save'}
             </Button>
           </form>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}

@@ -18,13 +18,16 @@ export function UserMenu() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="bg-[#252b3b] text-[#F9FAFB] border-[#374151]">
+          <DropdownMenuItem onClick={() => router.push('/dashboard')} className="cursor-pointer hover:bg-[#374151]">
+              Dashboard
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push('/profile-setup')} className="cursor-pointer hover:bg-[#374151]">
               Profile
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push('/billing')} className="cursor-pointer hover:bg-[#374151]">
               Billing
             </DropdownMenuItem>
-            <SignOutButton>
+            <SignOutButton redirectUrl="/sign-in">
               <DropdownMenuItem
                 className="cursor-pointer hover:bg-[#374151]"
               >

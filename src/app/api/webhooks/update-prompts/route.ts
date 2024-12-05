@@ -76,12 +76,12 @@ export async function GET() {
 }
 
 async function deleteAllPrompts() {
-  const TABLE = getTable('aic_prompts');
+  const TABLE = getTable('prompts');
   await sql.query(`DELETE FROM ${TABLE}`);
 }
 
 async function insertPrompt(prompt: any) {
-  const table = getTable('aic_prompts');
+  const table = getTable('prompts');
   const query = `
     INSERT INTO "${table}"
     (id, key, model, temperature, max_completion_tokens, system_prompt, user_prompt)
@@ -127,7 +127,7 @@ async function insertPrompts(prompts: any[]) {
 
   console.debug('flattenedValues: ', flattenedValues);
 
-  const TABLE = getTable('aic_prompts');
+  const TABLE = getTable('prompts');
 
   const query = `
     INSERT INTO ${TABLE} (

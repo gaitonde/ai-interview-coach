@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 
 import { getTable } from "@/lib/db";
@@ -8,25 +8,26 @@ const pool = new Pool({
   connectionString: process.env.POSTGRES_PRISMA_URL,
 });
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const profileId = searchParams.get('profileId');
+    const searchParams = request.nextUrl.searchParams
+    const { profileId, interviewId } = Object.fromEntries(searchParams.entries())
 
-    if (!profileId) {
-      return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 });
+    if (!profileId || !interviewId) {
+      return NextResponse.json({ error: 'Profile ID and Interview ID are required' }, { status: 400 });
     }
 
     const client = await pool.connect();
     try {
-      const table = getTable('aic_airesponses');
+      const table = getTable('airesponses');
       const result = await client.query(`
         SELECT generated_company_info
         FROM ${table}
         WHERE profile_id = $1
+        AND interview_id = $2
         ORDER BY created_at DESC
         LIMIT 1
-      `, [profileId]);
+      `, [profileId, interviewId]);
 
       if (result.rows.length === 0) {
         return NextResponse.json({ error: 'No company info found' }, { status: 404 });

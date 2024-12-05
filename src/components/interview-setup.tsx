@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { Footer } from './footer'
 
 export function InterviewSetup() {
   const router = useRouter()
@@ -13,6 +12,21 @@ export function InterviewSetup() {
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const [statusMessage, setStatusMessage] = useState('Thinking...')
+  const [isDemoMode, setIsDemoMode] = useState(false)
+
+  useEffect(() => {
+    const storedProfileId = localStorage.getItem('profileId')
+    const storedInterviewId = localStorage.getItem('interviewId')
+    const isDemo = localStorage.getItem('mode') === 'demo'
+    setIsDemoMode(isDemo)
+    console.log('storedProfileId: ', storedProfileId)
+    console.log('storedInterviewId: ', storedInterviewId)
+    console.log('isDemo: ', isDemo)
+
+    if (isDemo || storedProfileId) {
+      loadInterview(storedProfileId!, storedInterviewId!)
+    }
+  }, [])
 
   useEffect(() => {
     if (!isSubmitting) return
@@ -28,9 +42,40 @@ export function InterviewSetup() {
     return () => clearInterval(interval)
   }, [isSubmitting])
 
-  const saveJob = async (profileId: string, formData: FormData) => {
+
+  const loadInterview = async (profileId: string, interviewId: string) => {
+    const response = await fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`)
+    const json = await response.json()
+    console.log('XX interviews: ', json)
+    const interview = json.content || json
+
+    if (!interview) {
+      console.error('No interview data found')
+      return null
+    }
+
+    if (formRef.current) {
+      const form = formRef.current
+      if (interview) {
+        const companyUrlInput = form.elements.namedItem('company_url') as HTMLInputElement;
+        companyUrlInput.value = interview.company_url || '';
+
+        const jdUrlInput = form.elements.namedItem('jd_url') as HTMLInputElement;
+        jdUrlInput.value = interview.jd_url || '';
+
+        const interviewerNameInput = form.elements.namedItem('interviewer_name') as HTMLInputElement;
+        interviewerNameInput.value = interview.interviewer_name || '';
+
+        const interviewerRoleInput = form.elements.namedItem('interviewer_role') as HTMLInputElement;
+        interviewerRoleInput.value = interview.interviewer_role || '';
+      }
+    }
+
+    return interview;
+  }
+  const saveInterview = async (profileId: string, formData: FormData) => {
     try {
-      const response = await fetch(`/api/jobs?profileId=${profileId}`, {
+      const response = await fetch(`/api/interviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +85,8 @@ export function InterviewSetup() {
           company_url: formData.get('company_url'),
           jd_url: formData.get('jd_url'),
           interviewer_name: formData.get('interviewer_name'),
-          interviewer_role: formData.get('interviewer_role')
+          interviewer_role: formData.get('interviewer_role'),
+          interview_date: formData.get('interview_date')
         }),
       });
 
@@ -56,14 +102,14 @@ export function InterviewSetup() {
     }
   };
 
-  const generateJobPrep = async (profileId: string, jobId: string) => {
+  const generateJobPrep = async (profileId: string, interviewId: string) => {
     try {
       const response = await fetch('/api/generate-company-info', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profileId, jobId }),
+        body: JSON.stringify({ profileId, interviewId }),
       });
 
       if (!response.ok) {
@@ -104,15 +150,15 @@ export function InterviewSetup() {
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    e.preventDefault()
 
-    const isDemo = localStorage.getItem('mode') === 'demo';
-    if (isDemo) {
+    if (isDemoMode) {
       router.push(`/job-prep`);
       return;
     }
+
+    setIsSubmitting(true)
+    setError(null)
 
     const formData = new FormData(e.currentTarget);
 
@@ -125,10 +171,10 @@ export function InterviewSetup() {
 
     try {
       const profileId = localStorage.getItem('profileId') as string
-      const jobId = await saveJob(profileId, formData)
-      console.log('jobId: ', jobId)
-      localStorage.setItem('jobId', jobId)
-      await generateJobPrep(profileId, jobId)
+      const interviewId = await saveInterview(profileId, formData)
+      console.log('interviewId: ', interviewId)
+      localStorage.setItem('interviewId', interviewId)
+      await generateJobPrep(profileId, interviewId)
 
       router.push(`/job-prep`);
     } catch (error) {
@@ -201,13 +247,24 @@ export function InterviewSetup() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
+              <div>
+                <label htmlFor="interview_date" className="block text-sm font-medium text-white">
+                  Interview Date (Optional)
+                </label>
+                <Input
+                  id="interview_date"
+                  name="interview_date"
+                  type="date"
+                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                />
+              </div>
             </div>
             <Button
               type="submit"
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? statusMessage : 'Save'}
+              {isSubmitting ? statusMessage : isDemoMode ? 'Next' : 'Save'}
             </Button>
             <p className="text-sm text-muted-foreground mt-1 text-center">
               {isSubmitting && (

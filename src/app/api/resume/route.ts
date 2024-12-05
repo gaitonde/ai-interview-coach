@@ -42,7 +42,7 @@ async function uploadResume(file: File): Promise<string> {
 }
 
 async function updateProfileWithResumeUrl(profileId: string, resumeUrl: string, resumeContent: string): Promise<void> {
-  const table = getTable('aic_resumes');
+  const table = getTable('resumes');
   const query = `
     INSERT INTO ${table} (profile_id, url, text)
     VALUES (${profileId}, '${resumeUrl}', '${resumeContent}')

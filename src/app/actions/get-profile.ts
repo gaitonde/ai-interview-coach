@@ -1,4 +1,4 @@
-export async function getProfile(profileId: string) {
+export async function getProfileX(profileId: String) {
   try {
     const response = await fetch(`/api/profiles?profileId=${profileId}`)
 
@@ -6,7 +6,10 @@ export async function getProfile(profileId: string) {
       return null
     }
 
-    return response.json()
+    const json = await response.json()
+    const profile = json.profiles[0]
+    return profile
+
   } catch (error) {
     console.error('Error fetching profile:', error)
     return null

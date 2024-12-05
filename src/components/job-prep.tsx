@@ -1,10 +1,9 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
 import { Button } from "@/components/ui/button"
-import { Footer } from './footer'
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import MarkdownRenderer from './markdown-renderer'
 import { RubricScorer } from './rubric-scorer'
 
@@ -17,25 +16,26 @@ export function JobPrep() {
 
   useEffect(() => {
     const storedProfileId = localStorage.getItem('profileId')
+    const storedInterviewId = localStorage.getItem('interviewId')
     const isDemo = localStorage.getItem('mode') === 'demo'
     setIsDemoMode(isDemo)
 
     if (storedProfileId) {
-      fetch(`/api/generated-company-info?profileId=${storedProfileId}`)
+      fetch(`/api/generated-company-info?profileId=${storedProfileId}&interviewId=${storedInterviewId}`)
         .then(response => {
           if (!response.ok) {
-            throw new Error('Failed to fetch prep sheet response');
+            throw new Error('Failed to fetch prep sheet response')
           }
           return response.json();
         })
         .then(data => {
-          console.log('should be setting content', data);
-          setContent('# Company Scoop\n\n' + data.content);
+          console.log('should be setting content', data)
+          setContent('# Company Scoop\n\n' + data.content)
         })
         .catch(error => {
-          console.error('Error fetching prep sheet response:', error);
-          setContent('Error loading content. Please try again later.');
-        });
+          console.error('Error fetching prep sheet response:', error)
+          setContent('Error loading content. Please try again later.')
+        })
     } else {
       router.push('/');
     }
@@ -56,26 +56,26 @@ export function JobPrep() {
   }, [isSubmitting])
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
     const profileId = localStorage.getItem('profileId') || ''
     if (!profileId) {
       alert('No profile ID found. Please select a profile.')
     }
     if (!isDemoMode) {
-      await generateInterviewPrep(profileId);
+      setIsSubmitting(true)
+      await generateInterviewPrep(profileId)
     }
     router.push('/interview-prep');
   }
 
   const generateInterviewPrep = async (profileId: string) => {
     try {
-      const jobId = localStorage.getItem('jobId') || ''
+      const interviewId = localStorage.getItem('interviewId') || ''
       const response = await fetch('/api/generate-interview-prep', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profileId, jobId }),
+        body: JSON.stringify({ profileId, interviewId }),
       });
 
       if (!response.ok) {

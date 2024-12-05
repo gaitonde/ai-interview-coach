@@ -3,7 +3,7 @@ import { sql } from "@vercel/postgres";
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const table = getTable('aic_profiles');
+  const table = getTable('profiles');
   const profiles = await sql.query(`
     SELECT * FROM ${table}
     WHERE is_demo = TRUE

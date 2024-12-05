@@ -12,18 +12,17 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Profile ID, Question ID, and Answer ID are all required' }, { status: 400 });
   }
 
-  const table = getTable('aic_suggestions');
+  const table = getTable('feedback');
   const query = `
-      SELECT id, suggestion_content
+      SELECT id, feedback
       FROM ${table}
       WHERE profile_id = $1
       AND question_id = $2
       AND answer_id = $3
       ORDER BY id ASC
   `;
-  console.log('ZZZ query', query);
   const result = await sql.query(query, [profileId, questionId, answerId]);
 
-  return NextResponse.json({ suggestions: result.rows[0].suggestion_content });
+  return NextResponse.json({ feedback: result.rows[0].feedback });
 }
 

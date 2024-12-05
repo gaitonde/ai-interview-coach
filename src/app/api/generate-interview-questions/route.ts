@@ -1,8 +1,8 @@
+import { getTable } from "@/lib/db"
+import { sql } from '@vercel/postgres'
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
-import { sql } from '@vercel/postgres'
 import { fetchPrompt, PromptData } from '../utils/fetchPrompt'
-import { getTable } from "@/lib/db"
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -11,11 +11,10 @@ const openai = new OpenAI({
 export async function POST(request: Request) {
   console.log('in BE with request for generating questions')
   const body = await request.json()
-  const { profileId, jobId } = body
+  const { profileId, interviewId } = body
 
   try {
     const promptData: PromptData = await fetchPrompt(profileId, 'prompt-questions')
-    console.log('BBB promptData: ', promptData.systemPrompt)
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,
@@ -26,8 +25,6 @@ export async function POST(request: Request) {
       max_completion_tokens: promptData.maxCompletionTokens,
       temperature: promptData.temperature,
     })
-
-    console.log('VVV completion: ', completion)
 
     const generatedContent = completion.choices[0]?.message?.content?.replace('```json', '').replace('```', '')
 
@@ -40,14 +37,14 @@ export async function POST(request: Request) {
       for (const question of questions) {
         // Clean and sanitize the question text
         const sanitizedQuestion = question.question.replace(/'/g, "''")
-        const table = getTable('aic_job_questions')
+        const table = getTable('questions')
         const query = `
           INSERT INTO ${table}
-            (profile_id, job_id, category, question, why, focus)
+            (profile_id, interview_id, category, question, why, focus)
           VALUES
             ($1, $2, $3, $4, $5, $6)
         `
-        await sql.query(query, [profileId, jobId, category, sanitizedQuestion, question.why, question.focus])
+        await sql.query(query, [profileId, interviewId, category, sanitizedQuestion, question.why, question.focus])
       }
     }
 

@@ -6,19 +6,19 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const profileId = searchParams.get('profileId');
-    const jobId = searchParams.get('jobId');
+    const interviewId = searchParams.get('interviewId');
     if (!profileId) {
       return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 });
     }
 
-    const table = getTable('aic_airesponses')
+    const table = getTable('airesponses')
     const result = await sql.query(`
       SELECT generated_interview_prep_info
       FROM ${table}
       WHERE profile_id = $1
-      AND job_id = $2
+      AND interview_id = $2
       ORDER BY created_at DESC
-    `, [profileId, jobId]);
+    `, [profileId, interviewId]);
 
     if (result.rows.length < 1) {
       return NextResponse.json({ error: 'No questions found' }, { status: 404 });
