@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     profileId,
     company_url,
     jd_url,
-    interviewer_linkedin,
+    interviewer_linkedin_url,
     interviewer_role,
     interview_date
   } = body;
@@ -62,8 +62,9 @@ export async function POST(request: Request) {
   const formattedInterviewDate = interview_date === '' ? null : interview_date;
 
   //TODO: do these url fetches async
-  const company_md = await fetchUrlContents(company_url);
-  const jd_md = await fetchUrlContents(jd_url);
+  const company_md = await fetchUrlContents(company_url)
+  const jd_md = await fetchUrlContents(jd_url)
+  const interviewer_linkedin_md = interviewer_linkedin_url ? await fetchUrlContents(interviewer_linkedin_url) : null
 
   const query = `
     INSERT INTO "${TABLE}" (
@@ -72,11 +73,12 @@ export async function POST(request: Request) {
       company_text,
       jd_url,
       jd_text,
-      interviewer_linkedin,
+      interviewer_linkedin_url,
+      interviewer_linkedin_text,
       interviewer_role,
       interview_date
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING id
   `;
 
@@ -86,7 +88,8 @@ export async function POST(request: Request) {
     company_md,
     jd_url,
     jd_md,
-    interviewer_linkedin,
+    interviewer_linkedin_url,
+    interviewer_linkedin_md,
     interviewer_role,
     formattedInterviewDate
   ];
@@ -135,9 +138,10 @@ async function fetchUrlContents(url: string): Promise<string> {
     });
 
     // Get the cleaned HTML
-    const cleanHtml = $('body').html();
-    const markdown = turndownService.turndown(cleanHtml || '');
-    return markdown;
+    const cleanHtml = $('body').html()
+    const markdown = turndownService.turndown(cleanHtml || '')
+    console.log('markdown: ', markdown)
+    return markdown
   } catch (error) {
     console.error('Error in fetchUrlContents:', error);
     throw error;

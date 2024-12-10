@@ -91,55 +91,59 @@ export default function InterviewerPrep() {
   }
 
   return (
-    <>
-    {content && (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted">
       <div className="flex-grow flex justify-center">
         <div className="w-full max-w-4xl prep-sheet-content">
-          <MarkdownRenderer content={content} />
+          {content ? (
+            <>
+              <MarkdownRenderer content={content} />
 
-          {showScore && (
-            <RubricScorer
-              profileId={profileId || ''}
-              promptKey='prompt-interviewer-prep-rubric'
-              content={content}
-            />
-          )}
+              {showScore && (
+                <RubricScorer
+                  profileId={profileId || ''}
+                  promptKey='prompt-interviewer-prep-rubric'
+                  content={content}
+                />
+              )}
 
-          <div className="mx-4 mb-4">
-            <Button
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  const content = document.querySelector('.prep-sheet-content')?.textContent
-                  if (content) {
-                    navigator.clipboard.writeText(content)
-                      .then(() => alert('Content copied to clipboard!'))
-                      .catch(err => console.error('Failed to copy: ', err));
-                  }
-                }
-              }}
-              className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
-            >
-              <Clipboard className="w-4 h-4 mr-2" />
-              Copy to Clipboard
-            </Button>
-            <Button
-              disabled={isSubmitting}
-              onClick={handleSubmit}
-              className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
-            >
-              {isSubmitting ? statusMessage : 'Next'}
-            </Button>
-            <p className="text-sm text-muted-foreground mt-1 text-center">
-                {isSubmitting && (
-                  'Takes about 10 seconds, please be patient. Thank you.'
-                )}
-            </p>
+              <div className="mx-4 mb-4">
+                <Button
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      const content = document.querySelector('.prep-sheet-content')?.textContent
+                      if (content) {
+                        navigator.clipboard.writeText(content)
+                          .then(() => alert('Content copied to clipboard!'))
+                          .catch(err => console.error('Failed to copy: ', err));
+                      }
+                    }
+                  }}
+                  className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
+                >
+                  <Clipboard className="w-4 h-4 mr-2" />
+                  Copy to Clipboard
+                </Button>
+                <Button
+                  disabled={isSubmitting}
+                  onClick={handleSubmit}
+                  className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+                >
+                  {isSubmitting ? statusMessage : 'Next'}
+                </Button>
+                <p className="text-sm text-muted-foreground mt-1 text-center">
+                  {isSubmitting && (
+                    'Takes about 10 seconds, please be patient. Thank you.'
+                  )}
+                </p>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center justify-center h-[50vh]">
+              <p className="text-muted-foreground">Loading...</p>
             </div>
-          </div>
+          )}
         </div>
       </div>
-    )}
-    </>
+    </div>
   )
 }

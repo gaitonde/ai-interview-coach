@@ -17,7 +17,8 @@ interface ProfileData {
   todayDateFormatted: string
   interviewerName?: string
   interviewerRole?: string
-  interviewerLIProfile?: string
+  interviewerLinkedInUrl?: string
+  interviewerLinkedInText?: string
   question?: string
   answer?: string
 }
@@ -57,7 +58,7 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
       FROM "${PROFILES_TABLE}"
       WHERE id = $1`;
 
-  const INTERVIEW_QUERY = `SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role
+  const INTERVIEW_QUERY = `SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role, interviewer_linkedin_url, interviewer_linkedin_text
       FROM "${INTERVIEWS_TABLE}"
       WHERE profile_id = $1
       ORDER BY created_at DESC LIMIT 1`;
@@ -80,7 +81,7 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
   ]);
 
   console.log('Profile rows:', profileDetails.rows.length);
-  console.log('Job rows:', interviewDetails.rows.length);
+  console.log('Interview rows:', interviewDetails.rows.length);
   console.log('Resume rows:', resumeDetails.rows.length);
 
   if (profileDetails.rows.length === 0) throw new Error(`Profile not found for ID: ${profileId}`);
@@ -90,7 +91,7 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
   if (answerId && answerDetails.rows.length === 0) throw new Error("Answers not found");
 
   const { school: schoolName, major: schoolMajor, concentration: schoolConcentration, graduation_date: graduationDate } = profileDetails.rows[0];
-  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, interviewer_name: interviewerName, interviewer_role: interviewerRole } = interviewDetails.rows[0];
+  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, interviewer_name: interviewerName, interviewer_role: interviewerRole, interviewer_linkedin_url: interviewerLinkedInUrl, interviewer_linkedin_text: interviewerLinkedInText } = interviewDetails.rows[0];
   const { url: resumeUrl, text: resume } = resumeDetails.rows[0];
   const question = questionId ? questionDetails.rows[0]?.question : null;
   const answer = answerId ? answerDetails.rows[0]?.answer : null;
@@ -115,6 +116,8 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
     todayDateFormatted,
     interviewerName,
     interviewerRole,
+    interviewerLinkedInUrl,
+    interviewerLinkedInText,
     question,
     answer
   };
@@ -134,7 +137,6 @@ export function fetchGradeClass(graduationYear: number, currentDate: Date): stri
 }
 
 async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: string; user_prompt: string; model: string; temperature: number; max_completion_tokens: number }> {
-  console.log('fetching prompt', process.env.NEXT_PUBLIC_VERCEL_URL);
   const protocol = process.env.NEXT_PUBLIC_VERCEL_URL?.startsWith('localhost') ? 'http' : 'https';
   const promptResponse = await fetch(`${protocol}://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prompts?key=${promptKey}`);
   if (!promptResponse.ok) throw new Error("Failed to fetch prompt");
@@ -142,15 +144,6 @@ async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: strin
   return promptData.data;
 }
 
-/*
-__JOBDESCRIPTION__: ${jobDescription}
-__COMPANYWEBSITE__: ${companyWebsiteText}
-__RESUME__: ${resume}
-__TODAYSDATE__: ${todayDate}
-__INTERVIEWERNAME__: ${interviewerName}
-__INTERVIEWERROLE__: ${interviewerRole}
-__INTERVIEWER_LIPROFILE__: ${interviewerLIProfile}
-*/
 function applyVariables(prompt: string, data: ProfileData, content?: string): string {
   return prompt
     .replace('${jobDescription}', data.jobDescription)
@@ -164,7 +157,7 @@ function applyVariables(prompt: string, data: ProfileData, content?: string): st
     .replace('${schoolConcentration}', data.schoolConcentration || '')
     .replace('${interviewerName}', data.interviewerName || '')
     .replace('${interviewerRole}', data.interviewerRole || '')
-    .replace('${interviewerLIProfile}', data.interviewerLIProfile || '')
+    .replace('${interviewerLIProfile}', data.interviewerLinkedInText || '')
     .replace('${question}', data.question || '')
     .replace('${transcription}', data.answer || '')
     .replace('${content}', content || '')
@@ -180,10 +173,8 @@ export async function fetchPromptByKey(key: string): Promise<PromptData> {
       WHERE key = $1
       LIMIT 1
     `;
-    // console.log('query', query)
-    const result = await sql.query(query, [key])
 
-    console.log('result', result)
+    const result = await sql.query(query, [key])
 
     if (result.rows.length === 0) {
       throw new Error(`No prompt found with key: ${key}`);

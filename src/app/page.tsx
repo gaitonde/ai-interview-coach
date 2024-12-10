@@ -17,8 +17,7 @@ export default function Home() {
     } else {
       console.log('User is loaded and authenticated!')
 
-      // Make API call to /users with clerk_id
-      fetch(`/api/users?clerk_id=${userId}`, {
+      fetch(`/api/users?id=${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

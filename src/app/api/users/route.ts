@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
   console.log('In /api/users route!!')
   const { searchParams } = new URL(request.url)
   const userId = searchParams.get('id')
-  const clerkId = searchParams.get('clerk_id')
+  // const clerkId = searchParams.get('clerk_id')
   const table = getTable('users')
 
   let query: string
@@ -15,11 +15,11 @@ export async function GET(request: NextRequest) {
   if (userId) {
     query = `SELECT id FROM ${table} WHERE id = $1`
     params = [userId]
-  } else if (clerkId) {
-    query = `SELECT id FROM ${table} WHERE clerk_id = $1`
-    params = [clerkId]
+  // } else if (clerkId) {
+  //   query = `SELECT id FROM ${table} WHERE clerk_id = $1`
+  //   params = [clerkId]
   } else {
-    return NextResponse.json({ error: 'Missing id or clerk_id parameter' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 })
   }
 
   const result = await sql.query(query, params)

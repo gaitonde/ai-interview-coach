@@ -100,8 +100,7 @@ export function ProfileSetup() {
       body: JSON.stringify(profileAttributes)
     });
 
-    const {success, userId, profileId, error} = await profileResponse.json();
-    console.log('Profile response: ', success, profileId);
+    const {userId, profileId, error} = await profileResponse.json();
 
     if (!profileResponse.ok) {
       console.log('Profile response error: ', error)
@@ -181,7 +180,6 @@ export function ProfileSetup() {
 
     // Add specific validation for graduation year dropdown
     const graduationYear = formData.get('graduation_year') as string
-    console.log('graduationYear: ', graduationYear)
     if (!graduationYear) {
       return 'Please select your graduation year'
     }

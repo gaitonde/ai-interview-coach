@@ -19,19 +19,12 @@ export function InterviewSetup() {
   const [statusMessage, setStatusMessage] = useState('Thinking...')
   const [, setAtomInterviewId] = useAtom<string | null>(interviewIdAtom)
   const profileId = useAtomValue(profileIdAtom)
-  const userId = useAtomValue(userIdAtom)
+  // const userId = useAtomValue(userIdAtom)
   const interviewId = useAtomValue(interviewIdAtom)
   const isDemo = useAtomValue(isDemoModeAtom)
 
-  console.log('atom profileId from atom: ', profileId)
-  console.log('atom userId from atom: ', userId)
-  console.log('atom isDemo from atom: ', isDemo)
 
   useEffect(() => {
-    console.log('xx storedProfileId: ', profileId)
-    console.log('xx storedUserId: ', userId)
-    console.log('xx storedInterviewId: ', interviewId)
-    console.log('xx isDemo: ', isDemo)
 
     if (isDemo && profileId) {
       loadInterview(profileId!, interviewId!)
@@ -74,8 +67,8 @@ export function InterviewSetup() {
         const jdUrlInput = form.elements.namedItem('jd_url') as HTMLInputElement;
         jdUrlInput.value = interview.jd_url || '';
 
-        const interviewerNameInput = form.elements.namedItem('interviewer_linkedin') as HTMLInputElement;
-        interviewerNameInput.value = interview.interviewer_linkedin || '';
+        const interviewerNameInput = form.elements.namedItem('interviewer_linkedin_url') as HTMLInputElement;
+        interviewerNameInput.value = interview.interviewer_linkedin_url || '';
 
         const interviewerRoleInput = form.elements.namedItem('interviewer_role') as HTMLInputElement;
         interviewerRoleInput.value = interview.interviewer_role || '';
@@ -99,7 +92,7 @@ export function InterviewSetup() {
           profileId,
           company_url: formData.get('company_url'),
           jd_url: formData.get('jd_url'),
-          interviewer_linkedin: formData.get('interviewer_linkedin'),
+          interviewer_linkedin_url: formData.get('interviewer_linkedin_url'),
           interviewer_role: formData.get('interviewer_role'),
           interview_date: formData.get('interview_date')
         }),
@@ -253,12 +246,12 @@ export function InterviewSetup() {
                 />
               </div>
               <div>
-                <label htmlFor="interviewer_linkedin" className="block text-sm font-medium text-white">
+                <label htmlFor="interviewer_linkedin_url" className="block text-sm font-medium text-white">
                   Interviewer LinkedIn URL (Optional)
                 </label>
                 <Input
-                  id="interviewer_linkedin"
-                  name="interviewer_linkedin"
+                  id="interviewer_linkedin_url"
+                  name="interviewer_linkedin_url"
                   type="text"
                   placeholder="eg. https://www.linkedin.com/in/johndoe"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"

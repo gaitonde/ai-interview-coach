@@ -1,10 +1,10 @@
-import { getTable } from "@/lib/db"
+import { fetchPromptByKey, PromptData } from '@/app/api/utils/fetchPrompt'
+import { getTable } from '@/lib/db'
 import { put } from '@vercel/blob'
 import { sql } from '@vercel/postgres'
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import PDFParser from 'pdf2json'
-import { fetchPromptByKey, PromptData } from "../utils/fetchPrompt"
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -88,15 +88,14 @@ async function extractText(resume: File): Promise<string> {
 }
 
 async function insertResumeRecord(profileId: string, filename: string, resumeUrl: string, resumeContent: string): Promise<void> {
-  const table = getTable('resumes')
-  const query = `
-    INSERT INTO ${table} (profile_id, filename, url, text)
-    VALUES (${profileId}, '${filename}', '${resumeUrl}', '${resumeContent}')
-  `
 
   try {
+    const table = getTable('resumes')
+    const query = `
+      INSERT INTO ${table} (profile_id, filename, url, text)
+      VALUES (${profileId}, '${filename}', '${resumeUrl}', '${resumeContent}')
+    `
     await sql.query(query)
-    console.log(`For profile ${profileId} inserted new resume URL: ${resumeUrl}`)
   } catch (error) {
     console.error('Error updating profile with resume URL:', error)
     throw new Error('Failed to update profile with resume URL')
@@ -118,12 +117,7 @@ async function parseResume(resumeText: string): Promise<string> {
   })
 
   const content = completion.choices[0].message.content
-  console.log('content', content)
   return content as string
-
-  // const parsedResume = JSON.parse(content as string)
-
-  // return parsedResume
 }
 
 async function insertProfile(resumeJson: string): Promise<string> {
