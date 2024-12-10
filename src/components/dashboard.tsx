@@ -1,12 +1,15 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button } from '@/components/ui/button'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AlertCircle, FileText, Frown, Meh, Plus, Smile } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { useClerk, useUser } from "@clerk/nextjs";
+import { useClerk, useUser } from '@clerk/nextjs'
+import { useAtom } from 'jotai'
+import { profileIdAtom } from '@/stores/profileAtoms'
+import { useLogout } from '@/utils/auth'
 
 type InterviewAnalysis = {
   id: string
@@ -38,7 +41,9 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortColumn, setSortColumn] = useState<keyof InterviewAnalysis>('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [profileId, userId] = useAtom(profileIdAtom)
   // const [interviewData, setInterviewData] = useState<InterviewData | null>(null)
+  const logout = useLogout();
 
   const handleSort = (column: keyof InterviewAnalysis) => {
     if (column === sortColumn) {
@@ -67,44 +72,37 @@ export default function Dashboard() {
 
   console.log('Full user state:', userState)
 
-  const { user, isLoaded } = userState
+  // const { user, isLoaded } = userState
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId')
-    const storedProfileId = localStorage.getItem('profileId')
-    if (!storedProfileId) {
+    if (!profileId) {
       if (!userId) {
         console.log('XXX no userId. FIX ME')
-        // signOut().then(() => {
-        //   router.push('/sign-in');
-        // });
+        logout().then(() => {
+          router.push('/sign-in');
+        });
       } else {
         fetch(`/api/users?id=${userId}`)
         .then(response => response.json())
         .then(json => {
           console.log('user: ', json)
           if (json.error) {
-            console.log('XXX user not found. FIX ME')
-            // localStorage.removeItem('userId')
-            // signOut().then(() => {
-            //   router.push('/sign-in');
-            // })
+            logout().then(() => {
+              router.push('/sign-in');
+            });
           }
         })
       }
       return
     }
-    fetch(`/api/interviews?profileId=${storedProfileId}`)
+    fetch(`/api/interviews?profileId=${profileId}`)
     .then(response => {
       console.log('YYY response', response)
       if (!response.ok) {
         console.error('YYY Failed to fetch job data:', response)
-        console.log('XXX Failed to fetch job data. FIX ME')
-        // Log out the user
-        // signOut().then(() => {
-        //   localStorage.removeItem('profileId');
-        //   router.push('/sign-in');
-        // });
+        logout().then(() => {
+          router.push('/sign-in');
+        });
         throw new Error('Failed to fetch job data');
       }
       return response.json();
@@ -128,7 +126,7 @@ export default function Dashboard() {
     .catch(error => {
       console.error('Error fetching interview data:', error)
     });
-  }, [signOut, router])
+  }, [signOut, router, logout])
 
   return (
     <div className="h-[80vh]">
@@ -172,12 +170,12 @@ export default function Dashboard() {
                       </TableCell>
                       <TableCell className="py-2">
                         <div className="flex space-x-1 md:space-x-2">
-                          <Link href={`/job-prep`}>
+                          <Link href={`/company-prep`}>
                             <Button variant="ghost" size="sm" className="p-1 md:p-2">
                               <FileText className="h-3 w-3 md:h-4 md:w-4 text-[#10B981]" />
                             </Button>
                           </Link>
-                          <Link href={`/interview-prep`}>
+                          <Link href={`/interviewer-prep`}>
                             <Button variant="ghost" size="sm" className="p-1 md:p-2">
                               <FileText className="h-3 w-3 md:h-4 md:w-4 text-[#10B981]" />
                             </Button>

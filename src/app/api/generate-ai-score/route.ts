@@ -7,7 +7,7 @@ import { getTable } from "@/lib/db";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+})
 
 interface RubricScores {
   foundationalKnowledge: number;

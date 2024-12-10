@@ -86,7 +86,7 @@ async function createProfile(
     `)
     return result.rows[0].id
   } catch (error) {
-    console.error('Error creating profile:', error)
+    console.error('Error creating profiles:', error)
     throw error
   }
 }

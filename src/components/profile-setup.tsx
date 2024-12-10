@@ -3,39 +3,39 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
-// import Cookies from 'js-cookie'
+import { useAtom } from 'jotai'
+import { profileIdAtom, userIdAtom, isDemoAtom } from '@/stores/profileAtoms'
 
 export function ProfileSetup() {
   const router = useRouter()
-  const [fileName, setFileName] = useState<string>('No file chosen')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
-  const [resumeFile, setResumeFile] = useState<File | null>(null)
   const [school, setSchool] = useState<string | undefined>(undefined)
   const [graduationYear, setGraduationYear] = useState<string | undefined>(undefined)
-  const [isDemoMode, setIsDemoMode] = useState(false)
-  const [includeResume, setIncludeResume] = useState(false)
-  const [userId, setUserId] = useState<string | null>(null)
+  const [isSignup, setIsSignup] = useState(false)
+  // const [isDemoMode, setIsDemoMode] = useState(false)
+  // const [includeResume, setIncludeResume] = useState(false)
+  // const [fileName, setFileName] = useState<string>('No file chosen')
+  // const [resumeFile, setResumeFile] = useState<File | null>(null)
+  // const [userId, setUserId] = useState<string | null>(null)
+
+  const [atomProfileId, setAtomProfileId] = useAtom<string | null>(profileIdAtom)
+  const [atomUserId, setAtomUserId] = useAtom<string | null>(userIdAtom)
+  const [isDemo] = useAtom(isDemoAtom)
 
   useEffect(() => {
-    setUserId(localStorage.getItem('userId'))
+    console.log('atomProfileId: ', atomProfileId)
+    console.log('atomUserId: ', atomUserId)
+    console.log('atomDemoMode: ', isDemo)
 
-    const storedProfileId = localStorage.getItem('profileId')
-    const mode = localStorage.getItem('mode')
-    const isDemo = mode === 'demo'
-    console.log('storedProfileId: ', storedProfileId)
-    console.log('mode: ', mode)
-
-    if (isDemo || storedProfileId) {
-      loadProfile(storedProfileId!)
-    } else {
-      setIncludeResume(true)
+    setIsSignup(atomUserId === null)
+    if (isDemo || atomProfileId) {
+      loadProfile(atomProfileId!)
     }
-    setIsDemoMode(isDemo)
+
   }, [])
 
 
@@ -54,32 +54,38 @@ export function ProfileSetup() {
 
       if (profile) {
         // Profile fields
+        (form.elements.namedItem('email') as HTMLInputElement).value = profile.email || '';
+        (form.elements.namedItem('linkedin') as HTMLInputElement).value = profile.linkedin_url || '';
+        (form.elements.namedItem('school') as HTMLInputElement).value = profile.school || '';
         (form.elements.namedItem('major') as HTMLInputElement).value = profile.major || '';
         (form.elements.namedItem('concentration') as HTMLInputElement).value = profile.concentration || '';
 
         //resume field
-        setFileName(`${profile.email}-resume.pdf`);
-        const mockFile = new File([''], 'sample-resume.pdf', { type: 'application/pdf' });
-        setResumeFile(mockFile);
+        // setFileName(`${profile.email}-resume.pdf`);
+        // const mockFile = new File([''], 'sample-resume.pdf', { type: 'application/pdf' });
+        // setResumeFile(mockFile);
       }
     }
 
     return profile;
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFileName(e.target.files[0].name);
-      setResumeFile(e.target.files[0]);
-    } else {
-      setFileName('No file chosen');
-      setResumeFile(null);
-    }
-  }
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files && e.target.files.length > 0) {
+  //     setFileName(e.target.files[0].name);
+  //     setResumeFile(e.target.files[0]);
+  //   } else {
+  //     setFileName('No file chosen');
+  //     setResumeFile(null);
+  //   }
+  // }
 
   const saveProfile = async (formData: FormData) => {
     const profileAttributes = {
-      userId: userId,
+      id: atomProfileId,
+      userId: atomUserId,
+      email: formData.get('email'),
+      linkedin: formData.get('linkedin'),
       school: formData.get('school'),
       major: formData.get('major'),
       concentration: formData.get('concentration'),
@@ -94,14 +100,18 @@ export function ProfileSetup() {
       body: JSON.stringify(profileAttributes)
     });
 
-    const {success, profileId} = await profileResponse.json();
+    const {success, userId, profileId, error} = await profileResponse.json();
     console.log('Profile response: ', success, profileId);
 
     if (!profileResponse.ok) {
-      throw new Error('Failed to save profile');
+      console.log('Profile response error: ', error)
+      throw new Error(error || 'Failed to save profile');
     }
 
-    return profileId;
+    setAtomProfileId(profileId)
+    setAtomUserId(userId)
+
+    return profileId
   }
 
   const uploadResume = async (profileId: number, resumeFile: File) => {
@@ -126,23 +136,48 @@ export function ProfileSetup() {
     return false;
   }
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
   const validateForm = (formData: FormData): string | null => {
     const requiredFields = [
-      // 'email',
+      'email',
+      'linkedin',
+      'school',
       'major'
-    ];
+    ]
+
     for (const field of requiredFields) {
       if (!formData.get(field)) {
         return `${field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')} is required`;
       }
     }
 
-    // Add specific validation for school dropdown
-    const school = formData.get('school') as string
-    console.log('school: ', school)
-    if (!school) {
-      return 'Please select your school'
+    // Email validation
+    const email = formData.get('email') as string
+    if (!validateEmail(email)) {
+      return 'Please enter a valid email address'
     }
+
+    // LinkedIn URL validation
+    const linkedin = formData.get('linkedin') as string
+    try {
+      const url = new URL(linkedin)
+      if (!url.hostname.includes('linkedin.com')) {
+        return 'Please enter a valid LinkedIn URL'
+      }
+    } catch {
+      return 'Please enter a valid LinkedIn URL'
+    }
+
+    // Add specific validation for school dropdown
+    // const school = formData.get('school') as string
+    // console.log('school: ', school)
+    // if (!school) {
+    //   return 'Please select your school'
+    // }
 
     // Add specific validation for graduation year dropdown
     const graduationYear = formData.get('graduation_year') as string
@@ -151,25 +186,22 @@ export function ProfileSetup() {
       return 'Please select your graduation year'
     }
 
-    if (!resumeFile) {
-      return 'Resume is required';
-    }
+    // if (!resumeFile) {
+    //   return 'Resume is required';
+    // }
 
     // Add userId validation
-    if (!userId) {
-      return 'User ID not found. Please log in again.';
-    }
+    // if (!userId) {
+    //   return 'User ID not found. Please log in again.';
+    // }
 
     return null;
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    console.log('in handleSubmit')
     e.preventDefault()
 
-    console.log('isDemoMode: ', isDemoMode)
-
-    if (isDemoMode) {
+    if (isDemo) {
       router.push(`/interview-setup`)
       return
     }
@@ -178,8 +210,6 @@ export function ProfileSetup() {
     setError(null)
 
     const formData = new FormData(e.currentTarget)
-    console.log('formData: ', formData)
-
     const validationError = validateForm(formData)
     if (validationError) {
       setError(validationError)
@@ -190,27 +220,36 @@ export function ProfileSetup() {
     try {
       const profileId = await saveProfile(formData)
       console.log('Profile ID: ', profileId)
-      localStorage.setItem('profileId', profileId)
+      if (profileId < 0) {
+        setIsSubmitting(false)
+        return
+      }
 
       // await saveJob(profileId, formData)
 
-      if (includeResume) {
-        const resumeFile = formData.get('resume') as File
-        await uploadResume(profileId, resumeFile)
-      }
+      // if (includeResume) {
+      //   const resumeFile = formData.get('resume') as File
+      //   await uploadResume(profileId, resumeFile)
+      // }
 
       router.push(`/interview-setup`)
-    } catch (error) {
-      console.error('Error during submission:', error)
-      setError('An error occurred. Please try again.')
+    } catch (error: any) {
+      setError(error?.message)
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  const getButtonText = () => {
+    if (isSubmitting) return 'Saving...'
+    if (isDemo) return 'Next'
+    if (isSignup) return 'Continue'
+    return 'Save'
+  }
+
   return (
     <>
-      <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="flex-grow flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-[#252b3b] px-8 py-4 rounded-lg shadow-lg my-4">
           <div className="text-center">
             <h2 className="mt-2 text-3xl font-bold text-white">Profile Setup</h2>
@@ -225,11 +264,6 @@ export function ProfileSetup() {
                   const demoProfileId = process.env.NEXT_PUBLIC_DEMO_PROFILE_ID as string
                   console.log('Demo profile ID: ', demoProfileId)
 
-                  // Set both localStorage
-                  localStorage.setItem('mode', 'demo')
-                  localStorage.setItem('profileId', demoProfileId)
-                  // Cookies.set('mode', 'demo', { expires: 7 }) // Expires in 7 days
-                  // Cookies.set('profileId', demoProfileId, { expires: 7 })
 
                   toast({
                     variant: "default",
@@ -257,7 +291,7 @@ export function ProfileSetup() {
             onSubmit={handleSubmit}
           >
             <div className="space-y-4">
-{/*
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-white">
                   Email
@@ -270,7 +304,7 @@ export function ProfileSetup() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
- */}
+{/*
               {includeResume && (
                 <div>
                   <label htmlFor="resume" className="block text-sm font-medium text-white">
@@ -295,10 +329,11 @@ export function ProfileSetup() {
                   </div>
                 </div>
               )}
-{/*
+                 */}
+
               <div>
                 <label htmlFor="linkedin" className="block text-sm font-medium text-white">
-                  LinkedIn URL
+                  LinkedIn
                 </label>
                 <Input
                   id="linkedin"
@@ -308,11 +343,19 @@ export function ProfileSetup() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
- */}
+
               <div>
                 <label htmlFor="school" className="block text-sm font-medium text-white">
                   School
                 </label>
+                <Input
+                  id="school"
+                  name="school"
+                  type="text"
+                  placeholder="e.g. Baylor University"
+                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                />
+{/*
                 <Select name="school" value={school} onValueChange={setSchool}>
                   <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 mt-1 rounded-md">
                     <SelectValue placeholder="Select your school" />
@@ -329,6 +372,7 @@ export function ProfileSetup() {
                     <SelectItem value="Not on this list">Not on this list</SelectItem>
                   </SelectContent>
                 </Select>
+                 */}
               </div>
               <div>
                 <label htmlFor="graduation_year" className="block text-sm font-medium text-white">
@@ -346,6 +390,8 @@ export function ProfileSetup() {
                       <SelectItem value="2026">2026</SelectItem>
                       <SelectItem value="2027">2027</SelectItem>
                       <SelectItem value="2028">2028</SelectItem>
+                      <SelectItem value="2029">2029</SelectItem>
+                      <SelectItem value="2030">2030</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -395,12 +441,12 @@ export function ProfileSetup() {
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Saving...' : isDemoMode ? 'Next' : 'Save'}
+              {getButtonText()}
             </Button>
           </form>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
-      </main>
+      </div>
     </>
   )
 }

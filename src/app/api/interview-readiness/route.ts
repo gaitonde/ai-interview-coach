@@ -5,8 +5,8 @@ import OpenAI from "openai"
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions.mjs"
 import { fetchPrompt, PromptData } from "../utils/fetchPrompt"
 import {
-  CATEGORIES,
-  getExistingReadiness,
+  // CATEGORIES,
+  // getExistingReadiness,
   ReadinessData
 } from '../utils/readiness'
 
@@ -20,26 +20,29 @@ export async function GET(request: NextRequest) {
     const { profileId, interviewId, category } = Object.fromEntries(request.nextUrl.searchParams)
     console.log('profileId', profileId)
     console.log('interviewId', interviewId)
-    console.log('category', category)
 
-    if (!CATEGORIES.includes(category)) {
-      return NextResponse.json({ content: `Category not found: ${category}` }, { status: 400 })
-    }
+    const initialReadiness = await getInitialReadiness(profileId)
+    console.log('XXX initialReadiness', initialReadiness)
+    // console.log('category', category)
 
-    const existingRecord = await getExistingReadiness(profileId, interviewId, category)
+    // if (!CATEGORIES.includes(category)) {
+    //   return NextResponse.json({ content: `Category not found: ${category}` }, { status: 400 })
+    // }
 
-    //TODO: figure out what to do if no record, upsert or return 400?
-    if (existingRecord?.is_up_to_date) {
-      return NextResponse.json({ content: existingRecord })
-    }
+    // const existingRecord = await getExistingReadiness(profileId, interviewId, category)
 
-    console.log('New data available. Generating readiness evaluation...')
+    // //TODO: figure out what to do if no record, upsert or return 400?
+    // if (existingRecord?.is_up_to_date) {
+    //   return NextResponse.json({ content: existingRecord })
+    // }
 
-    const readinessData = await generateReadinessEvaluation(profileId, interviewId, category)
+    // console.log('New data available. Generating readiness evaluation...')
+
+    // const readinessData = await generateReadinessEvaluation(profileId, interviewId, category)
 
     // const result = await updateReadinessRecord(profileId, interviewId, category, readinessData)
     // return NextResponse.json({ content: result })
-    return NextResponse.json({ content: 'result2' })
+    return NextResponse.json({ content: initialReadiness })
 
   } catch (error) {
     console.error('Interview Readiness Error:', error)
@@ -47,8 +50,36 @@ export async function GET(request: NextRequest) {
   }
 }
 
+async function getInitialReadiness(profileId: string): Promise<string> {
+
+  try {
+    const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-initial`)
+
+    console.log('XXX promptData.userPrompt', promptData.userPrompt)
+
+    const completion = await openai.chat.completions.create({
+      model: promptData.model,
+      messages: [
+        { role: "system", content: promptData.systemPrompt },
+        { role: "user", content: promptData.userPrompt }
+      ],
+      max_completion_tokens: promptData.maxCompletionTokens,
+      temperature: promptData.temperature,
+    });
+
+    const generatedContent = completion.choices[0]?.message?.content
+    console.log('generatedContent', generatedContent)
+    return generatedContent || ''
+  } catch (error) {
+    console.error('Error generating initial readiness:', error)
+    throw new Error('Unable to generate initial readiness')
+  }
+
+}
+
 async function generateReadinessEvaluation(profileId: string, interviewId: string, category: string): Promise<ReadinessData> {
-  const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-${category.toLowerCase()}`)
+  // const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-${category.toLowerCase()}`)
+  const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready`)
 
   console.log('xx interviewId', interviewId)
   const chatHistory = await getChatHistory(profileId, interviewId)

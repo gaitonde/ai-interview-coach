@@ -34,7 +34,7 @@ export default async function RootLayout({
   const { userId } = await auth()
 
   return (
-    <ClerkProvider>
+    <ClerkProvider afterSignOutUrl="/home">
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}>
           <div className="min-h-screen flex flex-col">

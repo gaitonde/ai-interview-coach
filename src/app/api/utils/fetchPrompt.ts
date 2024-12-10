@@ -2,23 +2,24 @@ import { getTable } from "@/lib/db";
 import { sql } from '@vercel/postgres';
 
 interface ProfileData {
-  profileId: string;
-  companyWebsiteUrl: string;
-  companyWebsiteText: string;
-  jobDescriptionURL: string;
-  jobDescription: string;
-  resumeUrl?: string;
-  resume?: string;
-  schoolName?: string;
-  schoolMajor?: string;
-  schoolConcentration?: string;
-  gradYear: number;
-  gradeClass?: string;
-  todayDateFormatted: string;
-  interviewerName?: string;
-  interviewerRole?: string;
-  question?: string;
-  answer?: string;
+  profileId: string
+  companyWebsiteUrl: string
+  companyWebsiteText: string
+  jobDescriptionURL: string
+  jobDescription: string
+  resumeUrl?: string
+  resume?: string
+  schoolName?: string
+  schoolMajor?: string
+  schoolConcentration?: string
+  gradYear: number
+  gradeClass?: string
+  todayDateFormatted: string
+  interviewerName?: string
+  interviewerRole?: string
+  interviewerLIProfile?: string
+  question?: string
+  answer?: string
 }
 
 export interface PromptData {
@@ -47,7 +48,7 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
   const todayDateFormatted = todayDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
   const PROFILES_TABLE = getTable('profiles');
-  const JOBS_TABLE = getTable('interviews');
+  const INTERVIEWS_TABLE = getTable('interviews');
   const RESUMES_TABLE = getTable('resumes');
   const QUESTIONS_TABLE = getTable('questions');
   const ANSWERS_TABLE = getTable('answers');
@@ -56,8 +57,8 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
       FROM "${PROFILES_TABLE}"
       WHERE id = $1`;
 
-  const JOB_QUERY = `SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role
-      FROM "${JOBS_TABLE}"
+  const INTERVIEW_QUERY = `SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role
+      FROM "${INTERVIEWS_TABLE}"
       WHERE profile_id = $1
       ORDER BY created_at DESC LIMIT 1`;
 
@@ -66,9 +67,9 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
       WHERE profile_id = $1
       ORDER BY created_at DESC LIMIT 1`;
 
-  const [profileDetails, jobDetails, resumeDetails, questionDetails, answerDetails] = await Promise.all([
+  const [profileDetails, interviewDetails, resumeDetails, questionDetails, answerDetails] = await Promise.all([
     sql.query(PROFILE_QUERY, [profileId]),
-    sql.query(JOB_QUERY, [profileId]),
+    sql.query(INTERVIEW_QUERY, [profileId]),
     sql.query(RESUME_QUERY, [profileId]),
     questionId
       ? sql.query(`SELECT question FROM "${QUESTIONS_TABLE}" WHERE profile_id = $1 AND id = $2`, [profileId, questionId])
@@ -79,17 +80,17 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
   ]);
 
   console.log('Profile rows:', profileDetails.rows.length);
-  console.log('Job rows:', jobDetails.rows.length);
+  console.log('Job rows:', interviewDetails.rows.length);
   console.log('Resume rows:', resumeDetails.rows.length);
 
   if (profileDetails.rows.length === 0) throw new Error(`Profile not found for ID: ${profileId}`);
-  if (jobDetails.rows.length === 0) throw new Error(`Job not found for profile ID: ${profileId}`);
+  if (interviewDetails.rows.length === 0) throw new Error(`Interview not found for profile ID: ${profileId}`);
   if (resumeDetails.rows.length === 0) throw new Error(`Resume not found for profile ID: ${profileId}`);
   if (questionId && questionDetails.rows.length === 0) throw new Error("Question not found");
   if (answerId && answerDetails.rows.length === 0) throw new Error("Answers not found");
 
   const { school: schoolName, major: schoolMajor, concentration: schoolConcentration, graduation_date: graduationDate } = profileDetails.rows[0];
-  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, interviewer_name: interviewerName, interviewer_role: interviewerRole } = jobDetails.rows[0];
+  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, interviewer_name: interviewerName, interviewer_role: interviewerRole } = interviewDetails.rows[0];
   const { url: resumeUrl, text: resume } = resumeDetails.rows[0];
   const question = questionId ? questionDetails.rows[0]?.question : null;
   const answer = answerId ? answerDetails.rows[0]?.answer : null;
@@ -141,6 +142,15 @@ async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: strin
   return promptData.data;
 }
 
+/*
+__JOBDESCRIPTION__: ${jobDescription}
+__COMPANYWEBSITE__: ${companyWebsiteText}
+__RESUME__: ${resume}
+__TODAYSDATE__: ${todayDate}
+__INTERVIEWERNAME__: ${interviewerName}
+__INTERVIEWERROLE__: ${interviewerRole}
+__INTERVIEWER_LIPROFILE__: ${interviewerLIProfile}
+*/
 function applyVariables(prompt: string, data: ProfileData, content?: string): string {
   return prompt
     .replace('${jobDescription}', data.jobDescription)
@@ -154,7 +164,40 @@ function applyVariables(prompt: string, data: ProfileData, content?: string): st
     .replace('${schoolConcentration}', data.schoolConcentration || '')
     .replace('${interviewerName}', data.interviewerName || '')
     .replace('${interviewerRole}', data.interviewerRole || '')
+    .replace('${interviewerLIProfile}', data.interviewerLIProfile || '')
     .replace('${question}', data.question || '')
     .replace('${transcription}', data.answer || '')
-    .replace('${content}', content || '');
+    .replace('${content}', content || '')
+}
+
+export async function fetchPromptByKey(key: string): Promise<PromptData> {
+  try {
+    const table = getTable('prompts')
+
+    const query =`
+      SELECT *
+      FROM ${table}
+      WHERE key = $1
+      LIMIT 1
+    `;
+    // console.log('query', query)
+    const result = await sql.query(query, [key])
+
+    console.log('result', result)
+
+    if (result.rows.length === 0) {
+      throw new Error(`No prompt found with key: ${key}`);
+    }
+
+    return {
+      systemPrompt: result.rows[0].system_prompt,
+      userPrompt: result.rows[0].user_prompt,
+      model: result.rows[0].model,
+      temperature: Number(result.rows[0].temperature),
+      maxCompletionTokens: Number(result.rows[0].max_completion_tokens)
+    };
+  } catch (error) {
+    console.error('Error fetching prompt:', error);
+    throw new Error('Failed to fetch prompt from database');
+  }
 }

@@ -1,9 +1,5 @@
-import InterviewPractice from "@/components/interview-practice"
+import InterviewPractice from '@/components/interview-practice'
 
 export default function InterviewPracticePage() {
-  return (
-    <div>
-      <InterviewPractice />
-    </div>
-  )
+  return <InterviewPractice />
 }

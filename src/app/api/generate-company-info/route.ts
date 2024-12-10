@@ -4,7 +4,7 @@ import { generateCompletion } from "../utils/openAiCompletion";
 import { getTable } from "@/lib/db";
 
 export async function POST(request: Request) {
-  console.log('in BE with request for generating job-prep');
+  console.log('in BE with request for generating company-prep')
   const body = await request.json();
   const profileId = body.profileId;
   const interviewId = body.interviewId;
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { content, usage } = await generateCompletion(profileId, 'prompt-job-prep');
+    const { content, usage } = await generateCompletion(profileId, 'prompt-company-prep')
     const aiResponsesTable = getTable('airesponses');
     const query = `
       INSERT INTO ${aiResponsesTable} (profile_id, interview_id, generated_company_info, usage)

@@ -6,22 +6,22 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import MarkdownRenderer from './markdown-renderer'
 import { RubricScorer } from './rubric-scorer'
+import { useAtom } from "jotai"
+import { interviewIdAtom, isDemoAtom, profileIdAtom, showScoreAtom } from "@/stores/profileAtoms"
 
-export function JobPrep() {
+export default function CompanyPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isDemoMode, setIsDemoMode] = useState(false)
+  // const [isDemoMode, setIsDemoMode] = useState(false)
   const [statusMessage, setStatusMessage] = useState('Thinking...')
-
+  const [profileId] = useAtom(profileIdAtom)
+  const [interviewId] = useAtom(interviewIdAtom)
+  const [isDemo] = useAtom(isDemoAtom)
+  const [showScore] = useAtom(showScoreAtom)
   useEffect(() => {
-    const storedProfileId = localStorage.getItem('profileId')
-    const storedInterviewId = localStorage.getItem('interviewId')
-    const isDemo = localStorage.getItem('mode') === 'demo'
-    setIsDemoMode(isDemo)
-
-    if (storedProfileId) {
-      fetch(`/api/generated-company-info?profileId=${storedProfileId}&interviewId=${storedInterviewId}`)
+    if (profileId) {
+      fetch(`/api/generated-company-info?profileId=${profileId}&interviewId=${interviewId}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch prep sheet response')
@@ -55,22 +55,22 @@ export function JobPrep() {
     return () => clearInterval(interval)
   }, [isSubmitting])
 
-  const handleSubmit = async () => {
-    const profileId = localStorage.getItem('profileId') || ''
+  const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
+    e.preventDefault()
     if (!profileId) {
       alert('No profile ID found. Please select a profile.')
     }
-    if (!isDemoMode) {
-      setIsSubmitting(true)
+
+    setIsSubmitting(true)
+    if (!isDemo && profileId) {
       await generateInterviewPrep(profileId)
     }
-    router.push('/interview-prep');
+    router.push('/interviewer-prep');
   }
 
   const generateInterviewPrep = async (profileId: string) => {
     try {
-      const interviewId = localStorage.getItem('interviewId') || ''
-      const response = await fetch('/api/generate-interview-prep', {
+      const response = await fetch('/api/generate-interviewer-prep', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,56 +93,56 @@ export function JobPrep() {
   return (
     <>
       {content && (
-        <div className="flex flex-col min-h-screen bg-[#111827]">
-          <main className="flex-grow flex justify-center">
+        <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted px-4">
+          <div className="flex-grow flex justify-center">
             <div className="w-full max-w-4xl prep-sheet-content overflow-hidden">
               <div className="mx-4">
                 <div className="prose prose-invert max-w-none">
                   <MarkdownRenderer content={content} />
                 </div>
 
-                {localStorage.getItem('showScore') && (
+                {showScore && (
                   <RubricScorer
-                    profileId={localStorage.getItem('profileId') || ''}
-                    promptKey='prompt-job-prep-rubric'
+                    profileId={profileId || ''}
+                    promptKey='prompt-company-prep-rubric'
                     content={content}
                   />
                 )}
 
                 <div className="mx-4 mb-4">
-                <Button
-                  onClick={() => {
-                    if (typeof window !== 'undefined') {
-                      const content = document.querySelector('.prep-sheet-content')?.textContent;
-                      if (content) {
-                        navigator.clipboard.writeText(content)
-                          .then(() => alert('Content copied to clipboard!')) //TODO: replace with toas
-                          .catch(err => console.error('Failed to copy: ', err));
+                  <Button
+                    onClick={() => {
+                      if (typeof window !== 'undefined') {
+                        const content = document.querySelector('.prep-sheet-content')?.textContent;
+                        if (content) {
+                          navigator.clipboard.writeText(content)
+                            .then(() => alert('Content copied to clipboard!')) //TODO: replace with toas
+                            .catch(err => console.error('Failed to copy: ', err));
+                        }
                       }
-                    }
-                  }}
-                  className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
-                >
-                  <Clipboard className="w-4 h-4 mr-2" />
-                  Copy to Clipboard
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  onClick={handleSubmit}
-                  className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
-                >
-                  {isSubmitting ? statusMessage : 'Next'}
-                </Button>
-                <p className="text-sm text-muted-foreground mt-1 text-center">
-                {isSubmitting && (
-                  'Takes about 30 seconds, please be patient. Thank you.'
-                )}
-                </p>
+                    }}
+                    className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
+                  >
+                    <Clipboard className="w-4 h-4 mr-2" />
+                    Copy to Clipboard
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    onClick={handleSubmit}
+                    className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+                  >
+                    {isSubmitting ? statusMessage : 'Next'}
+                  </Button>
+                  <p className="text-sm text-muted-foreground mt-1 text-center">
+                  {isSubmitting && (
+                    'Takes about 30 seconds, please be patient. Thank you.'
+                  )}
+                  </p>
                 </div>
               </div>
             </div>
-          </main>
+          </div>
         </div>
       )}
     </>

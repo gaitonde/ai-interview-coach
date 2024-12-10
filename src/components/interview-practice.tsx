@@ -7,6 +7,9 @@ import { get } from 'idb-keyval';
 import { useRouter, useSearchParams } from 'next/navigation'
 import styles from '../styles/interview-practice.module.css';
 import { Button } from "./ui/button";
+import { removeDemoData } from "@/utils/auth";
+import { useAtom } from "jotai";
+import { profileIdAtom, interviewIdAtom, isDemoAtom } from '@/stores/profileAtoms'
 
 type EvaluatingState = 'Ready' | 'Evaluating';
 
@@ -52,15 +55,15 @@ export function InterviewPracticeContent() {
   const [evaluatingState, setEvaluatingState] = useState<EvaluatingState>('Ready');
   const [questions, setQuestions] = useState<Array<Question>>([]);
   const [questionIndex, setQuestionIndex] = useState(-1);
-  const [isDemo, setIsDemo] = useState(true);
-
+  const [isDemo] = useAtom(isDemoAtom)
+  const [profileId] = useAtom(profileIdAtom)
+  const [interviewId] = useAtom(interviewIdAtom)
   const getQuestionId = (question: Question | null): string => {
     if (!question) return '';
     return question.questionId || question.id?.toString() || '';
   };
 
   async function saveAnswer(questionId: string, transcript: string) {
-    const profileId = localStorage.getItem('profileId');
     const response = await fetch('/api/answers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -99,7 +102,6 @@ export function InterviewPracticeContent() {
 
     try {
       const questionId = question?.id;
-      const profileId = localStorage.getItem('profileId');
 
       const response = await fetch('/api/generate-ai-score', {
         method: 'POST',
@@ -132,16 +134,11 @@ export function InterviewPracticeContent() {
 
   // Use useEffect to collapse all versions except the most recent when a new recording is added
   useEffect(() => {
-    const mode = localStorage.getItem('mode');
-    const isDemo = mode === 'demo';
-    setIsDemo(isDemo);
 
     if (versions.length > 0) {
       setShowDebug(false);
       setExpandedVersionIndex(0);
     }
-
-    const profileId = localStorage.getItem('profileId');
 
     const fetchJob = async () => {
       try {
@@ -173,9 +170,8 @@ export function InterviewPracticeContent() {
     const fetchQuestions = async () => {
       try {
         if (profileId) {
-          const interviewId = localStorage.getItem('interviewId')
           const categoryParam = category ? `&category=${encodeURIComponent(category)}` : '';
-          const modeParam = mode ? `&mode=${encodeURIComponent(mode)}` : '';
+          const modeParam = isDemo ? `&mode=demo` : '';
           console.log('CATEGORY PARAM', categoryParam);
           const response = await fetch(`/api/questions?profileId=${profileId}&interviewId=${interviewId}${modeParam}${categoryParam}`);
           if (!response.ok) {
@@ -236,7 +232,7 @@ export function InterviewPracticeContent() {
   return (
     <>
       <div className="flex flex-col min-h-screen bg-[#111827]">
-        <main className="flex-grow flex justify-center px-4 sm:px-6 lg:px-8 mt-6">
+        <div className="flex-grow flex justify-center px-4 sm:px-6 lg:px-8 mt-6">
           <div className="w-full max-w-3xl p-6 sm:p-8 sm:space-y-8 bg-[#1F2937] rounded-xl shadow-md mb-4">
             <div className="markdown-content text-[#F9FAFB]">
               <h1 className={styles.h1}>Interview Jam Session</h1>
@@ -396,16 +392,21 @@ export function InterviewPracticeContent() {
           {questions.length > 0 && (<div className="my-4">
             <Button
               onClick={() => {
-                router.push('/interview-ready')
+                if (isDemo) {
+                  removeDemoData()
+                  router.push('/home')
+                } else {
+                  router.push('/interview-ready')
+                }
               }}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
             >
-              Back - {versions.length} versions
+              {isDemo ? 'Exit Demo' : 'Back'}
             </Button>
           </div>
           )}
           </div>
-        </main>
+        </div>
       </div>
     </>
   );

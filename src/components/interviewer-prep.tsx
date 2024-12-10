@@ -1,26 +1,26 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import MarkdownRenderer from "./markdown-renderer"
-import { RubricScorer } from "./rubric-scorer"
+import MarkdownRenderer from './markdown-renderer'
+import { RubricScorer } from './rubric-scorer'
+import { useAtom } from 'jotai'
+import { interviewIdAtom, profileIdAtom, showScoreAtom } from '@/stores/profileAtoms'
 
-export default function InterviewPrep() {
+export default function InterviewerPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDemoMode, setIsDemoMode] = useState(false)
   const [statusMessage, setStatusMessage] = useState('Thinking...')
+  const [profileId] = useAtom(profileIdAtom)
+  const [interviewId] = useAtom(interviewIdAtom)
+  const [showScore] = useAtom(showScoreAtom)
 
   useEffect(() => {
-    const profileId = localStorage.getItem('profileId')
-    const isDemo = localStorage.getItem('mode') === 'demo'
-    setIsDemoMode(isDemo)
-
     if (profileId) {
-      const interviewId = localStorage.getItem('interviewId') || ''
       fetch(`/api/generated-questions?profileId=${profileId}&interviewId=${interviewId}`)
         .then(response => {
             if (!response.ok) {
@@ -29,7 +29,7 @@ export default function InterviewPrep() {
             return response.json()
           })
           .then(data => {
-            setContent('# Awesome Interview Cheat Sheet\n\n' + data.content)
+            setContent('# Interviewer Scoop\n\n' + data.content)
           })
           .catch(error => {
             console.error('Error fetching prep sheet response:', error)
@@ -56,7 +56,6 @@ export default function InterviewPrep() {
 
   const generateInterviewQuestions = async (profileId: string) => {
     try {
-      const interviewId = localStorage.getItem('interviewId')
       const response = await fetch('/api/generate-interview-questions', {
         method: 'POST',
         headers: {
@@ -77,31 +76,32 @@ export default function InterviewPrep() {
     }
   };
 
-  const handleSubmit = async () => {
-    const profileId = localStorage.getItem('profileId') || ''
+  const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
+    e.preventDefault()
     if (!profileId) {
       alert('No profile ID found. Please select a profile.')
     }
-    if (!isDemoMode) {
-      setIsSubmitting(true)
+
+    setIsSubmitting(true)
+    if (!isDemoMode && profileId) {
       await generateInterviewQuestions(profileId)
     }
 
-    router.push(`/interview-ready`)
+    router.push(`/question-prep`)
   }
 
   return (
     <>
     {content && (
-    <div className="flex flex-col min-h-screen bg-[#111827]">
-      <main className="flex-grow flex justify-center">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted">
+      <div className="flex-grow flex justify-center">
         <div className="w-full max-w-4xl prep-sheet-content">
           <MarkdownRenderer content={content} />
 
-          {localStorage.getItem('showScore') && (
+          {showScore && (
             <RubricScorer
-              profileId={localStorage.getItem('profileId') || ''}
-              promptKey='prompt-interview-prep-rubric'
+              profileId={profileId || ''}
+              promptKey='prompt-interviewer-prep-rubric'
               content={content}
             />
           )}
@@ -137,7 +137,7 @@ export default function InterviewPrep() {
             </p>
             </div>
           </div>
-        </main>
+        </div>
       </div>
     )}
     </>

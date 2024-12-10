@@ -9,7 +9,7 @@ interface MarkdownRendererProps {
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <div className="flex flex-col min-h-screen bg-[#111827]">
-      <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 my-6">
+      <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 my-6">
         <div className="w-full max-w-4xl sm:px-8 sm:pb-8 space-y-6 sm:space-y-8 bg-[#1F2937] rounded-xl shadow-md">
           <div className="markdown-content text-[#F9FAFB] p-4">
             <ReactMarkdown
@@ -30,7 +30,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             </ReactMarkdown>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

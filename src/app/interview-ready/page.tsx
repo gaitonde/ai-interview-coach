@@ -1,5 +1,5 @@
-import { InterviewReadinessComponent } from "@/components/interview-readiness"
+import { InterviewReady } from '@/components/interview-ready'
 
-export default function InterviewReadinessPage() {
-  return <InterviewReadinessComponent />
+export default function InterviewReadyPage() {
+  return <InterviewReady />
 }

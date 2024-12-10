@@ -1,70 +1,96 @@
 'use client'
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+
+import { HeroSection } from '@/components/hero-section'
+import { Button } from '@/components/ui/button'
+import { profileIdAtom } from '@/stores/profileAtoms'
+import { useAtom } from 'jotai'
+import { removeDemoData } from '@/utils/auth'
 import Cookies from 'js-cookie'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export default function Home() {
   const router = useRouter()
+  const [isUploading, setIsUploading] = useState(false)
+  const [, setProfileId] = useAtom(profileIdAtom)
 
-
-  const handleSignUpClick = () => {
-    localStorage.removeItem('mode')
-    Cookies.remove('mode')
-
-    router.push("/sign-up")
+  const handleUploadResume = async () => {
+    removeDemoData()
+    uploadResume().then(uploaded => {
+      if (uploaded) {
+        router.push('/profile-setup')
+      }
+    })
   }
 
-  const handleSignInClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleSignIn = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
-    localStorage.removeItem('mode')
-    Cookies.remove('mode')
+    removeDemoData()
     router.push("/sign-in")
   }
 
-  const handleDemoClick = () => {
-    const demoProfileId = process.env.NEXT_PUBLIC_DEMO_PROFILE_ID as string
-    const demoInterviewId = process.env.NEXT_PUBLIC_DEMO_INTERVIEW_ID as string
+  const uploadResume = async (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = 'application/pdf'
 
-    localStorage.setItem('mode', 'demo')
-    localStorage.setItem('profileId', demoProfileId)
-    localStorage.setItem('interviewId', demoInterviewId)
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0]
+        if (!file) {
+          resolve(false)
+          return
+        }
 
-    Cookies.set('mode', 'demo')
-    Cookies.set('profileId', demoProfileId)
-    Cookies.set('interviewId', demoInterviewId)
+        try {
+          setIsUploading(true)
+          const formData = new FormData()
+          formData.append('resume', file)
+          formData.append('filename', file.name)
 
-    router.push("/profile-setup");
-  };
+          const response = await fetch('/api/resume', {
+            method: 'POST',
+            body: formData,
+          })
 
-  return (
+          if (!response.ok) throw new Error('Upload failed')
+
+          const result = await response.json()
+          const profileId = result.profileId
+          console.log('profileId set in ATOM!!: ', profileId)
+          setProfileId(profileId)
+
+          Cookies.set('profileId', profileId, {
+            secure: true,
+            sameSite: 'strict'
+          })
+
+          resolve(true)
+        } catch (error) {
+          console.error('Upload error:', error)
+          resolve(false)
+        } finally {
+          setIsUploading(false)
+        }
+      }
+
+      input.click()
+    })
+  }
+
+   return (
     <div className="flex flex-col items-center min-h-screen px-4 py-12 bg-gradient-to-b from-background to-muted">
-      <div className="max-w-2xl text-center space-y-6 mb-12">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-          Ace Your Next Interview
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          Practice with AI-powered mock interviews tailored to your specific role and company.
-          Get instant feedback and improve your chances of landing your dream job.
-        </p>
-      </div>
+      <HeroSection />
 
       <div className="flex flex-col gap-4 w-full max-w-sm">
         <Button
           size="lg"
           className="text-lg h-12 bg-[#10B981] hover:bg-[#059669]"
-          onClick={handleSignUpClick}
+          onClick={handleUploadResume}
+          disabled={isUploading}
         >
-          Get Started Free
-        </Button>
-
-        <Button
-          variant="outline"
-          size="lg"
-          className="text-lg h-12 hover:bg-gray-100 dark:hover:bg-gray-800"
-          onClick={handleDemoClick}
-        >
-          See an Example
+          {isUploading ? "Uploading..." : "Start with your resume"}
         </Button>
 
         <div className="text-center mt-4">
@@ -72,7 +98,7 @@ export default function Home() {
             Already have an account?{' '}
             <Link
               href="/#"
-              onClick={handleSignInClick}
+              onClick={handleSignIn}
               className="text-blue-500 hover:underline"
               prefetch={true}
             >

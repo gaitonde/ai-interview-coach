@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server'
 import { sql } from '@vercel/postgres'
 import { getTable } from '@/lib/db'
+import { createUser } from '@/app/actions/create-user'
 
 const PROFILES_TABLE = getTable('profiles')
-const JOBS_TABLE = getTable('interviews')
+// const JOBS_TABLE = getTable('interviews')
+
+interface ClerkError extends Error {
+  errors?: Array<{ message: string }>;
+}
 
 export async function GET(request: Request) {
   console.debug('in profile route GET')
@@ -48,42 +53,66 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const json = await request.json()
-    const { userId, school, major, concentration, graduation_year } = json
+    const { id, email, linkedin, school, major, concentration, graduation_year } = json
 
     // Convert graduation_year String to a Date with Jan 1
     const graduation_date = new Date(`1/1/${graduation_year}`)
-    const profileId = await createProfile(userId, school, major, concentration, graduation_date)
 
-    return NextResponse.json({ success: true, profileId })
+
+    let userId
+
+    try {
+      const user = await createUser(email)
+      userId = user.id
+      await updateProfile(id, userId, email, linkedin, school, major, concentration, graduation_date)
+    } catch (err) {
+      const error = err as ClerkError
+      const errorMessage = error.errors?.[0]?.message || error.message || "Failed to create profile"
+      console.log('1')
+      return NextResponse.json({ error: errorMessage }, { status: 400 })
+    }
+
+
+
+    return NextResponse.json({ success: true, userId, profileId: id })
   } catch (error) {
     console.error('Error:', error)
-    return NextResponse.json({ content: "unable to add profile" }, { status: 500 })
+    return NextResponse.json({
+      error: "An unexpected error occurred while creating the profile"
+    }, { status: 500 })
   }
+
 }
 
-async function createProfile(
+//id, userId, email, linkedin, school, major, concentration, graduation_date
+async function updateProfile(
+  id: number,
   userId: number,
+  email: string,
+  linkedin: string,
   school: string,
   major: string,
   concentration: string,
-  graduation_date: Date
+  graduation_date: Date,
 ): Promise<number> {
+  console.log('in updateProfile...')
   try {
     const result = await sql.query(`
-      INSERT INTO ${PROFILES_TABLE} (user_id, school, major, concentration, graduation_date)
-      VALUES (${userId}, '${school}', '${major}', '${concentration}', '${graduation_date.toISOString()}')
-      ON CONFLICT (user_id)
-      DO UPDATE SET
-        school = EXCLUDED.school,
-        major = EXCLUDED.major,
-        concentration = EXCLUDED.concentration,
-        graduation_date = EXCLUDED.graduation_date,
-        last_updated_at = CURRENT_TIMESTAMP
+      UPDATE ${PROFILES_TABLE}
+      SET
+        user_id = ${userId},
+        email = '${email}',
+        linkedin_url = '${linkedin}',
+        school = '${school}',
+        major = '${major}',
+        concentration = '${concentration}',
+        graduation_date = '${graduation_date.toISOString()}'
+      WHERE id = ${id}
       RETURNING id
     `)
     return result.rows[0].id
   } catch (error) {
-    console.error('Error creating profile:', error)
+    console.error('Error updating profile:', error)
     throw error
   }
 }

@@ -1,10 +1,13 @@
-import React, { useCallback } from 'react';
-import { useEffect, useRef, useState } from 'react';
-import { set } from 'idb-keyval';
+import React, { useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { set } from 'idb-keyval'
+import { useAtomValue } from 'jotai'
+import { profileIdAtom } from '@/stores/profileAtoms'
+
 interface AudioRecorderProps {
-  onTranscriptionComplete: (transcript: string, audioUrl: string) => void;
-  version: number;
-  questionId: string;
+  onTranscriptionComplete: (transcript: string, audioUrl: string) => void
+  version: number
+  questionId: string
 }
 
 type RecorderState = 'Ready' | 'Recording' | 'Transcribing';
@@ -12,18 +15,19 @@ type RecorderState = 'Ready' | 'Recording' | 'Transcribing';
 const FIXED_TIME_LIMIT = 30;
 
 export default function AudioRecorder({ onTranscriptionComplete, version, questionId }: AudioRecorderProps) {
-  const [recorderState, setRecorderState] = useState<RecorderState>('Ready');
-  const [recordingTime, setRecordingTime] = useState(0);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const [selectedMimeType, setSelectedMimeType] = useState<string>('audio/webm;codecs=opus');
+  const [recorderState, setRecorderState] = useState<RecorderState>('Ready')
+  const [recordingTime, setRecordingTime] = useState(0)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const [selectedMimeType, setSelectedMimeType] = useState<string>('audio/webm;codecs=opus')
+  const profileId = useAtomValue(profileIdAtom)
 
   const startRecording = async () => {
     try {
       console.log('Requesting media stream...');
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       console.log('Media stream obtained:', stream);
-      
+
       const mimeTypes = [
         'audio/webm;codecs=opus',
         'audio/webm',
@@ -49,7 +53,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
       console.log('Selected MIME type:', mimeType);
       setSelectedMimeType(mimeType);
 
-      const mediaRecorder = new MediaRecorder(stream, { 
+      const mediaRecorder = new MediaRecorder(stream, {
         mimeType,
         audioBitsPerSecond: 128000 // Try a standard bitrate
       });
@@ -67,7 +71,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
       mediaRecorder.onstop = async () => {
         console.log('Recording stopped');
         setRecorderState('Transcribing');
-        
+
         try {
           const audioBlob = new Blob(audioChunksRef.current, { type: selectedMimeType });
           console.log('Audio blob created:', {
@@ -85,7 +89,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
 
           if (!window.matchMedia('(max-width: 768px)').matches) {
             const audio = new Audio();
-            
+
             audio.onerror = (e) => {
               console.error('Audio error:', {
                 error: audio.error,
@@ -102,7 +106,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
 
             audio.src = url;
           }
-          
+
           const key = `audio_v${version}`;
           await set(key, audioBlob);
           console.log('Audio saved to IndexedDB:', key);
@@ -144,10 +148,10 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
     try {
       console.log('in handleRecordInteraction', recorderState);
       console.log('Event type:', event.type);
-      
+
       // Prevent any default behavior
       event.preventDefault();
-      
+
       if (recorderState === 'Ready') {
         console.log('Attempting to start recording...');
         startRecording().catch(error => {
@@ -165,7 +169,6 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
   }, [recorderState, stopRecording]);
 
   const getTranscription = async (audioBlob: Blob): Promise<string> => {
-    const profileId = localStorage.getItem('profileId');
     const audioBase64 = await blobToBase64(audioBlob);
 
     const response = await fetch('/api/transcribe', {

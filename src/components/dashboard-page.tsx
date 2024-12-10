@@ -24,8 +24,8 @@ export default function DashboardPage({ profileId }: { profileId: string }) {
   }, [profileId, router])
 
   return (
-    <main>
+    <div>
       <Dashboard />
-    </main>
+    </div>
   )
 }

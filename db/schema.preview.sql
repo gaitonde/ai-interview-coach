@@ -12,15 +12,25 @@ DROP TABLE IF EXISTS aic_preview_users CASCADE;
 CREATE TABLE aic_preview_users (
     id SERIAL PRIMARY KEY,
     clerk_id VARCHAR(255),
-    email VARCHAR(255)
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TRIGGER update_users_last_updated_at
+BEFORE UPDATE ON aic_preview_users
+FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 -- Profiles
 DROP TABLE IF EXISTS aic_preview_profiles CASCADE;
 
 CREATE TABLE aic_preview_profiles (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER,
+    email VARCHAR(255),
+    phone VARCHAR(255),
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    linkedin_url VARCHAR(2048),
     school VARCHAR(255),
     major VARCHAR(255),
     concentration VARCHAR(255),
@@ -49,6 +59,7 @@ CREATE TABLE aic_preview_interviews (
     role_name VARCHAR(255),
     interviewer_name VARCHAR(255),
     interviewer_role VARCHAR(255),
+    interviewer_linkedin VARCHAR(255),
     interview_date TIMESTAMP WITH TIME ZONE,
     readiness VARCHAR(255),
     is_demo BOOLEAN DEFAULT FALSE,
@@ -67,6 +78,7 @@ DROP TABLE IF EXISTS aic_preview_resumes CASCADE;
 CREATE TABLE aic_preview_resumes (
     id SERIAL PRIMARY KEY,
     profile_id INTEGER NOT NULL,
+    filename VARCHAR(255),
     url VARCHAR(2048),
     text TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

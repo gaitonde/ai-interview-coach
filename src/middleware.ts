@@ -5,9 +5,9 @@ const isPublicRoute = createRouteMatcher(['/', '/home', '/privacy', '/terms', '/
 export default clerkMiddleware(async (auth, request) => {
   const isDemoMode = request.cookies.get('mode')?.value === 'demo';
 
-  if (!isPublicRoute(request) && !isDemoMode) {
-    await auth.protect()
-  }
+  // if (!isPublicRoute(request) && !isDemoMode) {
+  //   await auth.protect()
+  // }
 })
 
 export const config = {

@@ -2,8 +2,13 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { interviewIdAtom, profileIdAtom, userIdAtom } from "@/stores/profileAtoms"
+import { useAtom, useAtomValue } from "jotai"
+import { atomWithStorage } from 'jotai/utils'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
+
+const isDemoModeAtom = atomWithStorage('demoMode', false)
 
 export function InterviewSetup() {
   const router = useRouter()
@@ -12,21 +17,26 @@ export function InterviewSetup() {
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const [statusMessage, setStatusMessage] = useState('Thinking...')
-  const [isDemoMode, setIsDemoMode] = useState(false)
+  const [, setAtomInterviewId] = useAtom<string | null>(interviewIdAtom)
+  const profileId = useAtomValue(profileIdAtom)
+  const userId = useAtomValue(userIdAtom)
+  const interviewId = useAtomValue(interviewIdAtom)
+  const isDemo = useAtomValue(isDemoModeAtom)
+
+  console.log('atom profileId from atom: ', profileId)
+  console.log('atom userId from atom: ', userId)
+  console.log('atom isDemo from atom: ', isDemo)
 
   useEffect(() => {
-    const storedProfileId = localStorage.getItem('profileId')
-    const storedInterviewId = localStorage.getItem('interviewId')
-    const isDemo = localStorage.getItem('mode') === 'demo'
-    setIsDemoMode(isDemo)
-    console.log('storedProfileId: ', storedProfileId)
-    console.log('storedInterviewId: ', storedInterviewId)
-    console.log('isDemo: ', isDemo)
+    console.log('xx storedProfileId: ', profileId)
+    console.log('xx storedUserId: ', userId)
+    console.log('xx storedInterviewId: ', interviewId)
+    console.log('xx isDemo: ', isDemo)
 
-    if (isDemo || storedProfileId) {
-      loadInterview(storedProfileId!, storedInterviewId!)
+    if (isDemo && profileId) {
+      loadInterview(profileId!, interviewId!)
     }
-  }, [])
+  }, [profileId, interviewId, isDemo])
 
   useEffect(() => {
     if (!isSubmitting) return
@@ -44,6 +54,7 @@ export function InterviewSetup() {
 
 
   const loadInterview = async (profileId: string, interviewId: string) => {
+    //TODO: dont send interviewId if it is not set
     const response = await fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`)
     const json = await response.json()
     console.log('XX interviews: ', json)
@@ -63,11 +74,15 @@ export function InterviewSetup() {
         const jdUrlInput = form.elements.namedItem('jd_url') as HTMLInputElement;
         jdUrlInput.value = interview.jd_url || '';
 
-        const interviewerNameInput = form.elements.namedItem('interviewer_name') as HTMLInputElement;
-        interviewerNameInput.value = interview.interviewer_name || '';
+        const interviewerNameInput = form.elements.namedItem('interviewer_linkedin') as HTMLInputElement;
+        interviewerNameInput.value = interview.interviewer_linkedin || '';
 
         const interviewerRoleInput = form.elements.namedItem('interviewer_role') as HTMLInputElement;
         interviewerRoleInput.value = interview.interviewer_role || '';
+
+        const interviewDateInput = form.elements.namedItem('interview_date') as HTMLInputElement;
+        const dateValue = interview.interview_date ? new Date(interview.interview_date).toISOString().split('T')[0] : '';
+        interviewDateInput.value = dateValue;
       }
     }
 
@@ -84,7 +99,7 @@ export function InterviewSetup() {
           profileId,
           company_url: formData.get('company_url'),
           jd_url: formData.get('jd_url'),
-          interviewer_name: formData.get('interviewer_name'),
+          interviewer_linkedin: formData.get('interviewer_linkedin'),
           interviewer_role: formData.get('interviewer_role'),
           interview_date: formData.get('interview_date')
         }),
@@ -95,7 +110,10 @@ export function InterviewSetup() {
       }
 
       const result = await response.json()
-      return result.id
+      const interviewId = result.id
+      setAtomInterviewId(interviewId)
+
+      return interviewId
     } catch (error) {
       console.error('Error creating job record:', error);
       throw error;
@@ -135,6 +153,17 @@ export function InterviewSetup() {
       }
     }
 
+    const interviewDate = formData.get('interview_date') as string;
+    if (interviewDate) {
+      const selectedDate = new Date(interviewDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        return 'Interview date cannot be in the past';
+      }
+    }
+
     const urlFields = ['company_url', 'jd_url'];
     for (const field of urlFields) {
       let value = formData.get(field) as string;
@@ -152,8 +181,8 @@ export function InterviewSetup() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (isDemoMode) {
-      router.push(`/job-prep`);
+    if (isDemo) {
+      router.push(`/company-prep`);
       return;
     }
 
@@ -170,13 +199,13 @@ export function InterviewSetup() {
     }
 
     try {
-      const profileId = localStorage.getItem('profileId') as string
+      if (!profileId) {
+        throw new Error('Profile ID not found');
+      }
       const interviewId = await saveInterview(profileId, formData)
-      console.log('interviewId: ', interviewId)
-      localStorage.setItem('interviewId', interviewId)
       await generateJobPrep(profileId, interviewId)
 
-      router.push(`/job-prep`);
+      router.push(`/company-prep`);
     } catch (error) {
       console.error('Error during submission:', error);
       setError('An error occurred. Please try again.');
@@ -187,11 +216,11 @@ export function InterviewSetup() {
 
   return (
     <>
-      <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="flex-grow flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-[#252b3b] p-8 rounded-lg shadow-lg my-4">
           <div className="text-center">
             <h2 className="mt-2 text-3xl font-bold text-white">Interview Setup</h2>
-            <p className="mt-2 text-sm text-gray-400">Add your interview</p>
+            <p className="mt-2 text-sm text-gray-400">Add your first interview</p>
           </div>
           <form
             ref={formRef}
@@ -224,14 +253,14 @@ export function InterviewSetup() {
                 />
               </div>
               <div>
-                <label htmlFor="interviewer_name" className="block text-sm font-medium text-white">
-                  Interviewer Name (Optional)
+                <label htmlFor="interviewer_linkedin" className="block text-sm font-medium text-white">
+                  Interviewer LinkedIn URL (Optional)
                 </label>
                 <Input
-                  id="interviewer_name"
-                  name="interviewer_name"
+                  id="interviewer_linkedin"
+                  name="interviewer_linkedin"
                   type="text"
-                  placeholder="eg. Ira Johnson"
+                  placeholder="eg. https://www.linkedin.com/in/johndoe"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -255,6 +284,7 @@ export function InterviewSetup() {
                   id="interview_date"
                   name="interview_date"
                   type="date"
+                  min={new Date().toISOString().split('T')[0]}
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
@@ -264,7 +294,7 @@ export function InterviewSetup() {
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? statusMessage : isDemoMode ? 'Next' : 'Save'}
+              {isSubmitting ? statusMessage : isDemo ? 'Next' : 'Save'}
             </Button>
             <p className="text-sm text-muted-foreground mt-1 text-center">
               {isSubmitting && (
@@ -275,7 +305,7 @@ export function InterviewSetup() {
           </form>
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
-      </main>
+      </div>
     </>
   )
 }

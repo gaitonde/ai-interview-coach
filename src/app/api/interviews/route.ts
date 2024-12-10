@@ -53,10 +53,13 @@ export async function POST(request: Request) {
     profileId,
     company_url,
     jd_url,
-    interviewer_name,
+    interviewer_linkedin,
     interviewer_role,
     interview_date
   } = body;
+
+  // Convert empty interview_date to null
+  const formattedInterviewDate = interview_date === '' ? null : interview_date;
 
   //TODO: do these url fetches async
   const company_md = await fetchUrlContents(company_url);
@@ -69,7 +72,7 @@ export async function POST(request: Request) {
       company_text,
       jd_url,
       jd_text,
-      interviewer_name,
+      interviewer_linkedin,
       interviewer_role,
       interview_date
     )
@@ -83,9 +86,9 @@ export async function POST(request: Request) {
     company_md,
     jd_url,
     jd_md,
-    interviewer_name,
+    interviewer_linkedin,
     interviewer_role,
-    interview_date
+    formattedInterviewDate
   ];
 
   const interviews = await sql.query(query, values)
@@ -116,7 +119,7 @@ export async function POST(request: Request) {
 }
 
 async function fetchUrlContents(url: string): Promise<string> {
-  console.log('url', url)
+  console.log('Fetching url contents for: ', url)
 
   try {
     const response = await fetch(url);

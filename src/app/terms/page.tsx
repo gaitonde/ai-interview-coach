@@ -1,4 +1,4 @@
-import MarkdownRenderer from "@/components/markdown-renderer";
+import MarkdownRenderer from '@/components/markdown-renderer'
 
 export default function TermsPage() {
   return (

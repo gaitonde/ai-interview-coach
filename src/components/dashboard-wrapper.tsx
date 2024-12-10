@@ -1,21 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import DashboardPage from './dashboard-page'
+import { profileIdAtom } from '@/stores/profileAtoms'
+import { useAtom } from 'jotai'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import DashboardPage from './dashboard-page'
 
 export default function DashboardWrapper() {
-  console.log('in DashboardWrapper')
   const router = useRouter()
-  const [profileId, setProfileId] = useState<string | null>(null)
+  const [profileId] = useAtom(profileIdAtom)
 
   useEffect(() => {
-    const storedProfileId = localStorage.getItem('profileId')
-    setProfileId(storedProfileId)
-    if (!storedProfileId) {
+    if (!profileId) {
       router.push('/profile-setup')
     }
-  }, [])
+  }, [profileId])
 
   return (
     <div>

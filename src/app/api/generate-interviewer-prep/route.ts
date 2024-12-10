@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
-import { sql } from '@vercel/postgres';
-import { fetchPrompt, PromptData } from "../utils/fetchPrompt";
-import { getTable } from "@/lib/db";
+import { NextResponse } from 'next/server'
+import OpenAI from 'openai'
+import { sql } from '@vercel/postgres'
+import { fetchPrompt, PromptData } from '../utils/fetchPrompt'
+import { getTable } from '@/lib/db'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+})
 
 export async function POST(request: Request) {
   console.log('in BE with request for generating questions')
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const { profileId, interviewId } = body
 
   try {
-    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-interview-prep');
+    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-interviewer-prep')
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,
@@ -24,12 +24,12 @@ export async function POST(request: Request) {
       ],
       max_completion_tokens: promptData.maxCompletionTokens,
       temperature: promptData.temperature,
-    });
+    })
 
-    const generatedContent = completion.choices[0]?.message?.content;
+    const generatedContent = completion.choices[0]?.message?.content
 
     // Modified upsert operation
-    const table = getTable('airesponses');
+    const table = getTable('airesponses')
     const query = `
       WITH upsert AS (
         UPDATE ${table}
@@ -41,13 +41,13 @@ export async function POST(request: Request) {
       SELECT $1, $2, $3
       WHERE NOT EXISTS (
         SELECT * FROM upsert
-      );
-    `;
-    await sql.query(query, [profileId, interviewId, generatedContent]);
+      )
+    `
+    await sql.query(query, [profileId, interviewId, generatedContent])
 
-    return NextResponse.json({ content: generatedContent });
+    return NextResponse.json({ content: generatedContent })
   } catch (error) {
-    console.error('Error:', error);
-    return NextResponse.json({ content: "unable to get content" }, { status: 500 });
+    console.error('Error:', error)
+    return NextResponse.json({ content: "unable to get content" }, { status: 500 })
   }
 }

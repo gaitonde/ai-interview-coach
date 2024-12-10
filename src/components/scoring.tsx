@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
-import CircularProgress from "./circular-progress"
+import CircularProgress from './circular-progress'
 import { Separator } from './ui/separator'
 import Markdown from 'react-markdown'
+import { useAtom } from 'jotai'
+import { isDemoAtom, interviewIdAtom, profileIdAtom } from '@/stores/profileAtoms'
 
 interface Category {
   name: string
@@ -49,10 +51,12 @@ export default function Scoring({
   const [audioError, setAudioError] = useState<string | null>(null);
   const feedbackRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
   const hasFetchedRef = useRef(false);
-  const [questionText, setQuestionText] = useState<string>(question);
+  const [questionText, setQuestionText] = useState<string>(question)
+  const [profileId] = useAtom(profileIdAtom)
+  const [interviewId] = useAtom(interviewIdAtom)
+  const [isDemo] = useAtom(isDemoAtom)
 
   useEffect(() => {
-    const profileId = localStorage.getItem('profileId')
     const fetchFeedback = async () => {
       try {
         const response = await fetch(`/api/feedback?profileId=${profileId}&questionId=${questionId}&answerId=${answerId}`);
@@ -68,7 +72,7 @@ export default function Scoring({
       }
     }
     const generateFeedback = async () => {
-      const interviewId = localStorage.getItem('interviewId')
+
       try {
         const response = await fetch('/api/generate-feedback', {
           method: 'POST',
@@ -88,9 +92,7 @@ export default function Scoring({
         console.error('Error fetching feedback:', error);
         // Handle error (e.g., show an error message to the user)
       }
-    };
-
-    const isDemo = localStorage.getItem('mode') === 'demo';
+    }
 
     if (isDemo && !hasFetchedRef.current && questionId && answerId) {
       hasFetchedRef.current = true;
