@@ -67,7 +67,7 @@ export function InterviewPracticeContent() {
     const response = await fetch('/api/answers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profileId, questionId, transcript }),
+      body: JSON.stringify({ profileId, interviewId, questionId, transcript }),
     });
     const json = await response.json();
     return json.id;

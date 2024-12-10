@@ -9,11 +9,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// interface Suggestion {
-//   category: string;
-//   text: string;
-// }
-
 export async function POST(req: NextRequest) {
   console.log('Generating feedback...');
   try {
@@ -55,11 +50,11 @@ export async function POST(req: NextRequest) {
       const table = getTable('feedback');
       const query = `
         INSERT INTO ${table}
-        (profile_id, question_id, answer_id, feedback)
+        (profile_id, interview_id, question_id, answer_id, feedback)
         VALUES
-        ($1, $2, $3, $4)
+        ($1, $2, $3, $4, $5)
       `;
-      await sql.query(query, [profileId, questionId, answerId, feedback]);
+      await sql.query(query, [profileId, interviewId, questionId, answerId, feedback]);
 
       // Update readiness records to mark them as out of date
       const table2 = getTable('questions')
