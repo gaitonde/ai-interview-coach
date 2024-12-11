@@ -1,6 +1,11 @@
 {
   "extends": ["next/core-web-vitals", "next/typescript"],
   "rules": {
-    "@typescript-eslint/no-empty-object-type": ["error"]
-  }
+    "@typescript-eslint/no-empty-object-type": ["error"],
+    "no-relative-import-paths/no-relative-import-paths": [
+      "error",
+      { "allowSameFolder": true, "rootDir": "src", "prefix": "@" }
+    ]
+  },
+  "plugins": ["no-relative-import-paths"]
 }

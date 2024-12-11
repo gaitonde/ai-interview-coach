@@ -1,47 +1,138 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { profileIdAtom } from '@/stores/profileAtoms'
+import { interviewIdAtom, profileIdAtom } from '@/stores/profileAtoms'
 import { useAtom } from 'jotai'
 import { Clipboard } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import MarkdownRenderer from './markdown-renderer'
 import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
+import { ConditionalHeader } from "./conditional-header"
+import MarkdownRenderer from './markdown-renderer'
 
 export default function QuestionPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string | null>(null)
   const [profileId] = useAtom(profileIdAtom)
+  const [interviewId] = useAtom(interviewIdAtom)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [statusMessage, setStatusMessage] = useState('Thinking...')
+  const fetchedRef = useRef(false)
 
   useEffect(() => {
+    // Reset ref when dependencies change
+    if (fetchedRef.current && profileId && interviewId) return
+
     console.log('storedProfileId', profileId)
-    // if (!profileId) {
-    //   console.error('Missing interviewId or profileId')
-    //   return
-    // }
+    if (!profileId || !interviewId) return
 
-    // fetch(`/api/generate-question-prep?profileId=41&interviewId=6`)
-    fetch(`/api/generate-question-prep?profileId=${profileId}`)
-    // const x = fetch(`/api/interview-readiness?profileId=31&interviewId=14`)
-    .then(response => {
-      if (!response.ok) throw new Error(`Failed to fetch evaluation`)
-      console.log('response', response)
+    fetchedRef.current = true
 
-      return response.json()
-    })
-    .then(data => {
-      console.log('data', data)
-      setContent('# Question Scoop\n\n' + data.content)
+    fetch(`/api/question-prep?profileId=${profileId}&interviewId=${interviewId}`)
+      .then(response => {
+        if (!response.ok) throw new Error(`Failed to check question prep`)
+        return response.json()
+      })
+      .then(async data => {
+        if (data.content) {
+          // Use existing prep content
+          setContent('# Question Scoop\n\n' + data.content)
+        } else {
+          // Generate new prep content
+          const generateResponse = await fetch(`/api/generate-question-prep?profileId=${profileId}&interviewId=${interviewId}`)
+          if (!generateResponse.ok) throw new Error(`Failed to generate question prep`)
+          const newData = await generateResponse.json()
+          setContent('# Question Scoop\n\n' + newData.content)
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching question prep:', error)
+        setContent('# Error\n\nFailed to load question preparation content.')
+      })
+  }, [profileId, interviewId])
 
-    })
-  }, [])
+  useEffect(() => {
+    if (!isSubmitting) return
+
+    const messages = ['Thinking...', 'Researching...', 'Analyzing...', 'Generating...']
+    let currentIndex = 0
+
+    const interval = setInterval(() => {
+      currentIndex = (currentIndex + 1) % messages.length
+      setStatusMessage(messages[currentIndex])
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [isSubmitting])
 
   const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    router.push('/interview-ready');
+    if (!profileId) {
+      alert('No profile ID found. Please select a profile.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // First check if questions already exist
+      const checkResponse = await fetch(`/api/questions?profileId=${profileId}&interviewId=${interviewId}&checkOnly=true`)
+
+      const json = await checkResponse.json()
+      console.log('json for checkOnly', json)
+      const { count } = json
+      console.log('count for checkOnly', count)
+      if (!checkResponse.ok || count < 1) {
+        console.log('No questions! Generating questions')
+        // Only generate questions if they don't exist
+        const generateResponse = await fetch('/api/generate-interview-questions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ profileId, interviewId }),
+        })
+
+        if (!generateResponse.ok) {
+          throw new Error('Failed to generate questions')
+        }
+
+        await generateResponse.json()
+      } else {
+        console.log('Questions already exist!')
+      }
+
+      router.push('/interview-ready')
+    } catch (error) {
+      console.error('Error handling questions:', error)
+      alert('Failed to process questions. Please try again.')
+    }
+  }
+
+  const generateInterviewQuestions = async (profileId: string) => {
+    try {
+      const response = await fetch('/api/generate-interview-questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ profileId, interviewId }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate interview prep')
+      }
+
+      const result = await response.json()
+      return result.content
+    } catch (error) {
+      console.error('Error generating prep sheet:', error)
+      throw error
+    }
   }
 
   return (
+    <>
+    <ConditionalHeader />
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted px-4">
       <div className="flex-grow flex justify-center">
         <div className="w-full max-w-4xl prep-sheet-content overflow-hidden">
@@ -55,11 +146,11 @@ export default function QuestionPrep() {
                 <Button
                   onClick={() => {
                     if (typeof window !== 'undefined') {
-                      const content = document.querySelector('.prep-sheet-content')?.textContent;
+                      const content = document.querySelector('.prep-sheet-content')?.textContent
                       if (content) {
                         navigator.clipboard.writeText(content)
                           .then(() => alert('Content copied to clipboard!'))
-                          .catch(err => console.error('Failed to copy: ', err));
+                          .catch(err => console.error('Failed to copy: ', err))
                       }
                     }
                   }}
@@ -71,10 +162,14 @@ export default function QuestionPrep() {
                 <Button
                   type="submit"
                   onClick={handleSubmit}
+                  disabled={isSubmitting}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
-                  Next
+                  {isSubmitting ? statusMessage : 'Next'}
                 </Button>
+                <p className="text-sm mt-1 text-center">
+                  {isSubmitting && 'Takes about 10 seconds, please be patient. Thank you.'}
+                </p>
               </div>
             </div>
           ) : (
@@ -85,5 +180,6 @@ export default function QuestionPrep() {
         </div>
       </div>
     </div>
+    </>
   )
 }

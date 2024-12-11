@@ -9,12 +9,11 @@ const openai = new OpenAI({
 })
 
 export async function POST(request: Request) {
-  console.log('in BE with request for generating questions')
   const body = await request.json()
   const { profileId, interviewId } = body
 
   try {
-    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-interviewer-prep')
+    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-interviewer-prep', interviewId)
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,
@@ -33,11 +32,11 @@ export async function POST(request: Request) {
     const query = `
       WITH upsert AS (
         UPDATE ${table}
-        SET generated_interview_prep_info = $3
+        SET generated_interviewer_prep = $3
         WHERE profile_id = $1 AND interview_id = $2
         RETURNING *
       )
-      INSERT INTO ${table} (profile_id, interview_id, generated_interview_prep_info)
+      INSERT INTO ${table} (profile_id, interview_id, generated_interviewer_prep)
       SELECT $1, $2, $3
       WHERE NOT EXISTS (
         SELECT * FROM upsert

@@ -1,27 +1,29 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import { ConditionalHeader } from '@/components/conditional-header'
 import { Button } from '@/components/ui/button'
+import { interviewIdAtom, profileIdAtom, showScoreAtom } from '@/stores/profileAtoms'
+import { useAtom } from 'jotai'
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 import MarkdownRenderer from './markdown-renderer'
 import { RubricScorer } from './rubric-scorer'
-import { useAtom } from 'jotai'
-import { interviewIdAtom, profileIdAtom, showScoreAtom } from '@/stores/profileAtoms'
 
 export default function InterviewerPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isDemoMode, setIsDemoMode] = useState(false)
+  const [isDemoMode] = useState(false)
   const [statusMessage, setStatusMessage] = useState('Thinking...')
+
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
   const [showScore] = useAtom(showScoreAtom)
 
   useEffect(() => {
     if (profileId) {
-      fetch(`/api/generated-questions?profileId=${profileId}&interviewId=${interviewId}`)
+      fetch(`/api/interviewer-prep?profileId=${profileId}&interviewId=${interviewId}`)
         .then(response => {
             if (!response.ok) {
               throw new Error('Failed to fetch generated questions response')
@@ -54,28 +56,6 @@ export default function InterviewerPrep() {
     return () => clearInterval(interval)
   }, [isSubmitting])
 
-  const generateInterviewQuestions = async (profileId: string) => {
-    try {
-      const response = await fetch('/api/generate-interview-questions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ profileId, interviewId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate prep sheet');
-      }
-
-      const result = await response.json();
-      return result.content;
-    } catch (error) {
-      console.error('Error generating prep sheet:', error);
-      throw error;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
     if (!profileId) {
@@ -83,14 +63,16 @@ export default function InterviewerPrep() {
     }
 
     setIsSubmitting(true)
-    if (!isDemoMode && profileId) {
-      await generateInterviewQuestions(profileId)
-    }
+    // if (!isDemoMode && profileId) {
+    //   await generateInterviewQuestions(profileId)
+    // }
 
     router.push(`/question-prep`)
   }
 
   return (
+    <>
+    <ConditionalHeader />
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted">
       <div className="flex-grow flex justify-center">
         <div className="w-full max-w-4xl prep-sheet-content">
@@ -130,7 +112,7 @@ export default function InterviewerPrep() {
                 >
                   {isSubmitting ? statusMessage : 'Next'}
                 </Button>
-                <p className="text-sm text-muted-foreground mt-1 text-center">
+                <p className="text-sm mt-1 text-center">
                   {isSubmitting && (
                     'Takes about 10 seconds, please be patient. Thank you.'
                   )}
@@ -145,5 +127,6 @@ export default function InterviewerPrep() {
         </div>
       </div>
     </div>
+    </>
   )
 }

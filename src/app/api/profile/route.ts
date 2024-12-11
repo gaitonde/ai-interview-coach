@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { sql } from '@vercel/postgres'
 import { getTable } from '@/lib/db'
 import { createUser } from '@/app/actions/create-user'
+import { clerkClient } from '@clerk/express'
 
 const PROFILES_TABLE = getTable('profiles')
 // const JOBS_TABLE = getTable('interviews')
@@ -11,7 +12,6 @@ interface ClerkError extends Error {
 }
 
 export async function GET(request: Request) {
-  console.debug('in profile route GET')
   try {
     const { searchParams } = new URL(request.url)
     const profileId = searchParams.get('profileId')
@@ -56,14 +56,18 @@ export async function POST(request: Request) {
     const { id, email, linkedin, school, major, concentration, graduation_year } = json
 
     // Convert graduation_year String to a Date with Jan 1
-    const graduation_date = new Date(`1/1/${graduation_year}`)
+    const graduation_date = graduation_year ? new Date(`1/1/${graduation_year}`) : null
 
 
-    let userId
+    let userId, ticket
 
     try {
       const user = await createUser(email)
       userId = user.id
+      ticket = await clerkClient.signInTokens.createSignInToken({
+        userId: user.clerkId.toString(),
+        expiresInSeconds: 60 * 60, // Token expires in 1 hour
+      })
       await updateProfile(id, userId, email, linkedin, school, major, concentration, graduation_date)
     } catch (err) {
       const error = err as ClerkError
@@ -72,9 +76,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
 
-
-
-    return NextResponse.json({ success: true, userId, profileId: id })
+    return NextResponse.json({ success: true, userId, profileId: id, ticket: ticket.token })
   } catch (error) {
     console.error('Error:', error)
     return NextResponse.json({
@@ -93,9 +95,9 @@ async function updateProfile(
   school: string,
   major: string,
   concentration: string,
-  graduation_date: Date,
+  graduation_date: Date | null,
 ): Promise<number> {
-  console.log('in updateProfile...')
+
   try {
     const result = await sql.query(`
       UPDATE ${PROFILES_TABLE}
@@ -106,7 +108,7 @@ async function updateProfile(
         school = '${school}',
         major = '${major}',
         concentration = '${concentration}',
-        graduation_date = '${graduation_date.toISOString()}'
+        graduation_date = ${graduation_date ? `'${graduation_date.toISOString()}'` : 'NULL'}
       WHERE id = ${id}
       RETURNING id
     `)

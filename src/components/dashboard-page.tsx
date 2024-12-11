@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from "react"
-import { getProfileX } from "@/app/actions/get-profile"
-import Dashboard from "@/components/dashboard"
-import { useRouter } from "next/navigation"
+import { getProfileX } from '@/app/actions/get-profile'
+import Dashboard from '@/components/dashboard'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { ConditionalHeader } from '@/components/conditional-header'
 
 export default function DashboardPage({ profileId }: { profileId: string }) {
 
@@ -24,8 +25,9 @@ export default function DashboardPage({ profileId }: { profileId: string }) {
   }, [profileId, router])
 
   return (
-    <div>
+    <>
+      <ConditionalHeader />
       <Dashboard />
-    </div>
+    </>
   )
 }

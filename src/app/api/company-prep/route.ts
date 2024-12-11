@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
-
-import { getTable } from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server'
+import { Pool } from 'pg'
+import { getTable } from '@/lib/db'
 
 // Create a new pool using the connection string from your environment variables
 const pool = new Pool({
@@ -21,7 +20,7 @@ export async function GET(request: NextRequest) {
     try {
       const table = getTable('airesponses');
       const result = await client.query(`
-        SELECT generated_company_info
+        SELECT generated_company_prep
         FROM ${table}
         WHERE profile_id = $1
         AND interview_id = $2
@@ -33,7 +32,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'No company info found' }, { status: 404 });
       }
 
-      return NextResponse.json({ content: result.rows[0].generated_company_info });
+      return NextResponse.json({ content: result.rows[0].generated_company_prep });
     } finally {
       client.release();
     }

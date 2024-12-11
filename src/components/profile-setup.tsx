@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { useAtom } from 'jotai'
 import { profileIdAtom, userIdAtom, isDemoAtom } from '@/stores/profileAtoms'
+import { useSignIn, useClerk } from '@clerk/nextjs'
 
 export function ProfileSetup() {
   const router = useRouter()
@@ -16,6 +17,8 @@ export function ProfileSetup() {
   const [school, setSchool] = useState<string | undefined>(undefined)
   const [graduationYear, setGraduationYear] = useState<string | undefined>(undefined)
   const [isSignup, setIsSignup] = useState(false)
+  const { signIn } = useSignIn()
+  const clerk = useClerk()
   // const [isDemoMode, setIsDemoMode] = useState(false)
   // const [includeResume, setIncludeResume] = useState(false)
   // const [fileName, setFileName] = useState<string>('No file chosen')
@@ -27,17 +30,11 @@ export function ProfileSetup() {
   const [isDemo] = useAtom(isDemoAtom)
 
   useEffect(() => {
-    console.log('atomProfileId: ', atomProfileId)
-    console.log('atomUserId: ', atomUserId)
-    console.log('atomDemoMode: ', isDemo)
-
     setIsSignup(atomUserId === null)
     if (isDemo || atomProfileId) {
       loadProfile(atomProfileId!)
     }
-
   }, [])
-
 
   const loadProfile = async (profileId: string) => {
     const response = await fetch(`/api/profile?profileId=${profileId}`)
@@ -56,14 +53,16 @@ export function ProfileSetup() {
         // Profile fields
         (form.elements.namedItem('email') as HTMLInputElement).value = profile.email || '';
         (form.elements.namedItem('linkedin') as HTMLInputElement).value = profile.linkedin_url || '';
-        (form.elements.namedItem('school') as HTMLInputElement).value = profile.school || '';
-        (form.elements.namedItem('major') as HTMLInputElement).value = profile.major || '';
-        (form.elements.namedItem('concentration') as HTMLInputElement).value = profile.concentration || '';
 
-        //resume field
-        // setFileName(`${profile.email}-resume.pdf`);
-        // const mockFile = new File([''], 'sample-resume.pdf', { type: 'application/pdf' });
-        // setResumeFile(mockFile);
+        // Only set school-related fields if they exist in the form
+        const schoolInput = form.elements.namedItem('school') as HTMLInputElement;
+        if (schoolInput) schoolInput.value = profile.school || '';
+
+        const majorInput = form.elements.namedItem('major') as HTMLInputElement;
+        if (majorInput) majorInput.value = profile.major || '';
+
+        const concentrationInput = form.elements.namedItem('concentration') as HTMLInputElement;
+        if (concentrationInput) concentrationInput.value = profile.concentration || '';
       }
     }
 
@@ -81,36 +80,44 @@ export function ProfileSetup() {
   // }
 
   const saveProfile = async (formData: FormData) => {
-    const profileAttributes = {
-      id: atomProfileId,
-      userId: atomUserId,
-      email: formData.get('email'),
-      linkedin: formData.get('linkedin'),
-      school: formData.get('school'),
-      major: formData.get('major'),
-      concentration: formData.get('concentration'),
-      graduation_year: formData.get('graduation_year'),
-    };
+    try {
+      const profileAttributes = {
+        id: atomProfileId,
+        userId: atomUserId,
+        email: formData.get('email'),
+        linkedin: formData.get('linkedin'),
+        school: formData.get('school'),
+        major: formData.get('major'),
+        concentration: formData.get('concentration'),
+        graduation_year: formData.get('graduation_year'),
+      };
 
-    const profileResponse = await fetch('/api/profile', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(profileAttributes)
-    });
+      const profileResponse = await fetch('/api/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileAttributes)
+      });
 
-    const {userId, profileId, error} = await profileResponse.json();
+      const {userId: clerkId, profileId, ticket, error} = await profileResponse.json();
 
-    if (!profileResponse.ok) {
-      console.log('Profile response error: ', error)
-      throw new Error(error || 'Failed to save profile');
+      if (!profileResponse.ok) {
+        console.log('Profile response error: ', error)
+        throw new Error(error || 'Failed to save profile');
+      }
+
+      // Update atoms in this order and wait for them to complete
+      await Promise.all([
+        setAtomProfileId(profileId),
+        setAtomUserId(clerkId)
+      ]);
+
+      return {profileId, clerkId, ticket}
+    } catch (error) {
+      console.error('Error in saveProfile:', error);
+      throw error;
     }
-
-    setAtomProfileId(profileId)
-    setAtomUserId(userId)
-
-    return profileId
   }
 
   const uploadResume = async (profileId: number, resumeFile: File) => {
@@ -140,13 +147,23 @@ export function ProfileSetup() {
     return emailRegex.test(email);
   }
 
+  const isRecentOrFutureGrad = (year: string | undefined): boolean => {
+    if (!year) return false;
+    const currentYear = new Date().getFullYear();
+    const gradYear = parseInt(year);
+    return gradYear >= currentYear - 1;
+  }
+
   const validateForm = (formData: FormData): string | null => {
     const requiredFields = [
       'email',
       'linkedin',
-      'school',
-      'major'
     ]
+
+    // Add conditional required fields
+    if (isRecentOrFutureGrad(graduationYear)) {
+      requiredFields.push('school', 'major', 'graduation_year');
+    }
 
     for (const field of requiredFields) {
       if (!formData.get(field)) {
@@ -179,9 +196,11 @@ export function ProfileSetup() {
     // }
 
     // Add specific validation for graduation year dropdown
-    const graduationYear = formData.get('graduation_year') as string
-    if (!graduationYear) {
-      return 'Please select your graduation year'
+    if (isRecentOrFutureGrad(graduationYear)) {
+      const formGraduationYear = formData.get('graduation_year') as string
+      if (!formGraduationYear) {
+        return 'Please select your graduation year'
+      }
     }
 
     // if (!resumeFile) {
@@ -216,25 +235,29 @@ export function ProfileSetup() {
     }
 
     try {
-      const profileId = await saveProfile(formData)
-      console.log('Profile ID: ', profileId)
+      const {profileId, clerkId, ticket} = await saveProfile(formData)
       if (profileId < 0) {
         setIsSubmitting(false)
         return
       }
 
-      // await saveJob(profileId, formData)
+      const signInResult = await signIn?.create({
+        strategy: "ticket",
+        ticket: ticket,
+      });
 
-      // if (includeResume) {
-      //   const resumeFile = formData.get('resume') as File
-      //   await uploadResume(profileId, resumeFile)
-      // }
+      if (signInResult?.status === "complete") {
+        const sessionId = signInResult.createdSessionId
+        if (sessionId) {
+          await clerk.setActive({ session: sessionId })
+          console.log("Session activated successfully!")
+        }
+      }
+
 
       router.push(`/interview-setup`)
     } catch (error: any) {
       setError(error?.message)
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -247,11 +270,11 @@ export function ProfileSetup() {
 
   return (
     <>
-      <div className="flex-grow flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-[#252b3b] px-8 py-4 rounded-lg shadow-lg my-4">
           <div className="text-center">
             <h2 className="mt-2 text-3xl font-bold text-white">Profile Setup</h2>
-            <p className="mt-2 text-sm text-gray-400">Complete your profile to get started</p>
+            <p className="mt-2 text-sm text-gray-400">Verify your profile and contine to sign up</p>
 {/*
             <p className="mt-2 text-sm text-gray-400">
               (or
@@ -342,37 +365,21 @@ export function ProfileSetup() {
                 />
               </div>
 
-              <div>
-                <label htmlFor="school" className="block text-sm font-medium text-white">
-                  School
-                </label>
-                <Input
-                  id="school"
-                  name="school"
-                  type="text"
-                  placeholder="e.g. Baylor University"
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-                />
-{/*
-                <Select name="school" value={school} onValueChange={setSchool}>
-                  <SelectTrigger className="w-full bg-white text-gray-700 border-gray-300 focus:ring-blue-500 mt-1 rounded-md">
-                    <SelectValue placeholder="Select your school" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white text-gray-700 border-gray-300">
-                    <SelectItem value="Baylor University">Baylor University</SelectItem>
-                    <SelectItem value="Boston College">Boston College</SelectItem>
-                    <SelectItem value="Carnegie Mellon University">Carnegie Mellon University</SelectItem>
-                    <SelectItem value="Columbia University">Columbia University</SelectItem>
-                    <SelectItem value="Emory University">Emory University</SelectItem>
-                    <SelectItem value="Washington University in St. Louis">Washington University in St. Louis</SelectItem>
-                    <SelectItem value="UC Berkeley">UC Berkeley</SelectItem>
-                    <SelectItem value="USC">USC</SelectItem>
-                    <SelectItem value="Not on this list">Not on this list</SelectItem>
-                  </SelectContent>
-                </Select>
-                 */}
-              </div>
-              <div>
+              {isRecentOrFutureGrad(graduationYear) && (
+                <>
+                  <div>
+                    <label htmlFor="school" className="block text-sm font-medium text-white">
+                      School
+                    </label>
+                    <Input
+                      id="school"
+                      name="school"
+                      type="text"
+                      placeholder="e.g. Baylor University"
+                      className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                    />
+                  </div>
+                  <div>
                 <label htmlFor="graduation_year" className="block text-sm font-medium text-white">
                   Graduation Year
                 </label>
@@ -394,30 +401,33 @@ export function ProfileSetup() {
                   </Select>
                 </div>
               </div>
-              <div>
-                <label htmlFor="major" className="block text-sm font-medium text-white">
-                  Major
-                </label>
-                <Input
-                  id="major"
-                  name="major"
-                  type="text"
-                  placeholder="e.g. Finance, Marketing, etc."
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-                />
-              </div>
-              <div>
-                <label htmlFor="concentration" className="block text-sm font-medium text-white">
-                  Concentration (Optional)
-                </label>
-                <Input
-                  id="concentration"
-                  name="concentration"
-                  type="text"
-                  placeholder="e.g. Commercial, Private Equity, International"
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-                />
-              </div>
+
+                  <div>
+                    <label htmlFor="major" className="block text-sm font-medium text-white">
+                      Major
+                    </label>
+                    <Input
+                      id="major"
+                      name="major"
+                      type="text"
+                      placeholder="e.g. Finance, Marketing, etc."
+                      className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="concentration" className="block text-sm font-medium text-white">
+                      Concentration (Optional)
+                    </label>
+                    <Input
+                      id="concentration"
+                      name="concentration"
+                      type="text"
+                      placeholder="e.g. Commercial, Private Equity, International"
+                      className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                    />
+                  </div>
+                </>
+              )}
 
 {/*
               <div>

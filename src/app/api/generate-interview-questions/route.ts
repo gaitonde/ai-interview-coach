@@ -9,12 +9,11 @@ const openai = new OpenAI({
 })
 
 export async function POST(request: Request) {
-  console.log('in BE with request for generating questions')
   const body = await request.json()
   const { profileId, interviewId } = body
 
   try {
-    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-questions')
+    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-questions', interviewId)
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,

@@ -1,7 +1,17 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher(['/', '/home', '/privacy', '/terms', '/api/(.*)', '/sign-in(.*)', '/sign-up(.*)'])
 
+export function middleware(request: NextRequest) {
+  //TODO: re-enable logging
+  // Only log API routes
+  // if (request.nextUrl.pathname.startsWith('/api')) {
+  //   console.log(`API Request: ${request.method} ${request.nextUrl.pathname}`)
+  // }
+
+  return NextResponse.next()
+}
 export default clerkMiddleware(async (auth, request) => {
   const isDemoMode = request.cookies.get('mode')?.value === 'demo';
 

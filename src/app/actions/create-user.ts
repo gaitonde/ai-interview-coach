@@ -1,6 +1,6 @@
 import { getTable } from '@/lib/db'
 import { sql } from '@vercel/postgres'
-import { clerkClient } from '@clerk/clerk-sdk-node'
+import { clerkClient } from '@clerk/express'
 
 type ClerkError = {
   errors: {

@@ -20,9 +20,13 @@ export async function GET(request: Request) {
       AND question_id = $2
       AND answer_id = $3
       ORDER BY id ASC
-  `;
+  `
   const result = await sql.query(query, [profileId, questionId, answerId])
 
-  return NextResponse.json({ feedback: result.rows[0].feedback })
+  if (result.rows.length === 0) {
+    return NextResponse.json({ feedback: null })
+  } else {
+    return NextResponse.json({ feedback: result.rows[0].feedback })
+  }
 }
 

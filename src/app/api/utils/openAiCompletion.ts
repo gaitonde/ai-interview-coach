@@ -21,7 +21,8 @@ export async function genCompletion(promptData: PromptData): Promise<ChatComplet
 }
 
 export async function generateCompletion(profileId: string, promptKey: string, content?: string) {
-  const promptData: PromptData = await fetchPrompt(profileId, promptKey, undefined, undefined, content);
+  //profileId: string, interviewId: string, promptKey: string, questionId?: string, answerId?: string, content?: string
+  const promptData: PromptData = await fetchPrompt(profileId, promptKey, undefined, undefined, undefined, content);
 
   const completion = await openai.chat.completions.create({
     model: promptData.model,

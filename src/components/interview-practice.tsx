@@ -1,66 +1,81 @@
-'use client';
+'use client'
 
-import AudioRecorder from "@/components/audio-recorder";
-import { useState, useEffect, Suspense } from 'react';
-import Scoring from "./scoring";
-import { get } from 'idb-keyval';
+import AudioRecorder from '@/components/audio-recorder'
+import { useState, useEffect, Suspense } from 'react'
+import Scoring from './scoring'
+import { get } from 'idb-keyval'
 import { useRouter, useSearchParams } from 'next/navigation'
-import styles from '../styles/interview-practice.module.css';
-import { Button } from "./ui/button";
-import { removeDemoData } from "@/utils/auth";
-import { useAtom } from "jotai";
+import styles from '../styles/interview-practice.module.css'
+import { Button } from '@/components/ui/button'
+import { removeDemoData } from '@/utils/auth'
+import { useAtom } from 'jotai'
 import { profileIdAtom, interviewIdAtom, isDemoAtom } from '@/stores/profileAtoms'
+import { ConditionalHeader } from "./conditional-header"
 
-type EvaluatingState = 'Ready' | 'Evaluating';
+type EvaluatingState = 'Ready' | 'Evaluating'
+
+interface Answer {
+  answerId: string
+  answer: string
+  scores: ScoringResult
+  recordingTimestamp: string
+}
 
 interface Question {
-  id: number;
-  questionId?: string;
-  category: string;
-  question: string;
-  why: string;
-  focus: string;
+  id: number
+  questionId?: string
+  category: string
+  question: string
+  why: string
+  focus: string
+  // For demo data
+  answerId?: string  // Optional fields from the API response
+  answer?: string  // Optional fields from the API response
+  scores?: ScoringResult  // Optional fields from the API response
+  recordingTimestamp?: string  // Optional fields from the API response
+  feedback?: string  // Optional field from the API response
+  answers?: Array<Answer>  // Processed answers array
 }
 
 interface ScoringResult {
-  foundationalKnowledge: number;
-  problemSolvingAndLearningPotential: number;
-  behavioralAndSoftSkills: number;
-  culturalFitAndMotivation: number;
-  initiativeAndLeadershipPotential: number;
-  starMethodAdherence: number;
-  confidenceAndProfessionalism: number;
-  finalScore: number;
-  averageScore: number;
-  };
+  foundationalKnowledge: number
+  problemSolvingAndLearningPotential: number
+  behavioralAndSoftSkills: number
+  culturalFitAndMotivation: number
+  initiativeAndLeadershipPotential: number
+  starMethodAdherence: number
+  confidenceAndProfessionalism: number
+  finalScore: number
+  averageScore: number
+}
 
 export function InterviewPracticeContent() {
-  const searchParams = useSearchParams();
-  const category = searchParams.get('category');
-  const router = useRouter();
+  const searchParams = useSearchParams()
+  const category = searchParams.get('category')
+  const router = useRouter()
   const [versions, setVersions] = useState<Array<{
-    answerId: string;
-    questionId: string;
-    transcript: string | null;
-    aiScoringResult: ScoringResult | null;
-    audioUrl: string;
-    recordingTimestamp: Date;
-  }>>([]);
-  const [showDebug, setShowDebug] = useState(false);
-  const [expandedVersionIndex, setExpandedVersionIndex] = useState<number | null>(null);
-  const [question, setQuestion] = useState<Question | null>(null);
-  const [manualTranscript, setManualTranscript] = useState('');
-  const [whom, setWhom] = useState('');
-  const [inputMode, setInputMode] = useState<'record' | 'type'>('record');
-  const [evaluatingState, setEvaluatingState] = useState<EvaluatingState>('Ready');
-  const [questions, setQuestions] = useState<Array<Question>>([]);
-  const [questionIndex, setQuestionIndex] = useState(-1);
+    answerId: string
+    questionId: string
+    transcript: string | null
+    aiScoringResult: ScoringResult | null
+    audioUrl: string
+    recordingTimestamp: Date
+  }>>([])
+  const [showDebug, setShowDebug] = useState(false)
+  const [expandedVersionIndex, setExpandedVersionIndex] = useState<number | null>(null)
+  const [question, setQuestion] = useState<Question | null>(null)
+  const [manualTranscript, setManualTranscript] = useState('')
+  const [whom, setWhom] = useState('')
+  const [inputMode, setInputMode] = useState<'record' | 'type'>('record')
+  const [evaluatingState, setEvaluatingState] = useState<EvaluatingState>('Ready')
+  const [questions, setQuestions] = useState<Array<Question>>([])
+  const [questionIndex, setQuestionIndex] = useState(-1)
   const [isDemo] = useAtom(isDemoAtom)
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
   const getQuestionId = (question: Question | null): string => {
     if (!question) return '';
-    return question.questionId || question.id?.toString() || '';
+    return question.questionId || question.id?.toString() || ''
   };
 
   async function saveAnswer(questionId: string, transcript: string) {
@@ -74,7 +89,8 @@ export function InterviewPracticeContent() {
   }
 
   const handleTranscriptionComplete = async (newTranscript: string, newAudioUrl: string) => {
-    const answerId = await saveAnswer(question?.id?.toString() || '', newTranscript);
+    const answerId = await saveAnswer(question?.id?.toString() || '', newTranscript)
+    console.log('YYY ANSWER ID ', answerId)
 
     const versionNumber = getNextVersionNumber();
     const key = `audio_v${versionNumber}`;
@@ -94,38 +110,43 @@ export function InterviewPracticeContent() {
     await handleAiScoring(answerId, 0);
   };
 
-  const handleAiScoring = async (answerId: number, versionIndex: number) => {
+  const handleAiScoring = async (answerId: string | number, versionIndex: number) => {
     if (!answerId) {
       console.error('Need an answerId to do scoring.');
       return;
     }
 
     try {
-      const questionId = question?.id;
+      const questionId = question?.id
 
       const response = await fetch('/api/generate-ai-score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answerId, profileId, questionId }),
+        body: JSON.stringify({
+          answerId: answerId.toString(),
+          interviewId,
+          profileId,
+          questionId
+        }),
       });
       if (!response.ok) {
-        throw new Error('AI Scoring failed');
+        throw new Error('AI Scoring failed')
       }
-      const result = await response.json();
+      const result = await response.json()
       setVersions(prevVersions => {
-        const newVersions = [...prevVersions];
+        const newVersions = [...prevVersions]
         newVersions[versionIndex] = {
           ...newVersions[versionIndex],
           aiScoringResult: result,
         };
-        return newVersions;
+        return newVersions
       });
     } catch (error) {
-      console.error('AI Scoring error:', error);
+      console.error('AI Scoring error:', error)
     } finally {
-      setEvaluatingState('Ready');
+      setEvaluatingState('Ready')
     }
-  };
+  }
 
   // Add this new function to handle expanding/collapsing versions
   const handleVersionToggle = (index: number) => {
@@ -143,7 +164,7 @@ export function InterviewPracticeContent() {
     const fetchJob = async () => {
       try {
         if (profileId) {
-          const response = await fetch(`/api/interviews?profileId=${profileId}`);
+          const response = await fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`);
           if (!response.ok) {
             throw new Error('Failed to fetch questions');
           }
@@ -170,45 +191,95 @@ export function InterviewPracticeContent() {
     const fetchQuestions = async () => {
       try {
         if (profileId) {
-          const categoryParam = category ? `&category=${encodeURIComponent(category)}` : '';
-          const modeParam = isDemo ? `&mode=demo` : '';
-          console.log('CATEGORY PARAM', categoryParam);
-          const response = await fetch(`/api/questions?profileId=${profileId}&interviewId=${interviewId}${modeParam}${categoryParam}`);
+          const categoryParam = category ? `&category=${encodeURIComponent(category)}` : ''
+          const modeParam = isDemo ? `&mode=demo` : ''
+          const response = await fetch(`/api/questions?profileId=${profileId}&interviewId=${interviewId}${modeParam}${categoryParam}`)
           if (!response.ok) {
-            throw new Error('Failed to fetch questions');
+            throw new Error('Failed to fetch questions')
           }
-          const data = await response.json();
-          console.log('QUESTIONS!!', data);
+          const data = await response.json()
+          console.log('QUESTIONS!!', data)
           // Filter out duplicate questions by questionId
-          let questions;
-          if (isDemo) {
-            questions = data.reduce((acc: Question[], curr: Question) => {
-              const exists = acc.find(q => q.questionId === curr.questionId);
-              if (!exists) {
-                acc.push(curr);
-              }
-              return acc;
-            }, []);
-          } else {
-            questions = data;
-          }
-          console.log('UNIQUE QUESTIONS!!', questions);
-          setQuestions(questions);
-          setQuestion(questions[0]);
-          setQuestionIndex(0);
+          let questions = data
+          questions = data.reduce((acc: Question[], curr: Question) => {
+            const existingQuestion = acc.find(q => q.questionId === curr.questionId);
+            if (!existingQuestion) {
+              const newQuestion: Question = {
+                ...curr,
+                id: curr.questionId ? parseInt(curr.questionId) : 0,
+                answers: curr.answerId ? [{
+                  answerId: curr.answerId || '',
+                  answer: curr.answer || '',
+                  scores: curr.scores || {
+                    foundationalKnowledge: 0,
+                    problemSolvingAndLearningPotential: 0,
+                    behavioralAndSoftSkills: 0,
+                    culturalFitAndMotivation: 0,
+                    initiativeAndLeadershipPotential: 0,
+                    starMethodAdherence: 0,
+                    confidenceAndProfessionalism: 0,
+                    finalScore: 0,
+                    averageScore: 0,
+                  },
+                  recordingTimestamp: curr.recordingTimestamp || '',
+                }] : undefined
+              };
 
-          if (isDemo && data.length > 0) {
-            const demoVersions = data.map((item: Question & { answerId: string; answer: string; scores: ScoringResult; recordingTimestamp: string }) => ({
-              answerId: item.answerId,
-              questionId: item.questionId,
-              transcript: item.answer,
-              aiScoringResult: item.scores,
-              audioUrl: '',
-              recordingTimestamp: new Date(item.recordingTimestamp),
-            }));
-            console.log('DEMO VERSIONS', demoVersions);
-            setVersions(demoVersions);
-            setExpandedVersionIndex(0);
+              acc.push(newQuestion);
+            } else if (curr.answerId) {
+              if (!existingQuestion.answers) {
+                existingQuestion.answers = [];
+              }
+              existingQuestion.answers.push({
+                answerId: curr.answerId,
+                answer: curr.answer || '',
+                scores: curr.scores || {
+                  foundationalKnowledge: 0,
+                  problemSolvingAndLearningPotential: 0,
+                  behavioralAndSoftSkills: 0,
+                  culturalFitAndMotivation: 0,
+                  initiativeAndLeadershipPotential: 0,
+                  starMethodAdherence: 0,
+                  confidenceAndProfessionalism: 0,
+                  finalScore: 0,
+                  averageScore: 0,
+                },
+                recordingTimestamp: curr.recordingTimestamp || '',
+              });
+            }
+            return acc;
+          }, []);
+
+          console.log('UNIQUE QUESTIONS!!', questions);
+          setQuestions(questions)
+          console.log('XXXX QUESTION 0 ', questions[0])
+          console.log('XXXX QUESTION 0 ID ', questions[0].id)
+          setQuestion(questions[0])
+          setQuestionIndex(0)
+
+          if (questions.length > 0) {
+            // Convert all answers from all questions into versions
+            const demoVersions = questions
+              .flatMap((q: { answers?: Array<{ answerId: string; answer: string; scores: ScoringResult; recordingTimestamp: string }>; }) => q.answers || [])
+              .map((answer: { answerId: string; answer: string; scores: ScoringResult; recordingTimestamp: string }) => ({
+                answerId: answer.answerId,
+                questionId: getQuestionId(question),
+                transcript: answer.answer,
+                aiScoringResult: answer.scores,
+                audioUrl: '',
+                recordingTimestamp: new Date(answer.recordingTimestamp),
+              }))
+              .sort((a: { answerId: number }, b: { answerId: number }) => b.answerId - a.answerId) as Array<{
+                answerId: string;
+                questionId: string;
+                transcript: string | null;
+                aiScoringResult: ScoringResult | null;
+                audioUrl: string;
+                recordingTimestamp: Date;
+              }>;
+            console.log('DEMO VERSIONS', demoVersions)
+            setVersions(demoVersions)
+            setExpandedVersionIndex(0)
           }
         } else {
           router.push('/');
@@ -231,6 +302,7 @@ export function InterviewPracticeContent() {
 
   return (
     <>
+      <ConditionalHeader />
       <div className="flex flex-col min-h-screen bg-[#111827]">
         <div className="flex-grow flex justify-center px-4 sm:px-6 lg:px-8 mt-6">
           <div className="w-full max-w-3xl p-6 sm:p-8 sm:space-y-8 bg-[#1F2937] rounded-xl shadow-md mb-4">
@@ -332,18 +404,19 @@ export function InterviewPracticeContent() {
                   disabled={questions.length < 0 || !manualTranscript.trim()}
                   onClick={async () => {
                   setEvaluatingState('Evaluating');
-                  const answerId = await saveAnswer(question?.id?.toString() || '', manualTranscript);
+                  const answerId = await saveAnswer(question?.id?.toString() || '', manualTranscript)
+                  console.log('XXXX ANSWER ID ', answerId)
                   const newVersion = {
-                    answerId,
+                    answerId: answerId.toString(),
                     questionId: question?.id?.toString() || '',
                     transcript: manualTranscript,
                     aiScoringResult: null,
                     audioUrl: '',
                     recordingTimestamp: new Date(),
                   };
-                  setVersions(prevVersions => [newVersion, ...prevVersions]);
-                  handleAiScoring(answerId, 0);
-                  setManualTranscript('');
+                  setVersions(prevVersions => [newVersion, ...prevVersions])
+                  handleAiScoring(answerId, 0)
+                  setManualTranscript('')
                 }}
               >
                 {evaluatingState === 'Ready' ? 'Evaluate Answer' : 'Evaluating...'}

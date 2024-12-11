@@ -21,9 +21,8 @@ export async function GET(request: NextRequest) {
     console.log('profileId', profileId)
     console.log('interviewId', interviewId)
 
-    const initialReadiness = await getInitialReadiness(profileId)
+    const initialReadiness = await getInitialReadiness(profileId, interviewId)
     console.log('XXX initialReadiness', initialReadiness)
-    // console.log('category', category)
 
     // if (!CATEGORIES.includes(category)) {
     //   return NextResponse.json({ content: `Category not found: ${category}` }, { status: 400 })
@@ -50,10 +49,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function getInitialReadiness(profileId: string): Promise<string> {
+async function getInitialReadiness(profileId: string, interviewId: string): Promise<string> {
 
   try {
-    const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-initial`)
+    const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-initial`, interviewId)
 
     console.log('XXX promptData.userPrompt', promptData.userPrompt)
 
@@ -78,8 +77,8 @@ async function getInitialReadiness(profileId: string): Promise<string> {
 }
 
 async function generateReadinessEvaluation(profileId: string, interviewId: string, category: string): Promise<ReadinessData> {
-  // const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-${category.toLowerCase()}`)
-  const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready`)
+  // const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-${category.toLowerCase()}`, interviewId)
+  const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready`, interviewId)
 
   console.log('xx interviewId', interviewId)
   const chatHistory = await getChatHistory(profileId, interviewId)

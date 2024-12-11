@@ -1,19 +1,12 @@
 'use client'
 
 import { Header } from '@/components/header'
-import { isDemoAtom } from '@/stores/profileAtoms'
-import { useAtomValue } from 'jotai'
+import { isDemoAtom, userIdAtom } from '@/stores/profileAtoms'
+import { useAtom, useAtomValue } from 'jotai'
 
-interface ConditionalHeaderProps {
-  userId: string | null
-}
-
-export function ConditionalHeader({ userId }: ConditionalHeaderProps) {
+export function ConditionalHeader() {
+  const [userId] = useAtom(userIdAtom)
   const isDemo = useAtomValue(isDemoAtom)
 
-  if (userId || isDemo) {
-    return <Header />
-  }
-
-  return null
+  return (userId || isDemo) && <Header />
 }

@@ -3,8 +3,8 @@
 import { HeroSection } from '@/components/hero-section'
 import { Button } from '@/components/ui/button'
 import { profileIdAtom } from '@/stores/profileAtoms'
-import { useAtom } from 'jotai'
 import { removeDemoData } from '@/utils/auth'
+import { useAtom } from 'jotai'
 import Cookies from 'js-cookie'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -17,9 +17,12 @@ export default function Home() {
 
   const handleUploadResume = async () => {
     removeDemoData()
+    setIsUploading(true)
     uploadResume().then(uploaded => {
       if (uploaded) {
         router.push('/profile-setup')
+      } else {
+        setIsUploading(false)
       }
     })
   }
@@ -27,7 +30,7 @@ export default function Home() {
   const handleSignIn = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
     removeDemoData()
-    router.push("/sign-in")
+    router.push('/sign-in')
   }
 
   const uploadResume = async (): Promise<boolean> => {
@@ -44,7 +47,7 @@ export default function Home() {
         }
 
         try {
-          setIsUploading(true)
+
           const formData = new FormData()
           formData.append('resume', file)
           formData.append('filename', file.name)
@@ -70,8 +73,6 @@ export default function Home() {
         } catch (error) {
           console.error('Upload error:', error)
           resolve(false)
-        } finally {
-          setIsUploading(false)
         }
       }
 
@@ -80,7 +81,7 @@ export default function Home() {
   }
 
    return (
-    <div className="flex flex-col items-center min-h-screen px-4 py-12 bg-gradient-to-b from-background to-muted">
+    <div className="flex flex-col items-center min-h-[100dvh] px-4 py-12 bg-gradient-to-b from-background to-muted">
       <HeroSection />
 
       <div className="flex flex-col gap-4 w-full max-w-sm">
@@ -90,7 +91,9 @@ export default function Home() {
           onClick={handleUploadResume}
           disabled={isUploading}
         >
-          {isUploading ? "Uploading..." : "Start with your resume"}
+          <span className="min-w-[200px]">
+            {isUploading ? "Uploading..." : "Start with your resume"}
+          </span>
         </Button>
 
         <div className="text-center mt-4">

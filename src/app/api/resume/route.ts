@@ -11,7 +11,6 @@ const openai = new OpenAI({
 })
 
 export async function POST(request: Request) {
-  console.log('POST request received for resume')
   try {
     const formData = await request.formData()
     const resume = formData.get('resume') as File
@@ -122,6 +121,8 @@ async function parseResume(resumeText: string): Promise<string> {
 
 async function insertProfile(resumeJson: string): Promise<string> {
   const parsed = JSON.parse(resumeJson)
+
+  // Convert "Not Specified" to null for each field
   const {
     firstName,
     lastName,
@@ -132,9 +133,13 @@ async function insertProfile(resumeJson: string): Promise<string> {
     email,
     phone,
     linkedInURL
-  } = parsed
+  } = Object.fromEntries(
+    Object.entries(parsed).map(([key, value]) =>
+      [key, value === "Not Specified" ? null : value]
+    )
+  )
 
-  const graduation_date = new Date(`6/1/${graduationYear}`)
+  const graduation_date = graduationYear ? new Date(`6/1/${graduationYear}`) : null
   const table = getTable('profiles')
   const insertProfileQuery = `
     INSERT INTO ${table} (

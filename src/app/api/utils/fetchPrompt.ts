@@ -31,9 +31,9 @@ export interface PromptData {
   maxCompletionTokens: number;
 }
 
-export async function fetchPrompt(profileId: string, promptKey: string, questionId?: string, answerId?: string, content?: string): Promise<PromptData> {
-  const profileData = await fetchProfileData(profileId, questionId, answerId);
-  const rawPromptData = await fetchRawPrompt(promptKey);
+export async function fetchPrompt(profileId: string, promptKey: string, interviewId?: string, questionId?: string, answerId?: string, content?: string): Promise<PromptData> {
+  const profileData = await fetchProfileData(profileId, interviewId, questionId, answerId)
+  const rawPromptData = await fetchRawPrompt(promptKey)
 
   return {
     model: rawPromptData.model,
@@ -44,15 +44,15 @@ export async function fetchPrompt(profileId: string, promptKey: string, question
   };
 }
 
-async function fetchProfileData(profileId: string, questionId?: string, answerId?: string): Promise<ProfileData> {
+async function fetchProfileData(profileId: string, interviewId?: string, questionId?: string, answerId?: string): Promise<ProfileData> {
   const todayDate = new Date();
   const todayDateFormatted = todayDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-  const PROFILES_TABLE = getTable('profiles');
-  const INTERVIEWS_TABLE = getTable('interviews');
-  const RESUMES_TABLE = getTable('resumes');
-  const QUESTIONS_TABLE = getTable('questions');
-  const ANSWERS_TABLE = getTable('answers');
+  const PROFILES_TABLE = getTable('profiles')
+  const INTERVIEWS_TABLE = getTable('interviews')
+  const RESUMES_TABLE = getTable('resumes')
+  const QUESTIONS_TABLE = getTable('questions')
+  const ANSWERS_TABLE = getTable('answers')
 
   const PROFILE_QUERY = `SELECT school, major, concentration, graduation_date
       FROM "${PROFILES_TABLE}"
@@ -61,16 +61,19 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
   const INTERVIEW_QUERY = `SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role, interviewer_linkedin_url, interviewer_linkedin_text
       FROM "${INTERVIEWS_TABLE}"
       WHERE profile_id = $1
-      ORDER BY created_at DESC LIMIT 1`;
+      AND id = $2
+      ORDER BY created_at DESC LIMIT 1`
 
   const RESUME_QUERY = `SELECT url, text
       FROM "${RESUMES_TABLE}"
       WHERE profile_id = $1
-      ORDER BY created_at DESC LIMIT 1`;
+      ORDER BY created_at DESC LIMIT 1`
 
   const [profileDetails, interviewDetails, resumeDetails, questionDetails, answerDetails] = await Promise.all([
     sql.query(PROFILE_QUERY, [profileId]),
-    sql.query(INTERVIEW_QUERY, [profileId]),
+    interviewId
+      ? sql.query(INTERVIEW_QUERY, [profileId, interviewId])
+      : Promise.resolve({ rows: [] }),
     sql.query(RESUME_QUERY, [profileId]),
     questionId
       ? sql.query(`SELECT question FROM "${QUESTIONS_TABLE}" WHERE profile_id = $1 AND id = $2`, [profileId, questionId])
@@ -84,21 +87,29 @@ async function fetchProfileData(profileId: string, questionId?: string, answerId
   console.log('Interview rows:', interviewDetails.rows.length);
   console.log('Resume rows:', resumeDetails.rows.length);
 
-  if (profileDetails.rows.length === 0) throw new Error(`Profile not found for ID: ${profileId}`);
-  if (interviewDetails.rows.length === 0) throw new Error(`Interview not found for profile ID: ${profileId}`);
-  if (resumeDetails.rows.length === 0) throw new Error(`Resume not found for profile ID: ${profileId}`);
-  if (questionId && questionDetails.rows.length === 0) throw new Error("Question not found");
-  if (answerId && answerDetails.rows.length === 0) throw new Error("Answers not found");
+  if (profileDetails.rows.length === 0) throw new Error(`Profile not found for ID: ${profileId}`)
+  if (interviewId && interviewDetails.rows.length === 0) throw new Error(`Interview not found for profile ID: ${profileId}`)
+  if (resumeDetails.rows.length === 0) throw new Error(`Resume not found for profile ID: ${profileId}`)
+  if (questionId && questionDetails.rows.length === 0) throw new Error("Question not found")
+  if (answerId && answerDetails.rows.length === 0) throw new Error("Answers not found")
 
-  const { school: schoolName, major: schoolMajor, concentration: schoolConcentration, graduation_date: graduationDate } = profileDetails.rows[0];
-  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, interviewer_name: interviewerName, interviewer_role: interviewerRole, interviewer_linkedin_url: interviewerLinkedInUrl, interviewer_linkedin_text: interviewerLinkedInText } = interviewDetails.rows[0];
+  const { school: schoolName, major: schoolMajor, concentration: schoolConcentration, graduation_date: graduationDate } = profileDetails.rows[0]
+  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, interviewer_name: interviewerName, interviewer_role: interviewerRole, interviewer_linkedin_url: interviewerLinkedInUrl, interviewer_linkedin_text: interviewerLinkedInText } = interviewDetails.rows[0] || {
+    company_url: null,
+    company_text: null,
+    jd_url: null,
+    jd_text: null,
+    interviewer_name: null,
+    interviewer_role: null,
+    interviewer_linkedin_url: null,
+    interviewer_linkedin_text: null
+  }
   const { url: resumeUrl, text: resume } = resumeDetails.rows[0];
   const question = questionId ? questionDetails.rows[0]?.question : null;
   const answer = answerId ? answerDetails.rows[0]?.answer : null;
 
   const gradYear = new Date(graduationDate).getFullYear();
   const gradeClass = await fetchGradeClass(gradYear, todayDate);
-  console.debug('gradYear, todayDate, gradeClass:', gradYear, todayDate, gradeClass);
 
   return {
     profileId,

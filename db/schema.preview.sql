@@ -60,7 +60,7 @@ CREATE TABLE aic_preview_interviews (
     interviewer_name VARCHAR(255),
     interviewer_role VARCHAR(255),
     interviewer_linkedin_url VARCHAR(255),
-    interviewer_linkedin_text VARCHAR(255),
+    interviewer_linkedin_text TEXT,
     interview_date TIMESTAMP WITH TIME ZONE,
     readiness VARCHAR(255),
     is_demo BOOLEAN DEFAULT FALSE,
@@ -112,8 +112,9 @@ CREATE TABLE aic_preview_airesponses (
     id SERIAL PRIMARY KEY,
     profile_id INTEGER NOT NULL,
     interview_id INTEGER NOT NULL,
-    generated_company_info TEXT,
-    generated_interview_prep_info TEXT,
+    generated_company_prep TEXT,
+    generated_interviewer_prep TEXT,
+    generated_question_prep TEXT,
     usage JSON,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -266,3 +267,13 @@ BEFORE UPDATE ON aic_preview_interview_readiness_chat_history
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
 
+-- Billing
+DROP TABLE IF EXISTS aic_preview_billing CASCADE;
+CREATE TABLE aic_preview_billing (
+    id SERIAL PRIMARY KEY,
+    profile_id INTEGER NOT NULL,
+    paid_interviews INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES aic_preview_profiles(id) ON DELETE CASCADE
+);

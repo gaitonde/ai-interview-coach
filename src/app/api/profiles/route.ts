@@ -6,7 +6,6 @@ const PROFILES_TABLE = getTable('profiles')
 const JOBS_TABLE = getTable('interviews')
 
 export async function GET(request: Request) {
-  console.debug('in profile route GET')
   try {
     const { searchParams } = new URL(request.url)
     const profileId = searchParams.get('profileId')

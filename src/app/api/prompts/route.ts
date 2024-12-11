@@ -5,8 +5,6 @@ import { getTable } from "@/lib/db";
 const TABLE = getTable('prompts');
 
 export async function GET(request: Request) {
-  console.log('Fetching prompts');
-
   try {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');

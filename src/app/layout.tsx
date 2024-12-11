@@ -1,14 +1,13 @@
 import { Footer } from "@/components/footer"
-import { ConditionalHeader } from "@/components/conditional-header"
-import { Toaster } from "@/components/ui/toaster"
+import { AtomProvider } from '@/components/providers/atom-provider'
+import { Toaster } from '@/components/ui/toaster'
 import {
   ClerkProvider
 } from '@clerk/nextjs'
 import { Analytics } from '@vercel/analytics/react'
-import type { Metadata } from "next"
-import localFont from "next/font/local"
-import "./globals.css"
-import { auth } from "@clerk/nextjs/server"
+import type { Metadata } from 'next'
+import localFont from 'next/font/local'
+import './globals.css'
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,16 +30,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { userId } = await auth()
-
   return (
     <ClerkProvider afterSignOutUrl="/home">
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}>
           <div className="min-h-screen flex flex-col">
             <div className="max-w-7xl mx-auto w-full bg-[#1a1f2b]">
-              <ConditionalHeader userId={userId} />
-              {children}
+              <AtomProvider>
+                {children}
+              </AtomProvider>
               <Footer />
             </div>
             <Toaster />

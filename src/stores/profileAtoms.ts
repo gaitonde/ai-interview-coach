@@ -1,7 +1,40 @@
-import { atomWithStorage } from 'jotai/utils'
+import { atom } from 'jotai'
+import { getFromLocalStorage, setToLocalStorage } from '@/utils/localStorage'
 
-export const profileIdAtom = atomWithStorage<string | null>('profileId', null)
-export const userIdAtom = atomWithStorage<string | null>('userId', null)
-export const interviewIdAtom = atomWithStorage<string | null>('interviewId', null)
-export const isDemoAtom = atomWithStorage('isDemo', false)
-export const showScoreAtom = atomWithStorage('showScore', false)
+// Initialize atoms with values from localStorage
+const initialProfileId = getFromLocalStorage('profileId') || ''
+const initialUserId = getFromLocalStorage('userId') || ''
+const initialInterviewId = getFromLocalStorage('interviewId') || ''
+const initialIsDemo = getFromLocalStorage('isDemo') || false
+const initialShowScore = getFromLocalStorage('showScore') || false
+
+export const profileIdAtom = atom(initialProfileId)
+export const userIdAtom = atom(initialUserId)
+export const interviewIdAtom = atom(initialInterviewId)
+export const isDemoAtom = atom(initialIsDemo)
+export const showScoreAtom = atom(initialShowScore)
+
+// Create wrapper atoms that sync with localStorage
+export const profileIdAtomWithStorage = atom(
+  (get) => get(profileIdAtom),
+  (get, set, newValue: string) => {
+    set(profileIdAtom, newValue)
+    setToLocalStorage('profileId', newValue)
+  }
+)
+
+export const userIdAtomWithStorage = atom(
+  (get) => get(userIdAtom),
+  (get, set, newValue: string) => {
+    set(userIdAtom, newValue)
+    setToLocalStorage('userId', newValue)
+  }
+)
+
+export const interviewIdAtomWithStorage = atom(
+  (get) => get(interviewIdAtom),
+  (get, set, newValue: string) => {
+    set(interviewIdAtom, newValue)
+    setToLocalStorage('interviewId', newValue)
+  }
+)

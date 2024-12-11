@@ -26,11 +26,10 @@ export async function POST(req: NextRequest) {
 
     console.log('IN generate-feedback', profileId, questionId, answerId);
 
-    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-generate-feedback', questionId, answerId);
+    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-generate-feedback', interviewId, questionId, answerId);
     // const scoredCategories = categories.map(cat => `${cat.name}: ${cat.score}/10`).join('\n');
     // promptData.userPrompt = promptData.userPrompt.replace('${scoredCategories}', scoredCategories);
 
-    // console.log('PPP  IN generate-feedback system promptData', promptData.systemPrompt);
     console.log('IN generate-feedback user promptData', promptData.userPrompt);
 
     const completion = await openai.chat.completions.create({
@@ -44,7 +43,6 @@ export async function POST(req: NextRequest) {
     });
 
     const feedback = completion.choices[0]?.message?.content;
-    // console.log('Feedback :', feedback);
 
     if (feedback) {
       const table = getTable('feedback');

@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { interviewIdAtom, isDemoAtom, profileIdAtom } from '@/stores/profileAtoms'
+import { useAtom } from 'jotai'
+import React, { useEffect, useRef, useState } from 'react'
+import Markdown from 'react-markdown'
 import CircularProgress from './circular-progress'
 import { Separator } from './ui/separator'
-import Markdown from 'react-markdown'
-import { useAtom } from 'jotai'
-import { isDemoAtom, interviewIdAtom, profileIdAtom } from '@/stores/profileAtoms'
 
 interface Category {
   name: string
@@ -16,19 +16,19 @@ interface Feedback {
 }
 
 interface EvaluationRatingProps {
-  finalScore: number;
-  averageScore: number;
-  definedRound: string;
-  categories: Category[];
-  transcript: string | null;
-  audioUrl: string;
-  recordingTimestamp: Date | null;
-  versionNumber: number;
-  isExpanded: boolean;
-  answerId: string;
-  questionId: string;
-  question: string;
-  onToggle: () => void;
+  finalScore: number
+  averageScore: number
+  definedRound: string
+  categories: Category[]
+  transcript: string | null
+  audioUrl: string
+  recordingTimestamp: Date | null
+  versionNumber: number
+  isExpanded: boolean
+  answerId: string
+  questionId: string
+  question: string
+  onToggle: () => void
 }
 
 export default function Scoring({
@@ -58,6 +58,11 @@ export default function Scoring({
 
   useEffect(() => {
     const fetchFeedback = async () => {
+      console.log('Fetching feedback with:', {
+        profileId,
+        questionId,
+        answerId
+      })
       try {
         const response = await fetch(`/api/feedback?profileId=${profileId}&questionId=${questionId}&answerId=${answerId}`);
         if (!response.ok) {
@@ -71,6 +76,7 @@ export default function Scoring({
         // Handle error (e.g., show an error message to the user)
       }
     }
+
     const generateFeedback = async () => {
 
       try {
@@ -96,10 +102,10 @@ export default function Scoring({
 
     if (isDemo && !hasFetchedRef.current && questionId && answerId) {
       hasFetchedRef.current = true;
-      fetchFeedback();
+      fetchFeedback()
     } else if (!hasFetchedRef.current) {
       hasFetchedRef.current = true;
-      generateFeedback();
+      generateFeedback()
     }
 
     // Initialize refs for each category
@@ -122,9 +128,8 @@ export default function Scoring({
       })
     : 'Date not available';
 
-  //to satisfy the type checker
-  console.debug('finalScore', finalScore);
-  console.debug('definedRound', definedRound);
+  // console.debug('finalScore', finalScore);
+  // console.debug('definedRound', definedRound);
 
 
   // Add this CSS class to your existing styles

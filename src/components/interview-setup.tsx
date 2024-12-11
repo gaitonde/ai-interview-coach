@@ -1,9 +1,9 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { interviewIdAtom, profileIdAtom, userIdAtom } from "@/stores/profileAtoms"
-import { useAtom, useAtomValue } from "jotai"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { interviewIdAtom, profileIdAtom } from '@/stores/profileAtoms'
+import { useAtom, useAtomValue } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
@@ -25,7 +25,6 @@ export function InterviewSetup() {
 
 
   useEffect(() => {
-
     if (isDemo && profileId) {
       loadInterview(profileId!, interviewId!)
     }
@@ -47,40 +46,40 @@ export function InterviewSetup() {
 
 
   const loadInterview = async (profileId: string, interviewId: string) => {
-    //TODO: dont send interviewId if it is not set
-    const response = await fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`)
-    const json = await response.json()
-    console.log('XX interviews: ', json)
-    const interview = json.content || json
 
-    if (!interview) {
-      console.error('No interview data found')
-      return null
-    }
+      const response = await fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`)
+      const json = await response.json()
+      const interview = json.content || json
 
-    if (formRef.current) {
-      const form = formRef.current
-      if (interview) {
-        const companyUrlInput = form.elements.namedItem('company_url') as HTMLInputElement;
-        companyUrlInput.value = interview.company_url || '';
-
-        const jdUrlInput = form.elements.namedItem('jd_url') as HTMLInputElement;
-        jdUrlInput.value = interview.jd_url || '';
-
-        const interviewerNameInput = form.elements.namedItem('interviewer_linkedin_url') as HTMLInputElement;
-        interviewerNameInput.value = interview.interviewer_linkedin_url || '';
-
-        const interviewerRoleInput = form.elements.namedItem('interviewer_role') as HTMLInputElement;
-        interviewerRoleInput.value = interview.interviewer_role || '';
-
-        const interviewDateInput = form.elements.namedItem('interview_date') as HTMLInputElement;
-        const dateValue = interview.interview_date ? new Date(interview.interview_date).toISOString().split('T')[0] : '';
-        interviewDateInput.value = dateValue;
+      if (!interview) {
+        console.error('No interview data found')
+        return null
       }
-    }
 
-    return interview;
+      if (formRef.current) {
+        const form = formRef.current
+        if (interview) {
+          const companyUrlInput = form.elements.namedItem('company_url') as HTMLInputElement;
+          companyUrlInput.value = interview.company_url || '';
+
+          const jdUrlInput = form.elements.namedItem('jd_url') as HTMLInputElement;
+          jdUrlInput.value = interview.jd_url || '';
+
+          const interviewerNameInput = form.elements.namedItem('interviewer_linkedin_url') as HTMLInputElement;
+          interviewerNameInput.value = interview.interviewer_linkedin_url || '';
+
+          const interviewerRoleInput = form.elements.namedItem('interviewer_role') as HTMLInputElement;
+          interviewerRoleInput.value = interview.interviewer_role || '';
+
+          const interviewDateInput = form.elements.namedItem('interview_date') as HTMLInputElement;
+          const dateValue = interview.interview_date ? new Date(interview.interview_date).toISOString().split('T')[0] : '';
+          interviewDateInput.value = dateValue;
+        }
+      }
+
+    return interview
   }
+
   const saveInterview = async (profileId: string, formData: FormData) => {
     try {
       const response = await fetch(`/api/interviews`, {
@@ -99,7 +98,11 @@ export function InterviewSetup() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create job record');
+        console.log('XXX response', response)
+        const result = await response.json()
+        console.log('XXX result message', result.message)
+        setError(result.message)
+        return
       }
 
       const result = await response.json()
@@ -108,14 +111,13 @@ export function InterviewSetup() {
 
       return interviewId
     } catch (error) {
-      console.error('Error creating job record:', error);
-      throw error;
+      throw error
     }
   };
 
   const generateJobPrep = async (profileId: string, interviewId: string) => {
     try {
-      const response = await fetch('/api/generate-company-info', {
+      const response = await fetch('/api/generate-company-prep', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,13 +126,17 @@ export function InterviewSetup() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate prep sheet');
+        console.log('XXX response', response)
+        const result = await response.json()
+        console.log('XXX result message', result.message)
+        setError(result.message)
+        return
       }
 
-      const result = await response.json();
+      const result = await response.json()
       return result.content;
     } catch (error) {
-      console.error('Error generating prep sheet:', error);
+      console.error('Error generating company prep:', error);
       throw error;
     }
   };
@@ -168,7 +174,7 @@ export function InterviewSetup() {
       }
     }
 
-    return null;
+    return null
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -186,30 +192,34 @@ export function InterviewSetup() {
 
     const validationError = validateForm(formData);
     if (validationError) {
-      setError(validationError);
-      setIsSubmitting(false);
-      return;
+      setError(validationError)
+      setIsSubmitting(false)
+      return
     }
 
     try {
       if (!profileId) {
-        throw new Error('Profile ID not found');
+        setError('Profile ID not found')
+        return
       }
       const interviewId = await saveInterview(profileId, formData)
-      await generateJobPrep(profileId, interviewId)
-
-      router.push(`/company-prep`);
+      if (interviewId) {
+        await generateJobPrep(profileId, interviewId)
+        router.push(`/company-prep`)
+      } else {
+        setIsSubmitting(false)
+      }
     } catch (error) {
-      console.error('Error during submission:', error);
-      setError('An error occurred. Please try again.');
+      console.error('Error during submission:', error)
+      setError('An error occurred. Please try again.')
+      setIsSubmitting(false)
     } finally {
-      setIsSubmitting(false);
     }
   }
 
   return (
     <>
-      <div className="flex-grow flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-[#252b3b] p-8 rounded-lg shadow-lg my-4">
           <div className="text-center">
             <h2 className="mt-2 text-3xl font-bold text-white">Interview Setup</h2>
@@ -289,7 +299,7 @@ export function InterviewSetup() {
             >
               {isSubmitting ? statusMessage : isDemo ? 'Next' : 'Save'}
             </Button>
-            <p className="text-sm text-muted-foreground mt-1 text-center">
+            <p className="text-sm mt-1 text-center">
               {isSubmitting && (
                 'Takes about 30 seconds, please be patient. Thank you.'
               )}

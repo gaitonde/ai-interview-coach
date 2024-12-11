@@ -9,6 +9,7 @@ import { AlertCircle, Briefcase, Calendar, Frown, Meh, Smile, Target, User } fro
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { ConditionalHeader } from "./conditional-header"
 
 type Interview = {
   interviewer_name: string
@@ -134,12 +135,6 @@ export function InterviewReady() {
   // }, [searchParams])
 
   useEffect(() => {
-    // const interviewId = searchParams.get('interviewId')
-    // if (!interviewId || !profileId) {
-    //   console.error('Missing interviewId or profileId')
-    //   return
-    // }
-    // fetch(`/api/interviews?profileId=41&interviewId=6`)
     fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`)
     .then(response => {
       if (!response.ok) {
@@ -148,7 +143,6 @@ export function InterviewReady() {
       return response.json();
     })
     .then(data => {
-      console.log('Raw API response:', data.content);
       setInterview({
         interviewer_name: data.content.interviewer_name,
         interviewer_role: data.content.interviewer_role,
@@ -164,6 +158,8 @@ export function InterviewReady() {
   }, [searchParams])
 
   return (
+    <>
+    <ConditionalHeader />
     <div className="bg-[#1a1f2b] px-4 py-4">
       <div className="max-w-4xl mx-auto bg-[#252b3b] rounded-lg shadow-xl overflow-hidden">
         <div className="p-6 sm:p-8">
@@ -291,7 +287,7 @@ export function InterviewReady() {
                     className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm mt-4"
                     onClick={() => router.push('/interview-practice')}
                   >
-                    Start Rubric
+                    Start Interview Jam Session
                   </Button>
                 </CardContent>
               </Card>
@@ -323,6 +319,7 @@ export function InterviewReady() {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

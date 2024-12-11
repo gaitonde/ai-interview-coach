@@ -32,18 +32,16 @@ interface ScoringResult {
 }
 
 export async function POST(req: NextRequest) {
-  console.log('IN generate-ai-score');
+  console.log('in generate-ai-score')
   try {
-    const body = await req.json();
-    const { profileId, questionId, answerId } = body;
+    const body = await req.json()
+    const { profileId, interviewId, questionId, answerId } = body
 
     if (!questionId || !answerId) {
-      return NextResponse.json({ error: 'Question ID and Answer ID are required' }, { status: 400 });
+      return NextResponse.json({ error: 'Question ID and Answer ID are required' }, { status: 400 })
     }
 
-    console.log('PPP  IN generate-ai-score fetchPrompt', questionId, answerId);
-    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-answer-score', questionId, answerId);
-    console.log('IN generate-ai-score promptData');
+    const promptData: PromptData = await fetchPrompt(profileId, 'prompt-answer-score', interviewId, questionId, answerId);
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,

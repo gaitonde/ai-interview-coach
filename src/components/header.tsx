@@ -1,8 +1,8 @@
 'use client'
 
 import { useAuth } from '@clerk/nextjs'
-import Link from "next/link"
-import { UserMenu } from "./user-menu"
+import Link from 'next/link'
+import { UserMenu } from '@/components/user-menu'
 
 export function Header() {
   const { userId } = useAuth()

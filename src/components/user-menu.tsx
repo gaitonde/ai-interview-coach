@@ -21,13 +21,15 @@ export function UserMenu() {
           <DropdownMenuItem onClick={() => router.push('/dashboard')} className="cursor-pointer hover:bg-[#374151]">
               Dashboard
             </DropdownMenuItem>
+{/* TODO (DG: 12/11/2024): uncomment after being able to handle resume updates/versioning
             <DropdownMenuItem onClick={() => router.push('/profile-setup')} className="cursor-pointer hover:bg-[#374151]">
               Profile
             </DropdownMenuItem>
+             */}
             <DropdownMenuItem onClick={() => router.push('/billing')} className="cursor-pointer hover:bg-[#374151]">
               Billing
             </DropdownMenuItem>
-            <SignOutButton redirectUrl="/sign-in">
+            <SignOutButton redirectUrl="/home">
               <DropdownMenuItem
                 className="cursor-pointer hover:bg-[#374151]"
               >

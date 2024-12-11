@@ -1,53 +1,69 @@
 'use client'
+import { ConditionalHeader } from '@/components/conditional-header'
 import Dashboard from '@/components/dashboard'
 import { useRouter } from "next/navigation"
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAtom } from 'jotai'
-import { userIdAtom } from '@/stores/profileAtoms'
+import { profileIdAtom, userIdAtom } from '@/stores/profileAtoms'
 
 export default function Home() {
   const router = useRouter()
-  const [userId] = useAtom(userIdAtom)
+  const [atomUserId] = useAtom(userIdAtom)
+  const [profileId] = useAtom(profileIdAtom)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-  // Handle authentication check and redirect
   useEffect(() => {
-    if (!userId) {
+    if (atomUserId) {
+      setIsLoggedIn(true)
+    }
+  }, [atomUserId, profileId])
+
+  useEffect(() => {
+
+    if (atomUserId) {
+      setIsLoggedIn(true)
+    }
+  }, [atomUserId, profileId])
+
+  useEffect(() => {
+    if (!atomUserId) {
       console.debug('User is loaded and not authenticated!')
       router.push('home')
-    } else {
-      console.log('User is loaded and authenticated!')
-
-      fetch(`/api/users?id=${userId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('User data:', data)
-        console.log('data.profile', data.profile)
-        if (!data.profile.school) {
-          router.push('/profile-setup')
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching user:', error)
-      })
+      return
     }
-  }, [userId, router])
 
-  // Show loading state while auth is loading
-  if (!userId) {
+    console.log('User is loaded and authenticated!')
+    fetch(`/api/users?id=${atomUserId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('User data:', data)
+      console.log('data.profile', data.profile)
+      if (!data.profile.school) {
+        router.push('/profile-setup')
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching user:', error)
+    })
+  }, [atomUserId, router])
+
+  if (!isLoggedIn) {
     return (
       <div className="flex flex-col items-center min-h-screen px-4 py-12 bg-gradient-to-b from-background to-muted">
+        <p>Loading...</p>
       </div>
     )
   }
 
   return (
     <>
-      {userId && <Dashboard />}
+      <ConditionalHeader />
+      {atomUserId && <Dashboard />}
     </>
   )
 }

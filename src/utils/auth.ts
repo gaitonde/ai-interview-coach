@@ -15,7 +15,7 @@ export const useLogout = () => {
     // Sign out from Clerk
     await signOut()
     // Redirect to sign-in page
-    router.push('/sign-in')
+    router.push('/home')
   };
 
   return logout;

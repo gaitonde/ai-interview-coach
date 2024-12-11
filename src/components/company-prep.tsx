@@ -8,6 +8,7 @@ import MarkdownRenderer from './markdown-renderer'
 import { RubricScorer } from './rubric-scorer'
 import { useAtom } from "jotai"
 import { interviewIdAtom, isDemoAtom, profileIdAtom, showScoreAtom } from "@/stores/profileAtoms"
+import { ConditionalHeader } from "./conditional-header"
 
 export default function CompanyPrep() {
   const router = useRouter()
@@ -21,7 +22,7 @@ export default function CompanyPrep() {
   const [showScore] = useAtom(showScoreAtom)
   useEffect(() => {
     if (profileId) {
-      fetch(`/api/generated-company-info?profileId=${profileId}&interviewId=${interviewId}`)
+      fetch(`/api/company-prep?profileId=${profileId}&interviewId=${interviewId}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Failed to fetch prep sheet response')
@@ -29,7 +30,6 @@ export default function CompanyPrep() {
           return response.json();
         })
         .then(data => {
-          console.log('should be setting content', data)
           setContent('# Company Scoop\n\n' + data.content)
         })
         .catch(error => {
@@ -62,6 +62,7 @@ export default function CompanyPrep() {
     }
 
     setIsSubmitting(true)
+    //TODO: try to get first; if not generate
     if (!isDemo && profileId) {
       await generateInterviewPrep(profileId)
     }
@@ -91,6 +92,8 @@ export default function CompanyPrep() {
   };
 
   return (
+    <>
+    <ConditionalHeader />
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-background to-muted px-4">
       <div className="flex-grow flex justify-center">
         <div className="w-full max-w-4xl prep-sheet-content overflow-hidden">
@@ -133,7 +136,7 @@ export default function CompanyPrep() {
                 >
                   {isSubmitting ? statusMessage : 'Next'}
                 </Button>
-                <p className="text-sm text-muted-foreground mt-1 text-center">
+                <p className="text-sm mt-1 text-center">
                 {isSubmitting && (
                   'Takes about 30 seconds, please be patient. Thank you.'
                 )}
@@ -148,5 +151,6 @@ export default function CompanyPrep() {
         </div>
       </div>
     </div>
+    </>
   )
 }
