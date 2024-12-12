@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-const isPublicRoute = createRouteMatcher(['/', '/home', '/privacy', '/terms', '/api/(.*)', '/sign-in(.*)', '/sign-up(.*)'])
+const isPublicRoute = createRouteMatcher(['/', '/start', '/privacy', '/terms', '/api/(.*)', '/sign-in(.*)', '/sign-up(.*)'])
 
 export function middleware(request: NextRequest) {
   //TODO: re-enable logging

@@ -1,64 +1,42 @@
 'use client'
+
 import { ConditionalHeader } from '@/components/conditional-header'
 import Dashboard from '@/components/dashboard'
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from 'react'
+import { userIdAtom } from '@/stores/profileAtoms'
 import { useAtom } from 'jotai'
-import { profileIdAtom, userIdAtom } from '@/stores/profileAtoms'
+import { useRouter } from "next/navigation"
+import { useEffect, useCallback } from 'react'
 
 export default function Home() {
   const router = useRouter()
-  const [atomUserId] = useAtom(userIdAtom)
-  const [profileId] = useAtom(profileIdAtom)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [atomUserId, setAtomUserId] = useAtom(userIdAtom)
 
-  useEffect(() => {
-    if (atomUserId) {
-      setIsLoggedIn(true)
-    }
-  }, [atomUserId, profileId])
+  const navigateToStart = useCallback(() => {
+    router.push('/start')
+  }, [router])
 
-  useEffect(() => {
-
-    if (atomUserId) {
-      setIsLoggedIn(true)
-    }
-  }, [atomUserId, profileId])
+  const navigateToProfileSetup = useCallback(() => {
+    router.push('/profile-setup')
+  }, [router])
 
   useEffect(() => {
     if (!atomUserId) {
-      console.debug('User is loaded and not authenticated!')
-      router.push('home')
-      return
+      navigateToStart()
+    } else {
+      fetch(`/api/users?id=${atomUserId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (!data.profile.school) {
+          navigateToProfileSetup()
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching user:', error)
+        setAtomUserId(null)
+        navigateToStart()
+      })
     }
-
-    console.log('User is loaded and authenticated!')
-    fetch(`/api/users?id=${atomUserId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('User data:', data)
-      console.log('data.profile', data.profile)
-      if (!data.profile.school) {
-        router.push('/profile-setup')
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching user:', error)
-    })
-  }, [atomUserId, router])
-
-  if (!isLoggedIn) {
-    return (
-      <div className="flex flex-col items-center min-h-screen px-4 py-12 bg-gradient-to-b from-background to-muted">
-        <p>Loading...</p>
-      </div>
-    )
-  }
+  }, [atomUserId, navigateToStart, navigateToProfileSetup])
 
   return (
     <>

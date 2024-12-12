@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-export default function Home() {
+export default function HomePage() {
   const router = useRouter()
   const [isUploading, setIsUploading] = useState(false)
   const [, setProfileId] = useAtom(profileIdAtom)
@@ -61,7 +61,6 @@ export default function Home() {
 
           const result = await response.json()
           const profileId = result.profileId
-          console.log('profileId set in ATOM!!: ', profileId)
           setProfileId(profileId)
 
           Cookies.set('profileId', profileId, {

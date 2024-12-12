@@ -1,169 +1,206 @@
-import { getTable } from "@/lib/db"
-import { sql } from "@vercel/postgres"
+import { getTable } from '@/lib/db'
+import { getPromptByKey } from '@/lib/prompts'
+import { sql } from '@vercel/postgres'
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from "openai"
-import { ChatCompletionMessageParam } from "openai/resources/chat/completions.mjs"
-import { fetchPrompt, PromptData } from "../utils/fetchPrompt"
-import {
-  // CATEGORIES,
-  // getExistingReadiness,
-  ReadinessData
-} from '../utils/readiness'
+import OpenAI from 'openai'
+import { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
 export async function GET(request: NextRequest) {
-  try {
-    //TODO: think we can remove category
-    const { profileId, interviewId, category } = Object.fromEntries(request.nextUrl.searchParams)
-    console.log('profileId', profileId)
-    console.log('interviewId', interviewId)
+  const { profileId, interviewId } = Object.fromEntries(request.nextUrl.searchParams)
+  console.log('profileId', profileId)
+  console.log('interviewId', interviewId)
 
-    const initialReadiness = await getInitialReadiness(profileId, interviewId)
-    console.log('XXX initialReadiness', initialReadiness)
-
-    // if (!CATEGORIES.includes(category)) {
-    //   return NextResponse.json({ content: `Category not found: ${category}` }, { status: 400 })
-    // }
-
-    // const existingRecord = await getExistingReadiness(profileId, interviewId, category)
-
-    // //TODO: figure out what to do if no record, upsert or return 400?
-    // if (existingRecord?.is_up_to_date) {
-    //   return NextResponse.json({ content: existingRecord })
-    // }
-
-    // console.log('New data available. Generating readiness evaluation...')
-
-    // const readinessData = await generateReadinessEvaluation(profileId, interviewId, category)
-
-    // const result = await updateReadinessRecord(profileId, interviewId, category, readinessData)
-    // return NextResponse.json({ content: result })
-    return NextResponse.json({ content: initialReadiness })
-
-  } catch (error) {
-    console.error('Interview Readiness Error:', error)
-    return NextResponse.json({ content: "Unable to get Interview Readiness content" }, { status: 500 })
+  let interviewReadiness = await getInteriewReadiness(profileId, interviewId)
+  let result = interviewReadiness.rows
+  if (interviewReadiness.needsUpdate) {
+    let messages: ChatCompletionMessageParam[] = []
+    await addChatHistory(profileId, interviewId, messages)
+    await getUnsentFeedback(profileId, interviewId, messages)
+    if (messages.length > 0) {
+      console.log('XXX after chat history')
+      const evaluation = await runPrompt(profileId, interviewId, messages)
+      console.log('XXX evaluation', evaluation)
+      //insert new chat history for assistant message
+      const newChatHistory = await insertChatHistory(profileId, interviewId, 'assistant', evaluation)
+      //make sure feedback is marked so we don't use it again
+      await updateFeedback(profileId, interviewId, newChatHistory.id)
+      //TODO: post result stuff - db,
+      await upsertInterviewReadiness(profileId, interviewId, newChatHistory.id, result)
+      interviewReadiness = await getInteriewReadiness(profileId, interviewId)
+      result = interviewReadiness.rows
+    } else {
+      console.warn('Interview readiness needs updating but there is no new feedback to use')
+    }
   }
+  console.log('XXX result', result)
+  return NextResponse.json({content: result})
 }
 
-async function getInitialReadiness(profileId: string, interviewId: string): Promise<string> {
-
-  try {
-    const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-initial`, interviewId)
-
-    console.log('XXX promptData.userPrompt', promptData.userPrompt)
-
-    const completion = await openai.chat.completions.create({
-      model: promptData.model,
-      messages: [
-        { role: "system", content: promptData.systemPrompt },
-        { role: "user", content: promptData.userPrompt }
-      ],
-      max_completion_tokens: promptData.maxCompletionTokens,
-      temperature: promptData.temperature,
-    });
-
-    const generatedContent = completion.choices[0]?.message?.content
-    console.log('generatedContent', generatedContent)
-    return generatedContent || ''
-  } catch (error) {
-    console.error('Error generating initial readiness:', error)
-    throw new Error('Unable to generate initial readiness')
-  }
-
+async function updateFeedback(profileId: string, interviewId: string, interviewReadinessChatHistoryId: string) {
+  const table = getTable('feedback')
+  const query = `
+    UPDATE ${table}
+    SET interview_readiness_chat_history_id = $1
+    WHERE profile_id = $2
+    AND interview_id = $3
+  `
+  await sql.query(query, [interviewReadinessChatHistoryId, profileId, interviewId])
 }
 
-async function generateReadinessEvaluation(profileId: string, interviewId: string, category: string): Promise<ReadinessData> {
-  // const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-${category.toLowerCase()}`, interviewId)
-  const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready`, interviewId)
-
-  console.log('xx interviewId', interviewId)
-  const chatHistory = await getChatHistory(profileId, interviewId)
-  console.log('chatHistory', chatHistory.length)
-
-  // Convert chat history to OpenAI message format
-  const messages: ChatCompletionMessageParam[] = chatHistory.map(record => ({
-    role: record.role as 'user' | 'assistant',
-    content: record.content
-  }))
-
-  // const unsentFeedback = await getUnsentFeedback(profileId, interviewId)
-
-  // // Combine all unsentFeedback into a single message
-  // const combinedFeedback = unsentFeedback.map(feedback =>
-  //   `Category: ${feedback.category}\nFeedback: ${feedback.feedback}`
-  // ).join('\n')
-
-  // messages.push({
-  //   role: 'user',
-  //   content: combinedFeedback
-  // })
-
-  console.log('Messages to be sent to OpenAI:', messages)
-
-  const completion = await openai.chat.completions.create({
-    model: promptData.model,
-    messages: messages,
-    max_completion_tokens: promptData.maxCompletionTokens,
-    temperature: promptData.temperature,
-  })
-
-  const generatedContent = completion.choices[0]?.message?.content
-  if (!generatedContent) {
-    throw new Error('Generated content is null')
-  }
-  console.log('XXX generatedContent', generatedContent)
-  // Insert user message into chat history
-  // const chatHistoryTable = getTable('interview_readiness_chat_history')
-  // const insertChatQuery = `
-  //   INSERT INTO ${chatHistoryTable} (profile_id, interview_id, role, content)
-  //   VALUES ($1, $2, $3, $4)
-  //   RETURNING id
-  // `
-  // const chatResult = await sql.query(insertChatQuery, [profileId, interviewId, 'user', combinedFeedback])
-  // const chatHistoryId = chatResult.rows[0].id
-
-  // // Update feedback records with chat history id
-  // const feedbackTable = getTable('feedback')
-  // const updateFeedbackQuery = `
-  //   UPDATE ${feedbackTable}
-  //   SET interview_readiness_chat_history_id = $1
-  //   WHERE id = ANY($2)
-  // `
-  // await sql.query(updateFeedbackQuery, [chatHistoryId, unsentFeedback.map(f => f.id)])
-
-
-  // // Insert assistant response into chat history
-  // await sql.query(insertChatQuery, [profileId, interviewId, 'assistant', generatedContent])
-
-  return JSON.parse(generatedContent)
-}
-
-async function getChatHistory(profileId: string, interviewId: string) {
+async function insertChatHistory(profileId: string, interviewId: string, role: string, content: string) {
   const table = getTable('interview_readiness_chat_history')
   const query = `
+    INSERT INTO ${table}
+    (profile_id, interview_id, role, content)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *
+  `
+  const result = await sql.query(query, [profileId, interviewId, role, content])
+  return result.rows[0]
+}
+
+async function a(profileId: string, interviewId: string) {
+  const result = await getInteriewReadiness(profileId, interviewId)
+  return NextResponse.json(result)
+}
+
+// user should see initial state of interview readiness page -
+//assuming that there are no records
+async function getInteriewReadiness(profileId: string, interviewId: string) {
+  const table = await getTable('interview_readiness')
+
+  const result = await sql.query(`
     SELECT * FROM ${table}
     WHERE profile_id = $1
     AND interview_id = $2
-    ORDER BY id DESC
-  `
-  const result = await sql.query(query, [profileId, interviewId])
-  return result.rows
+  `, [profileId, interviewId])
+
+  const needsUpdate = result.rows.some(row => !row.is_up_to_date)
+
+  return {
+    needsUpdate: needsUpdate,
+    rows: result.rows,
+  }
 }
 
-async function getUnsentFeedback(profileId: string, interviewId: string) {
+async function upsertInterviewReadiness(profileId: string, interviewId: string, chatHistoryId: string, data: any) {
+  const table = getTable('interview_readiness')
+
+  console.log('XXX data', data)
+
+  for (const key of Object.keys(data)) {
+    if (key.endsWith('_readiness_rating')) {
+      const category = key.replace('_readiness_rating', '')
+      const ratingKey = `${category}_readiness_rating`
+      const textKey = `${category}_readiness_text`
+
+      const query = `
+        INSERT INTO ${table}
+        (profile_id, interview_id, category, readiness_rating, readiness_text, is_up_to_date)
+        VALUES ($1, $2, $3, $4, $5, true)
+        ON CONFLICT (profile_id, interview_id, category) DO UPDATE
+        SET readiness_rating = EXCLUDED.readiness_rating,
+            readiness_text = EXCLUDED.readiness_text,
+            is_up_to_date = true
+      `
+      await sql.query(query, [
+        profileId,
+        interviewId,
+        category,
+        data[ratingKey],
+        data[textKey],
+      ])
+    }
+  }
+}
+
+async function getUnsentFeedback(profileId: string, interviewId: string, messages: ChatCompletionMessageParam[]) {
   const table = getTable('feedback')
   const query = `
-    SELECT * FROM ${table}
+    SELECT id, category, feedback, created_at, interview_readiness_chat_history_id FROM ${table}
     WHERE profile_id = $1
     AND interview_id = $2
     AND interview_readiness_chat_history_id IS NULL
     ORDER BY id ASC
   `
   const result = await sql.query(query, [profileId, interviewId])
+  const allUnsentFeedback = result.rows
+  const feedback = allUnsentFeedback.map(unsentFeedback =>
+    `
+      =====
+      Id: ${unsentFeedback.id}
+      Date: ${unsentFeedback.created_at}
+      Category: ${unsentFeedback.category}
+      Feedback: ${unsentFeedback.feedback}
+    `
+  ).join('\n')
 
-  return result.rows
+  const userMessage = `Please provide an updated evaluation based the following
+    feedback the user has received since the last evaluation:\n
+    ${feedback}
+  `
+
+  messages.push({
+    role: 'user',
+    content: userMessage
+  })
+  //insert this into chat history
+  await insertChatHistory(profileId, interviewId, 'user', userMessage)
 }
+
+async function runPrompt(profileId: string, interviewId: string, messages: ChatCompletionMessageParam[]) {
+  console.log('XXX messages', messages)
+  console.log('XXX messages length', messages.length)
+
+  // const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-dayal`, interviewId)
+  const prompt = await getPromptByKey('prompt-interview-ready-dayal')
+  console.log('XXX prompt', prompt)
+  const completion = await openai.chat.completions.create({
+    model: prompt.model,
+    messages: messages,
+    max_completion_tokens: prompt.max_completion_tokens,
+    temperature: prompt.temperature,
+  })
+
+  console.log('XXX completion', completion)
+
+  const generatedContent = completion.choices[0]?.message?.content
+  if (!generatedContent) {
+    throw new Error('Unable to generate interview readiness evaluation')
+  }
+  const jsonContent = generatedContent.replace('```json', '').replace('```', '')
+  const jsonObject = JSON.parse(jsonContent)
+  return jsonObject
+}
+
+async function addChatHistory(profileId: string, interviewId: string, messages: ChatCompletionMessageParam[]) {
+  const table = getTable('interview_readiness_chat_history')
+  const query = `
+    SELECT * FROM ${table}
+    WHERE profile_id = $1
+    AND interview_id = $2
+    ORDER BY id ASC
+  `
+  const result = await sql.query(query, [profileId, interviewId])
+  let chatHistory = result.rows
+
+  //lazy insert chat history
+  if (chatHistory.length < 1) {
+    console.log('inserting initial system prompt for getting interview readiness')
+    const prompt = await getPromptByKey('prompt-interview-ready-dayal')
+    chatHistory = await insertChatHistory(profileId, interviewId, 'system', prompt.system_prompt)
+  }
+
+  for (const chat of chatHistory) {
+    messages.push({
+      role: chat.role,
+      content: chat.content
+    })
+  }
+}
+
+

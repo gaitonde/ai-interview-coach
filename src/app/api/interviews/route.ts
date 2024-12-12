@@ -11,7 +11,6 @@ const INTERVIEWS = getTable('interviews')
 const turndownService = new TurndownService()
 
 export async function GET(request: Request) {
-  console.log('IN interviews GET')
   const { searchParams } = new URL(request.url)
   const profileId = searchParams.get('profileId')
   const interviewId = searchParams.get('interviewId')

@@ -4,7 +4,6 @@ import { generateCompletion } from "../utils/openAiCompletion";
 import { getTable } from "@/lib/db";
 
 export async function POST(request: Request) {
-  console.log('in generate company-prep')
   const body = await request.json();
   const profileId = body.profileId;
   const interviewId = body.interviewId;
@@ -27,12 +26,8 @@ export async function POST(request: Request) {
 
     const companyMatch = content?.match(/\*\*Company\*\*:\s*([^\n]*)/);
     const companyName = companyMatch ? companyMatch[1].trim() : null;
-    console.log('company: ', companyName);
-
     const roleMatch = content?.match(/\*\*Position\*\*:\s*([^\n]*)/);
     const roleName = roleMatch ? roleMatch[1].trim() : null;
-    console.log('roleName: ', roleName);
-
     const jobsTable = getTable('interviews');
     const query2 = `
       UPDATE ${jobsTable}

@@ -10,7 +10,6 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: NextRequest) {
-  console.log('Generating feedback...');
   try {
     const body = await req.json();
     //TODO: need better protection here
@@ -24,13 +23,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Question ID and Answer ID are required' }, { status: 400 });
     }
 
-    console.log('IN generate-feedback', profileId, questionId, answerId);
-
     const promptData: PromptData = await fetchPrompt(profileId, 'prompt-generate-feedback', interviewId, questionId, answerId);
     // const scoredCategories = categories.map(cat => `${cat.name}: ${cat.score}/10`).join('\n');
     // promptData.userPrompt = promptData.userPrompt.replace('${scoredCategories}', scoredCategories);
-
-    console.log('IN generate-feedback user promptData', promptData.userPrompt);
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,
@@ -45,26 +40,24 @@ export async function POST(req: NextRequest) {
     const feedback = completion.choices[0]?.message?.content;
 
     if (feedback) {
-      const table = getTable('feedback');
-      const query = `
-        INSERT INTO ${table}
-        (profile_id, interview_id, question_id, answer_id, feedback)
-        VALUES
-        ($1, $2, $3, $4, $5)
-      `;
-      await sql.query(query, [profileId, interviewId, questionId, answerId, feedback]);
-
-      // Update readiness records to mark them as out of date
       const table2 = getTable('questions')
-      console.log('table2', table2)
-      console.log('XX questionId', questionId)
       const query2 = `
         SELECT category FROM ${table2} WHERE id = $1
       `
-      const questionCategory = await sql.query(query2, [questionId]);
-      console.log('XX questionCategory', questionCategory, questionId)
+      const questionCategory = await sql.query(query2, [questionId])
+      const category = questionCategory.rows[0].category
 
-      await upsertOutOfDateReadinessRecord(profileId, interviewId, questionCategory.rows[0].category);
+      const table = getTable('feedback');
+      const query = `
+        INSERT INTO ${table}
+        (profile_id, interview_id, question_id, answer_id, category, feedback)
+        VALUES
+        ($1, $2, $3, $4, $5, $6)
+      `;
+      await sql.query(query, [profileId, interviewId, questionId, answerId, category, feedback]);
+
+      // Update readiness records to mark them as out of date
+      await upsertOutOfDateReadinessRecord(profileId, interviewId, category);
     }
 
     return NextResponse.json({ feedback });

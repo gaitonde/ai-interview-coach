@@ -72,7 +72,6 @@ export async function POST(request: Request) {
     } catch (err) {
       const error = err as ClerkError
       const errorMessage = error.errors?.[0]?.message || error.message || "Failed to create profile"
-      console.log('1')
       return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
 

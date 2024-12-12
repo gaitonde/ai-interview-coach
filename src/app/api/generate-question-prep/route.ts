@@ -8,14 +8,11 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { profileId, interviewId } = Object.fromEntries(request.nextUrl.searchParams)
-    console.log('profileId', profileId)
-    console.log('interviewId', interviewId)
-
+    const body = await request.json()
+    const { profileId, interviewId } = body
     const content = await generateQuestionPrep(profileId, interviewId)
-    console.log('XXX content', content)
     return NextResponse.json({ content })
 
   } catch (error) {
@@ -28,9 +25,6 @@ async function generateQuestionPrep(profileId: string, interviewId: string): Pro
 
   try {
     const promptData: PromptData = await fetchPrompt(profileId, `prompt-question-prep`, interviewId)
-
-    console.log('XXX promptData.userPrompt', promptData.userPrompt)
-
     const completion = await openai.chat.completions.create({
       model: promptData.model,
       messages: [
@@ -42,7 +36,6 @@ async function generateQuestionPrep(profileId: string, interviewId: string): Pro
     })
 
     const generatedContent = completion.choices[0]?.message?.content
-    console.log('generatedContent', generatedContent)
 
     // Modified upsert operation
     const table = getTable('airesponses')

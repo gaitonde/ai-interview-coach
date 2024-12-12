@@ -2,21 +2,24 @@ import { getTable } from "@/lib/db";
 import { sql } from '@vercel/postgres';
 
 export interface ReadinessData {
-  readiness_text: string;
-  readiness_rating: string;
+  readiness_text: string
+  readiness_rating: string
 }
 
 export const CATEGORIES = ['Overall', 'Behavioral', 'Technical', 'Role', 'Case']
 
-export async function getExistingReadiness(profileId: string, interviewId: string, category: string) {
+export async function getExistingReadiness(profileId: string, interviewId: string) {
   const table = getTable('interview_readiness')
   const result = await sql.query(`
     SELECT * FROM ${table}
-    WHERE profile_id = $1 AND interview_id = $2 AND category = $3
-    LIMIT 1`,
-    [profileId, interviewId, category]
+    WHERE profile_id = $1
+    AND interview_id = $2
+    ORDER BY id DESC
+    `,
+    [profileId, interviewId]
   )
-  return result.rows[0]
+  console.log('XXX result', result.rows)
+  return result.rows
 }
 
 export async function getFeedbackContent(profileId: string, interviewId: string, category: string) {

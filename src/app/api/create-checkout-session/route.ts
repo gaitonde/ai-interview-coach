@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       ],
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`, //TODO: handle session id
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/buy`,
     })
 
     return NextResponse.json({ sessionId: session.id })

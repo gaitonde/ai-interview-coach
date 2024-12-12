@@ -57,7 +57,7 @@ async function extractText(resume: File): Promise<string> {
         const pdfParser = new (PDFParser as any)(null, 1)
 
         pdfParser.on('pdfParser_dataError', (errData: any) => {
-          console.log(errData.parserError)
+          console.error(errData.parserError)
           reject(errData.parserError)
         })
 

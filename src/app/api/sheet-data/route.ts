@@ -7,7 +7,6 @@ const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
 const GOOGLE_SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
 export async function GET() {
-  console.log('Fetching sheet data');
   try {
     if (!GOOGLE_SHEET_ID) {
       throw new Error('GOOGLE_SHEET_ID is not defined');

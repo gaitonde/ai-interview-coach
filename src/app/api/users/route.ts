@@ -3,7 +3,6 @@ import { sql } from "@vercel/postgres"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
-  console.log('In /api/users route!!')
   const { searchParams } = new URL(request.url)
   const userId = searchParams.get('id')
   // const clerkId = searchParams.get('clerk_id')

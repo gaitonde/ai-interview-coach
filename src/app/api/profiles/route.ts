@@ -69,7 +69,6 @@ async function createProfile(
   graduation_date: Date
 ): Promise<number> {
   try {
-    console.log('in createProfile...')
     // ON CONFLICT ON CONSTRAINT unique_user_id
     const result = await sql.query(`
       INSERT INTO ${PROFILES_TABLE} (user_id, school, major, concentration, graduation_date)

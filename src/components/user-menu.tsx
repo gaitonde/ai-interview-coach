@@ -4,9 +4,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { SignedIn, SignOutButton } from '@clerk/nextjs'
 import { User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useSetAtom } from 'jotai'
+import { userIdAtom } from '@/stores/profileAtoms'
 
 export function UserMenu() {
   const router = useRouter()
+  const setUserId = useSetAtom(userIdAtom)
 
   return (
     <>
@@ -26,11 +29,12 @@ export function UserMenu() {
               Profile
             </DropdownMenuItem>
              */}
-            <DropdownMenuItem onClick={() => router.push('/billing')} className="cursor-pointer hover:bg-[#374151]">
-              Billing
+            <DropdownMenuItem onClick={() => router.push('/buy')} className="cursor-pointer hover:bg-[#374151]">
+              Get More Interviews
             </DropdownMenuItem>
             <SignOutButton redirectUrl="/home">
               <DropdownMenuItem
+                onClick={() => setUserId(null)}
                 className="cursor-pointer hover:bg-[#374151]"
               >
                 Sign out

@@ -1,35 +1,25 @@
-import { NextResponse } from 'next/server';
-import { sql } from '@vercel/postgres';
-import { getTable } from "@/lib/db";
-
-const TABLE = getTable('prompts');
+import { getPromptByKey } from '@/lib/prompts'
+import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const key = searchParams.get('key');
+    const { searchParams } = new URL(request.url)
+    const key = searchParams.get('key') ?? ''
 
-    const result = await sql.query(
-      `SELECT * FROM ${TABLE} WHERE key = $1 LIMIT 1`,
-      [key]
-    );
-
-    let prompt = result.rows[0];
-    if (prompt) {
-      prompt = {
-        ...prompt,
-        temperature: parseFloat(prompt.temperature)
-      };
+    if (!key) {
+      return NextResponse.json({ success: false, message: 'Key is required' }, { status: 400 })
     }
 
+    const prompt = await getPromptByKey(key)
+
     if (!prompt) {
-      return NextResponse.json({ success: false }, { status: 404 });
+      return NextResponse.json({ success: false }, { status: 404 })
     } else {
-      return NextResponse.json({ success: true, data: prompt });
+      return NextResponse.json({ success: true, data: prompt })
     }
 
   } catch (error) {
-    console.error('Error fetching prompts:', error);
-    return NextResponse.json({ success: false, error: 'Failed to fetch prompts' }, { status: 500 });
+    console.error('Error fetching prompts:', error)
+    return NextResponse.json({ success: false, error: 'Failed to fetch prompts' }, { status: 500 })
   }
 }

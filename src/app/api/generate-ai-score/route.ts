@@ -32,10 +32,9 @@ interface ScoringResult {
 }
 
 export async function POST(req: NextRequest) {
-  console.log('in generate-ai-score')
   try {
     const body = await req.json()
-    const { profileId, interviewId, questionId, answerId } = body
+    const { profileId, interviewId, questionId, answerId, category } = body
 
     if (!questionId || !answerId) {
       return NextResponse.json({ error: 'Question ID and Answer ID are required' }, { status: 400 })
@@ -84,13 +83,16 @@ export async function POST(req: NextRequest) {
       confidenceAndProfessionalism: rubricScores.confidenceAndProfessionalism,
       finalScore: parseFloat((finalScore ?? 0).toFixed(2)),
       averageScore: parseFloat((averageScore ?? 0).toFixed(2))
-    };
+    }
 
-    const json = NextResponse.json(result);
+    const json = NextResponse.json(result)
     // const answerId = await insertAnswer(profileId, questionId, transcription);
-    await insertScore(profileId, answerId, finalScore, result);
+    await insertScore(profileId, answerId, finalScore, result)
 
-    return json;
+    // update the interview_readiness table
+    await updateInterviewReadiness(profileId, interviewId, category)
+
+    return json
   } catch (error) {
     console.error('Error processing request:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -107,4 +109,16 @@ async function insertScore(profileId: string, answerId: string, finalScore: numb
     DO UPDATE SET total_score = EXCLUDED.total_score, scores = EXCLUDED.scores;
   `;
   await sql.query(query, [profileId, answerId, finalScore, JSON.stringify(scores)]);
+}
+
+async function updateInterviewReadiness(profileId: string, interviewId: string, category: string) {
+  const table = getTable('interview_readiness')
+  const query = `
+    UPDATE ${table}
+    SET is_up_to_date = false
+    WHERE profile_id = $1
+    AND interview_id = $2
+    AND category = $3
+  `;
+  await sql.query(query, [profileId, interviewId, category])
 }
