@@ -9,12 +9,22 @@ import { useAtom, useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 
+const DEFAULT_GRADUATION_YEAR = '2023'
+
 export function ProfileSetup() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
-  const [graduationYear, setGraduationYear] = useState<string | undefined>(undefined)
+  const [formData, setFormData] = useState({
+    email: '',
+    linkedin: '',
+    school: '',
+    major: '',
+    concentration: '',
+    graduationYear: DEFAULT_GRADUATION_YEAR
+  });
+  const [graduationYear, setGraduationYear] = useState<string>(DEFAULT_GRADUATION_YEAR)
   const [isSignup, setIsSignup] = useState(false)
   const { signIn } = useSignIn()
   const clerk = useClerk()
@@ -39,45 +49,26 @@ export function ProfileSetup() {
   const loadProfile = async (profileId: string) => {
     const response = await fetch(`/api/profile?profileId=${profileId}`)
     const { profiles } = await response.json()
-    const profile = profiles[0]
+    const profileData = profiles[0]
 
-    // Populate form fields with profile data
-    if (formRef.current) {
-      const form = formRef.current
+    if (profileData) {
+      console.log('CCC profile', profileData)
+      await setStoredProfileId(profileData.id)
+      const gradYear = profileData.graduation_date ?
+        new Date(profileData.graduation_date).getUTCFullYear().toString() : DEFAULT_GRADUATION_YEAR
 
-      if (profile) {
-        console.log('CCC profile', profile)
-        await setStoredProfileId(profile.id)
-        setGraduationYear(profile.graduation_date ? new Date(profile?.graduation_date).getUTCFullYear().toString() : '')
-
-        // Profile fields
-        const emailInput = form.elements.namedItem('email') as HTMLInputElement
-        emailInput.value = profile.email || ''
-
-        const linkedinInput = form.elements.namedItem('linkedin') as HTMLInputElement
-        linkedinInput.value = profile.linkedin_url || ''
-
-        // Only set school-related fields if they exist in the form
-        const schoolInput = form.elements.namedItem('school') as HTMLInputElement
-        console.log('CCC schoolInput', schoolInput)
-        if (schoolInput) schoolInput.value = profile.school || ''
-
-        const majorInput = form.elements.namedItem('major') as HTMLInputElement
-        console.log('CCC majorInput', majorInput)
-        if (majorInput) majorInput.value = profile.major || ''
-
-        const concentrationInput = form.elements.namedItem('concentration') as HTMLInputElement
-        console.log('CCC concentrationInput', concentrationInput)
-        if (concentrationInput) concentrationInput.value = profile.concentration || ''
-
-        const graduationYearInput = form.elements.namedItem('graduation_year') as HTMLInputElement
-        console.log('CCC graduationYearInput', graduationYearInput)
-        if (graduationYearInput) graduationYearInput.value = profile.graduation_date ? new Date(profile?.graduation_date).getUTCFullYear().toString() : ''
-
-      }
+      setFormData({
+        email: profileData.email || '',
+        linkedin: profileData.linkedin_url || '',
+        school: profileData.school || '',
+        major: profileData.major || '',
+        concentration: profileData.concentration || '',
+        graduationYear: gradYear
+      });
+      setGraduationYear(gradYear);
     }
 
-    return profile
+    return profileData
   }
 
   // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -296,6 +287,14 @@ export function ProfileSetup() {
     setStoredUserId('')
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
     <>
       <div className="flex justify-center min-h-screen px-4 sm:px-6 lg:px-8">
@@ -349,6 +348,8 @@ export function ProfileSetup() {
                   id="email"
                   name="email"
                   type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   placeholder="email@example.com"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
@@ -388,6 +389,8 @@ export function ProfileSetup() {
                   id="linkedin"
                   name="linkedin"
                   type="url"
+                  value={formData.linkedin}
+                  onChange={handleInputChange}
                   placeholder="https://www.linkedin.com/in/yourprofile"
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
@@ -403,6 +406,8 @@ export function ProfileSetup() {
                       id="school"
                       name="school"
                       type="text"
+                      value={formData.school}
+                      onChange={handleInputChange}
                       placeholder="e.g. Baylor University"
                       className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                     />
@@ -438,6 +443,8 @@ export function ProfileSetup() {
                       id="major"
                       name="major"
                       type="text"
+                      value={formData.major}
+                      onChange={handleInputChange}
                       placeholder="e.g. Finance, Marketing, etc."
                       className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                     />
@@ -450,6 +457,8 @@ export function ProfileSetup() {
                       id="concentration"
                       name="concentration"
                       type="text"
+                      value={formData.concentration}
+                      onChange={handleInputChange}
                       placeholder="e.g. Commercial, Private Equity, International"
                       className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                     />
