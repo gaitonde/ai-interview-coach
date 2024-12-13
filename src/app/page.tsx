@@ -4,7 +4,7 @@ import { ConditionalHeader } from '@/components/conditional-header'
 import Dashboard from '@/components/dashboard'
 import { userIdAtom } from '@/stores/profileAtoms'
 import { useAtom } from 'jotai'
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 import { useEffect, useCallback } from 'react'
 
 export default function Home() {

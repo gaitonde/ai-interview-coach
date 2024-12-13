@@ -4,12 +4,12 @@ import { HeroSection } from '@/components/hero-section'
 import { Button } from '@/components/ui/button'
 import { profileIdAtom } from '@/stores/profileAtoms'
 import { removeDemoData } from '@/utils/auth'
+import { useClerk } from '@clerk/nextjs'
 import { useAtom } from 'jotai'
 import Cookies from 'js-cookie'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useClerk } from '@clerk/nextjs'
 
 export default function StartPage() {
   const router = useRouter()
@@ -19,12 +19,9 @@ export default function StartPage() {
 
   const handleUploadResume = async () => {
     removeDemoData()
-    setIsUploading(true)
     uploadResume().then(uploaded => {
       if (uploaded) {
         router.push('/profile-setup')
-      } else {
-        setIsUploading(false)
       }
     })
   }
@@ -55,7 +52,7 @@ export default function StartPage() {
         }
 
         try {
-
+          setIsUploading(true)
           const formData = new FormData()
           formData.append('resume', file)
           formData.append('filename', file.name)
@@ -80,6 +77,8 @@ export default function StartPage() {
         } catch (error) {
           console.error('Upload error:', error)
           resolve(false)
+        } finally {
+          setIsUploading(false)
         }
       }
 

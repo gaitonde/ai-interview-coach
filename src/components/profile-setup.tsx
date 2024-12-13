@@ -1,38 +1,38 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { isDemoAtomWithStorage, profileIdAtomWithStorage, userIdAtomWithStorage } from '@/stores/profileAtoms'
+import { useClerk, useSignIn } from '@clerk/nextjs'
+import { useAtom, useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { useAtom } from 'jotai'
-import { profileIdAtom, userIdAtom, isDemoAtom } from '@/stores/profileAtoms'
-import { useSignIn, useClerk } from '@clerk/nextjs'
 
 export function ProfileSetup() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
-  const [school, setSchool] = useState<string | undefined>(undefined)
   const [graduationYear, setGraduationYear] = useState<string | undefined>(undefined)
   const [isSignup, setIsSignup] = useState(false)
   const { signIn } = useSignIn()
   const clerk = useClerk()
+  const isDemo = useAtomValue(isDemoAtomWithStorage)
+  const [storedProfileId, setStoredProfileId] = useAtom(profileIdAtomWithStorage)
+  const [storedUserId, setStoredUserId] = useAtom(userIdAtomWithStorage)
+
   // const [isDemoMode, setIsDemoMode] = useState(false)
   // const [includeResume, setIncludeResume] = useState(false)
   // const [fileName, setFileName] = useState<string>('No file chosen')
   // const [resumeFile, setResumeFile] = useState<File | null>(null)
   // const [userId, setUserId] = useState<string | null>(null)
 
-  const [atomProfileId, setAtomProfileId] = useAtom<string | null>(profileIdAtom)
-  const [atomUserId, setAtomUserId] = useAtom<string | null>(userIdAtom)
-  const [isDemo] = useAtom(isDemoAtom)
 
   useEffect(() => {
-    setIsSignup(atomUserId === null)
-    if (isDemo || atomProfileId) {
-      loadProfile(atomProfileId!)
+    setIsSignup(storedUserId === null)
+    if (isDemo || storedProfileId) {
+      loadProfile(storedProfileId!)
     }
   }, [])
 
@@ -41,56 +41,63 @@ export function ProfileSetup() {
     const { profiles } = await response.json()
     const profile = profiles[0]
 
-    // Set select values using state
-    setSchool(profile?.school || undefined)
-    setGraduationYear(profile?.graduation_date ? new Date(profile?.graduation_date).getUTCFullYear().toString() : '')
-
     // Populate form fields with profile data
     if (formRef.current) {
       const form = formRef.current
 
       if (profile) {
+        console.log('CCC profile', profile)
+        await setStoredProfileId(profile.id)
+        setGraduationYear(profile.graduation_date ? new Date(profile?.graduation_date).getUTCFullYear().toString() : '')
+
         // Profile fields
-        (form.elements.namedItem('email') as HTMLInputElement).value = profile.email || '';
-        (form.elements.namedItem('linkedin') as HTMLInputElement).value = profile.linkedin_url || '';
+        const emailInput = form.elements.namedItem('email') as HTMLInputElement
+        emailInput.value = profile.email || ''
+
+        const linkedinInput = form.elements.namedItem('linkedin') as HTMLInputElement
+        linkedinInput.value = profile.linkedin_url || ''
 
         // Only set school-related fields if they exist in the form
-        const schoolInput = form.elements.namedItem('school') as HTMLInputElement;
-        if (schoolInput) schoolInput.value = profile.school || '';
+        const schoolInput = form.elements.namedItem('school') as HTMLInputElement
+        if (schoolInput) schoolInput.value = profile.school || ''
 
-        const majorInput = form.elements.namedItem('major') as HTMLInputElement;
-        if (majorInput) majorInput.value = profile.major || '';
+        const majorInput = form.elements.namedItem('major') as HTMLInputElement
+        if (majorInput) majorInput.value = profile.major || ''
 
-        const concentrationInput = form.elements.namedItem('concentration') as HTMLInputElement;
-        if (concentrationInput) concentrationInput.value = profile.concentration || '';
+        const concentrationInput = form.elements.namedItem('concentration') as HTMLInputElement
+        if (concentrationInput) concentrationInput.value = profile.concentration || ''
+
+        const graduationYearInput = form.elements.namedItem('graduation_year') as HTMLInputElement
+        if (graduationYearInput) graduationYearInput.value = profile.graduation_date ? new Date(profile?.graduation_date).getUTCFullYear().toString() : ''
+
       }
     }
 
-    return profile;
+    return profile
   }
 
   // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   if (e.target.files && e.target.files.length > 0) {
-  //     setFileName(e.target.files[0].name);
-  //     setResumeFile(e.target.files[0]);
+  //     setFileName(e.target.files[0].name)
+  //     setResumeFile(e.target.files[0])
   //   } else {
-  //     setFileName('No file chosen');
-  //     setResumeFile(null);
+  //     setFileName('No file chosen')
+  //     setResumeFile(null)
   //   }
   // }
 
   const saveProfile = async (formData: FormData) => {
     try {
       const profileAttributes = {
-        id: atomProfileId,
-        userId: atomUserId,
+        id: storedProfileId,
+        userId: storedUserId,
         email: formData.get('email'),
         linkedin: formData.get('linkedin'),
         school: formData.get('school'),
         major: formData.get('major'),
         concentration: formData.get('concentration'),
         graduation_year: formData.get('graduation_year'),
-      };
+      }
 
       const profileResponse = await fetch('/api/profile', {
         method: 'POST',
@@ -98,20 +105,20 @@ export function ProfileSetup() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(profileAttributes)
-      });
+      })
 
-      const {userId: clerkId, profileId, ticket, error} = await profileResponse.json();
+      const {userId: clerkId, profileId, ticket, error} = await profileResponse.json()
 
       if (!profileResponse.ok) {
         console.log('Profile response error: ', error)
-        throw new Error(error || 'Failed to save profile');
+        throw new Error(error || 'Failed to save profile')
       }
 
       // Update atoms in this order and wait for them to complete
       await Promise.all([
-        setAtomProfileId(profileId),
-        setAtomUserId(clerkId)
-      ]);
+        setStoredProfileId(profileId),
+        setStoredUserId(clerkId),
+      ])
 
       return {profileId, clerkId, ticket}
     } catch (error) {
@@ -122,36 +129,38 @@ export function ProfileSetup() {
 
   const uploadResume = async (profileId: number, resumeFile: File) => {
     if (resumeFile && resumeFile.name !== 'No file chosen') {
-      const resumeFormData = new FormData();
-      resumeFormData.append('resume', resumeFile);
-      resumeFormData.append('profileId', profileId.toString()); // Associate resume with profile
+      const resumeFormData = new FormData()
+      resumeFormData.append('resume', resumeFile)
+      resumeFormData.append('profileId', profileId.toString()) // Associate resume with profile
 
       const resumeResponse = await fetch('/api/resume', {
         method: 'POST',
         body: resumeFormData
-      });
+      })
 
       if (!resumeResponse.ok) {
-        throw new Error('Failed to upload resume');
+        throw new Error('Failed to upload resume')
       }
 
-      const {success: resumeSuccess, resumeUrl} = await resumeResponse.json();
-      console.log('Resume response: ', resumeSuccess, resumeUrl);
-      return resumeSuccess;
+      const {success: resumeSuccess, resumeUrl} = await resumeResponse.json()
+      console.log('Resume response: ', resumeSuccess, resumeUrl)
+      return resumeSuccess
     }
-    return false;
+    return false
   }
 
   const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
   }
 
   const isRecentOrFutureGrad = (year: string | undefined): boolean => {
-    if (!year) return false;
-    const currentYear = new Date().getFullYear();
-    const gradYear = parseInt(year);
-    return gradYear >= currentYear - 1;
+    console.log('CCC year', year)
+    if (!year) return false
+    const currentYear = new Date().getFullYear()
+    const gradYear = parseInt(year)
+    console.log('CCC currentYear', currentYear, gradYear, gradYear >= currentYear - 1)
+    return gradYear >= currentYear - 1
   }
 
   const validateForm = (formData: FormData): string | null => {
@@ -162,12 +171,12 @@ export function ProfileSetup() {
 
     // Add conditional required fields
     if (isRecentOrFutureGrad(graduationYear)) {
-      requiredFields.push('school', 'major', 'graduation_year');
+      requiredFields.push('school', 'major', 'graduation_year')
     }
 
     for (const field of requiredFields) {
       if (!formData.get(field)) {
-        return `${field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')} is required`;
+        return `${field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')} is required`
       }
     }
 
@@ -204,15 +213,15 @@ export function ProfileSetup() {
     }
 
     // if (!resumeFile) {
-    //   return 'Resume is required';
+    //   return 'Resume is required'
     // }
 
     // Add userId validation
     // if (!userId) {
-    //   return 'User ID not found. Please log in again.';
+    //   return 'User ID not found. Please log in again.'
     // }
 
-    return null;
+    return null
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -222,6 +231,9 @@ export function ProfileSetup() {
       router.push(`/interview-setup`)
       return
     }
+
+    handleSignOut()
+
 
     setIsSubmitting(true)
     setError(null)
@@ -242,26 +254,26 @@ export function ProfileSetup() {
       }
 
       const signInResult = await signIn?.create({
-        strategy: "ticket",
+        strategy: 'ticket',
         ticket: ticket,
-      });
+      })
 
-      if (signInResult?.status === "complete") {
+      if (signInResult?.status === 'complete') {
         const sessionId = signInResult.createdSessionId
         if (sessionId) {
           await clerk.setActive({ session: sessionId })
 
           // The atoms will automatically persist to localStorage
           await Promise.all([
-            setAtomProfileId(profileId),
-            setAtomUserId(clerkId)
-          ]);
+            setStoredProfileId(profileId),
+            setStoredUserId(clerkId)
+          ])
 
           console.log("Session activated successfully!")
         }
       }
 
-      router.push(`/interview-setup`)
+      router.push('/interview-setup')
     } catch (error: any) {
       setError(error?.message)
     }
@@ -272,6 +284,12 @@ export function ProfileSetup() {
     if (isDemo) return 'Next'
     if (isSignup) return 'Continue'
     return 'Save'
+  }
+
+  const handleSignOut = async () => {
+    await clerk.signOut()
+    setStoredProfileId('')
+    setStoredUserId('')
   }
 
   return (
@@ -287,7 +305,7 @@ export function ProfileSetup() {
               <a
                 href="#"
                 onClick={(e) => {
-                  e.preventDefault();
+                  e.preventDefault()
                   const demoProfileId = process.env.NEXT_PUBLIC_DEMO_PROFILE_ID as string
                   console.log('Demo profile ID: ', demoProfileId)
 

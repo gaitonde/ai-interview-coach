@@ -1,15 +1,15 @@
 'use client'
 
+import { ConditionalHeader } from '@/components/conditional-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { interviewIdAtom, profileIdAtom } from '@/stores/profileAtoms'
+import { interviewIdAtom, isDemoAtom, profileIdAtom } from '@/stores/profileAtoms'
 import { useAtom } from 'jotai'
 import { AlertCircle, Briefcase, Calendar, Frown, Meh, Smile, Target, User } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { ConditionalHeader } from "./conditional-header"
 
 type Interview = {
   interviewer_name: string
@@ -21,8 +21,8 @@ type Interview = {
 }
 
 type CategoryResponse = {
-  readiness_rating: string;
-  readiness_text: string;
+  readiness_rating: string
+  readiness_text: string
 }
 
 type Category = {
@@ -72,69 +72,55 @@ const getScoreInfo = (score?: string): { icon: React.ReactNode; text: string; co
 
 export function InterviewReady() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [interview, setInterview] = useState<Interview | null>(null)
-  const [categoryResponses, setCategoryResponses] = useState<Record<string, CategoryResponse>>({})
-  const [isDemoMode, setIsDemoMode] = useState(false)
+  const [categoryRatings, setCategoryRatings] = useState<Record<string, CategoryResponse>>({})
+  const [isDemoMode] = useAtom(isDemoAtom)
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
-
 
   useEffect(() => {
     console.log('storedProfileId', profileId)
     console.log('interviewId', interviewId)
 
-    const x = fetch(`/api/interview-readiness?profileId=${profileId}&interviewId=${interviewId}`)
-    .then(response => {
-      if (!response.ok) throw new Error(`Failed to fetch evaluation`)
-      console.log('response', response)
+    const fetchReadiness = async () => {
+      try {
+        const response = await fetch(`/api/interview-readiness?profileId=${profileId}&interviewId=${interviewId}`)
+        if (!response.ok) throw new Error('Failed to fetch evaluation')
+        const { content: results } = await response.json()
+        console.log('XXX results', results)
 
-      return response.json()
-    })
-    .then(data => {
-      console.log('XXX data', data)
-      const results = data.content
+        // Map results into categoryResponses format
+        const categoryRatings: Record<string, CategoryResponse> = {};
+        results.forEach((result: any) => {
+          categoryRatings[result.category] = {
+            readiness_rating: result.readiness_rating || "No Data",
+            readiness_text: result.readiness_text || "We don't have enough information to calculate a score."
+          }
+        })
 
-      // Map results into categoryResponses format
-      const responses: Record<string, CategoryResponse> = {};
-      results.forEach((result: any) => {
-        responses[result.category] = {
-          readiness_rating: result.readiness_rating || "No Data",
-          readiness_text: result.readiness_text || "We don't have enough information to calculate a score."
-        }
-      })
+        setCategoryRatings(categoryRatings);
+      } catch (error) {
+        console.error('Error fetching evaluations:', error);
+      }
+    }
 
-      console.log('YYY responses', responses)
-
-      setCategoryResponses(responses);
-    })
-    .catch(error => {
-      console.error('Error fetching evaluations:', error);
-    });
-  }, [searchParams])
+    fetchReadiness()
+  }, [profileId, interviewId])
 
   useEffect(() => {
-    fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch job data');
+    const fetchInterview = async () => {
+      try {
+        const response = await fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`)
+        if (!response.ok) throw new Error('Failed to fetch job data')
+        const { content: interview } = await response.json()
+        console.log('XXX interview', interview)
+        setInterview(interview)
+      } catch (error) {
+        console.error('Error fetching interview data:', error)
       }
-      return response.json();
-    })
-    .then(data => {
-      setInterview({
-        interviewer_name: data.content.interviewer_name,
-        interviewer_role: data.content.interviewer_role,
-        interview_date: data.content.interview_date,
-        company_name: data.content.company_name,
-        role_name: data.content.role_name,
-        readiness: data.content.readiness
-      });
-    })
-    .catch(error => {
-      console.error('Error fetching interview data:', error)
-    });
-  }, [searchParams])
+    }
+    fetchInterview()
+  }, [profileId, interviewId])
 
   return (
     <>
@@ -196,12 +182,12 @@ export function InterviewReady() {
             </CardContent>
           </Card>
 
-          {categoryResponses.overall?.readiness_rating && (
+          {categoryRatings.overall?.readiness_rating && (
             <>
               <Card className="bg-[#1a1f2b] text-white mb-6">
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <ReadinessIndicator readiness={categoryResponses.overall.readiness_rating} />
+                    <ReadinessIndicator readiness={categoryRatings.overall.readiness_rating} />
                   </div>
                   <ReactMarkdown
                     components={{
@@ -209,7 +195,7 @@ export function InterviewReady() {
                         <ul className="list-disc pl-4 space-y-1 mb-4" {...props} />
                       )
                     }}
-                  >{categoryResponses.overall.readiness_text ?? ''}</ReactMarkdown>
+                  >{categoryRatings.overall.readiness_text ?? ''}</ReactMarkdown>
                   <Button
                     className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm mt-4"
                     onClick={() => router.push('/interview-practice')}
@@ -220,7 +206,7 @@ export function InterviewReady() {
               </Card>
 
               {categories.map((category) => {
-                const categoryResponse = categoryResponses[category.name];
+                const categoryResponse = categoryRatings[category.name];
                 const { icon, text, color } = getScoreInfo(categoryResponse?.readiness_rating);
                 return (
                   <Card key={category.name} className="bg-[#1a1f2b] text-white mb-4">
@@ -241,10 +227,11 @@ export function InterviewReady() {
                         {categoryResponse?.readiness_text ?? 'Loading...'}
                       </p>
                       <Button
-                        className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm"
+                        variant='outline'
+                        className="w-full text-white font-medium py-2 rounded-lg text-sm"
                         onClick={() => router.push(`/interview-practice?category=${category.name.toLowerCase()}`)}
                       >
-                        Practice {category.name} Questions
+                        Practice {category.name.charAt(0).toUpperCase() + category.name.slice(1)} Questions
                       </Button>
                     </CardContent>
                   </Card>
@@ -253,15 +240,24 @@ export function InterviewReady() {
             </>
           )}
 
-          {(!interview || !interview.readiness) && (
+          {(!interview || !categoryRatings.overall) && (
             <div className="mt-0">
               <Card className="bg-[#1a1f2b] text-white mb-6">
                 <CardContent className="p-4 sm:p-6">
                   <div>
+                    <div className="sm:hidden">
                     <p>
-                      Personalized questions have been created to help you prepare for your interview.
-                      Jam sessions are a great way to practice your answers and see what you're at!
-                    </p>
+                        Personalized questions have been created to help you prepare for your interview.
+                      </p>
+                      <p className="mt-4">
+                        Interview Jam sessions are a great way to practice your answers and see what you're at!
+                      </p>
+                    </div>
+                    <div className="hidden sm:block">
+                      <p>
+                      Personalized questions have been created to help you prepare for your interview. Interview Jam sessions are a great way to practice your answers and see what you're at!
+                      </p>
+                    </div>
                   </div>
                   <Button
                     className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm mt-4"

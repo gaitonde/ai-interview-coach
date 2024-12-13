@@ -38,3 +38,11 @@ export const interviewIdAtomWithStorage = atom(
     setToLocalStorage('interviewId', newValue)
   }
 )
+
+export const isDemoAtomWithStorage = atom(
+  (get) => get(isDemoAtom),
+  (get, set, newValue: boolean) => {
+    set(isDemoAtom, newValue)
+    setToLocalStorage('isDemo', newValue)
+  }
+)

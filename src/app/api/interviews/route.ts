@@ -120,7 +120,7 @@ export async function POST(request: Request) {
       category,
       is_up_to_date
     )
-    VALUES ($1, $2, $3, FALSE)
+    VALUES ($1, $2, $3, TRUE)
   `
 
   // Insert a record for each category

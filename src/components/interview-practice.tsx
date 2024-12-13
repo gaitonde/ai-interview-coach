@@ -310,10 +310,10 @@ export function InterviewPracticeContent() {
               <h1 className={styles.h1}>Interview Jam Session</h1>
             {whom && <h3 className={styles.h3}>with {whom}</h3>}
             </div>
-            {questions.length > 0 && (
+            {questions.length > 0 && question?.category && (
               <div className="p-4 bg-white rounded-lg shadow">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
-                  <h2 className="text-black"><b>Category:</b> {question?.category}</h2>
+                  <h2 className="text-black"><b>Category:</b> {question?.category.charAt(0).toUpperCase() + question?.category.slice(1)}</h2>
                   <span className="text-black whitespace-nowrap"><b>Question:</b> {questionIndex + 1} of {questions.length}</span>
                   <hr className="border-gray-300 w-full sm:hidden" />
                 </div>

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { interviewIdAtom, profileIdAtom } from '@/stores/profileAtoms'
+import { interviewIdAtomWithStorage, profileIdAtom } from '@/stores/profileAtoms'
 import { useAtom, useAtomValue } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 import { useRouter } from 'next/navigation'
@@ -17,10 +17,10 @@ export function InterviewSetup() {
   const [error, setError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const [statusMessage, setStatusMessage] = useState('Thinking...')
-  const [, setAtomInterviewId] = useAtom<string | null>(interviewIdAtom)
   const profileId = useAtomValue(profileIdAtom)
   // const userId = useAtomValue(userIdAtom)
-  const interviewId = useAtomValue(interviewIdAtom)
+  const [interviewId, setInterviewId] = useAtom(interviewIdAtomWithStorage)
+
   const isDemo = useAtomValue(isDemoModeAtom)
 
 
@@ -107,7 +107,7 @@ export function InterviewSetup() {
 
       const result = await response.json()
       const interviewId = result.id
-      setAtomInterviewId(interviewId)
+      setInterviewId(interviewId)
 
       return interviewId
     } catch (error) {
