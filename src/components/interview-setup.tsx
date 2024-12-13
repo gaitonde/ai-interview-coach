@@ -204,7 +204,8 @@ export function InterviewSetup() {
       }
       const interviewId = await saveInterview(profileId, formData)
       if (interviewId) {
-        await generateCompanyPrep(profileId, interviewId)
+        // await generateCompanyPrep(profileId, interviewId)
+        await generateAll(profileId, interviewId)
         router.push(`/company-prep`)
       } else {
         setIsSubmitting(false)
@@ -311,4 +312,27 @@ export function InterviewSetup() {
       </div>
     </>
   )
+}
+
+const generateAll = async (profileId: string, interviewId: string) => {
+  try {
+    const response = await fetch('/api/generate-all', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ profileId, interviewId }),
+    });
+
+    if (!response.ok) {
+      console.log('XXX error response', response)
+      return
+    }
+
+    const result = await response.json()
+    return result.content
+  } catch (error) {
+    console.error('Error generating company prep:', error)
+    throw error
+  }
 }

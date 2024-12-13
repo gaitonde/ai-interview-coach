@@ -63,9 +63,9 @@ export default function InterviewerPrep() {
     }
 
     setIsSubmitting(true)
-    if (!isDemoMode && profileId) {
-      await generateQuestionPrep(profileId, interviewId)
-    }
+    // if (!isDemoMode && profileId) {
+    //   await generateQuestionPrep(profileId, interviewId)
+    // }
 
     router.push(`/question-prep`)
   }

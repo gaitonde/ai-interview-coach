@@ -87,7 +87,6 @@ export function InterviewReady() {
         const response = await fetch(`/api/interview-readiness?profileId=${profileId}&interviewId=${interviewId}`)
         if (!response.ok) throw new Error('Failed to fetch evaluation')
         const { content: results } = await response.json()
-        console.log('XXX results', results)
 
         // Map results into categoryResponses format
         const categoryRatings: Record<string, CategoryResponse> = {};

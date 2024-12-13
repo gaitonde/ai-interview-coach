@@ -11,8 +11,6 @@ export function ConditionalHeader() {
   const router = useRouter()
   const { userId, signOut } = useAuth()
 
-  console.log('In ConditionalHeader userId', userId)
-
   useEffect(() => {
     if (!userId) {
       signOut()
@@ -22,8 +20,8 @@ export function ConditionalHeader() {
 
   const isDemo = useAtomValue(isDemoAtom)
 
-  console.log('userId', userId)
-  console.log('isDemo', isDemo)
+  //console.log('In ConditionalHeader userId', userId)
+  //console.log('In ConditionalHeader isDemo', isDemo)
 
   if (!userId) return null
 

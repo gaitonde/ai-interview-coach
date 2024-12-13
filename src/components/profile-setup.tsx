@@ -149,11 +149,9 @@ export function ProfileSetup() {
   }
 
   const isRecentOrFutureGrad = (year: string | undefined): boolean => {
-    console.log('CCC year', year)
     if (!year) return false
     const currentYear = new Date().getFullYear()
     const gradYear = parseInt(year)
-    console.log('CCC currentYear', currentYear, gradYear, gradYear >= currentYear - 1)
     return gradYear >= currentYear - 1
   }
 
@@ -281,8 +279,8 @@ export function ProfileSetup() {
 
   const handleSignOut = async () => {
     await clerk.signOut()
-    setStoredProfileId('')
-    setStoredUserId('')
+    // setStoredProfileId('')
+    // setStoredUserId('')
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -63,9 +63,9 @@ export default function CompanyPrep() {
 
     setIsSubmitting(true)
     //TODO: try to get first; if not generate
-    if (!isDemo && profileId) {
-      await generateInterviewPrep(profileId)
-    }
+    // if (!isDemo && profileId) {
+    //   await generateInterviewPrep(profileId)
+    // }
     router.push('/interviewer-prep');
   }
 
