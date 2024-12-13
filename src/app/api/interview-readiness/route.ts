@@ -204,9 +204,7 @@ async function getUpdatedInteriewReadiness(profileId: string, interviewId: strin
   await addChatHistory(profileId, interviewId, messages)
   await getUnsentFeedback(profileId, interviewId, messages)
   if (messages.length > 0) {
-    console.log('XXX after chat history')
     const evaluation = await runPrompt(profileId, interviewId, messages)
-    console.log('XXX evaluation', evaluation)
 
     //insert new chat history for assistant message
     const newChatHistory = await insertChatHistory(profileId, interviewId, 'assistant', evaluation)

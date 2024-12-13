@@ -59,15 +59,19 @@ export function ProfileSetup() {
 
         // Only set school-related fields if they exist in the form
         const schoolInput = form.elements.namedItem('school') as HTMLInputElement
+        console.log('CCC schoolInput', schoolInput)
         if (schoolInput) schoolInput.value = profile.school || ''
 
         const majorInput = form.elements.namedItem('major') as HTMLInputElement
+        console.log('CCC majorInput', majorInput)
         if (majorInput) majorInput.value = profile.major || ''
 
         const concentrationInput = form.elements.namedItem('concentration') as HTMLInputElement
+        console.log('CCC concentrationInput', concentrationInput)
         if (concentrationInput) concentrationInput.value = profile.concentration || ''
 
         const graduationYearInput = form.elements.namedItem('graduation_year') as HTMLInputElement
+        console.log('CCC graduationYearInput', graduationYearInput)
         if (graduationYearInput) graduationYearInput.value = profile.graduation_date ? new Date(profile?.graduation_date).getUTCFullYear().toString() : ''
 
       }
