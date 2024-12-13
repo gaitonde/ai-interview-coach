@@ -85,7 +85,6 @@ export function ProfileSetup() {
     try {
       const profileAttributes = {
         id: storedProfileId,
-        userId: storedUserId,
         email: formData.get('email'),
         linkedin: formData.get('linkedin'),
         school: formData.get('school'),
@@ -300,7 +299,7 @@ export function ProfileSetup() {
         <div className="w-full max-w-md space-y-8 bg-[#252b3b] px-8 py-4 rounded-lg shadow-lg my-4">
           <div className="text-center">
             <h2 className="mt-2 text-3xl font-bold text-white">Profile Setup</h2>
-            <p className="mt-2 text-sm text-gray-400">Verify your profile and contine to sign up</p>
+            <p className="mt-2 text-sm text-gray-400">Verify and save your profile to sign up</p>
 {/*
             <p className="mt-2 text-sm text-gray-400">
               (or
