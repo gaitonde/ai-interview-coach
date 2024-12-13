@@ -228,8 +228,6 @@ export function ProfileSetup() {
     }
 
     handleSignOut()
-
-
     setIsSubmitting(true)
     setError(null)
 
@@ -271,6 +269,7 @@ export function ProfileSetup() {
       router.push('/interview-setup')
     } catch (error: any) {
       setError(error?.message)
+      setIsSubmitting(false)
     }
   }
 
