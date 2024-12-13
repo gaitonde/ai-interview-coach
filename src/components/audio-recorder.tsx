@@ -69,8 +69,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
       };
 
       mediaRecorder.onstop = async () => {
-        console.log('Recording stopped');
-        setRecorderState('Transcribing');
+        setRecorderState('Transcribing')
 
         try {
           const audioBlob = new Blob(audioChunksRef.current, { type: selectedMimeType });
@@ -229,9 +228,10 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
           `}
           onClick={handleRecordInteraction}
           onTouchStart={handleRecordInteraction}
-          disabled={recorderState === 'Transcribing'}
+          // disabled={recorderState === 'Transcribing'}
+          disabled={true}
         >
-          {recorderState === 'Ready' ? 'Record Answer' : recorderState === 'Recording' ? 'Stop' : 'Transcribing...'}
+          {recorderState === 'Ready' ? 'Record Answerx' : recorderState === 'Recording' ? 'Stop' : 'Transcribing...'}
         </button>
       </div>
 

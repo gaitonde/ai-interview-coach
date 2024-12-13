@@ -71,6 +71,7 @@ export default function Dashboard() {
   // console.log('filteredAnalyses', filteredAnalyses);
 
   useEffect(() => {
+
     if (!profileId) {
       if (!userId) {
         logout().then(() => {
@@ -132,11 +133,11 @@ export default function Dashboard() {
     if (data.interviewsAvailable > 0) {
         router.push('/interview-setup')
       } else {
-        router.push('/billing')
+        router.push('/buy')
       }
     } catch (error) {
       console.error('Error checking billing status:', error)
-      router.push('/billing')
+      router.push('/buy')
     }
   }, [profileId, router])
 

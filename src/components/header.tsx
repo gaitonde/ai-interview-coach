@@ -6,6 +6,7 @@ import { UserMenu } from '@/components/user-menu'
 
 export function Header() {
   const { userId } = useAuth()
+  console.log('userId from useAuth', userId)
 
   return (
     <header className="p-4 md:p-8">

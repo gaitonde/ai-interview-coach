@@ -35,22 +35,22 @@ type Category = {
 
 const categories: Category[] = [
   {
-    name: "Behavioral",
+    name: "behavioral",
     displayName: "Behavioral",
     description: "Questions about past experiences and how you handled specific work situations.",
   },
   {
-    name: "Technical",
+    name: "technical",
     displayName: "Technical",
     description: "Questions testing your knowledge of specific skills required for the job.",
   },
   {
-    name: "Role",
+    name: "role",
     displayName: "Role Based",
     description: "Questions specific to the responsibilities and expectations of the target job.",
   },
   {
-    name: "Case",
+    name: "case",
     displayName: "Case Style",
     description: "Problem-solving questions that assess your analytical and creative thinking skills.",
   },
@@ -80,59 +80,38 @@ export function InterviewReady() {
   const [interviewId] = useAtom(interviewIdAtom)
 
 
-  // useEffect(() => {
-  //   console.log('storedProfileId', profileId)
-  //   console.log('interviewId', interviewId)
-  //   if (!interviewId || !profileId) {
-  //     console.error('Missing interviewId or profileId')
-  //     return
-  //   }
+  useEffect(() => {
+    console.log('storedProfileId', profileId)
+    console.log('interviewId', interviewId)
 
-  //   const x = fetch(`/api/interview-readiness?profileId=${profileId}&interviewId=${interviewId}`)
-  //   // const x = fetch(`/api/interview-readiness?profileId=31&interviewId=14`)
-  //   .then(response => {
-  //     if (!response.ok) throw new Error(`Failed to fetch evaluation`)
-  //     console.log('response', response)
+    const x = fetch(`/api/interview-readiness?profileId=${profileId}&interviewId=${interviewId}`)
+    .then(response => {
+      if (!response.ok) throw new Error(`Failed to fetch evaluation`)
+      console.log('response', response)
 
-  //     return response.json()
-  //   })
-  //   .then(data => {
-  //     console.log('data', data)
-  //     setContent(data.content)
-  //   })
+      return response.json()
+    })
+    .then(data => {
+      console.log('XXX data', data)
+      const results = data.content
 
-  //   console.log('xXx', x)
+      // Map results into categoryResponses format
+      const responses: Record<string, CategoryResponse> = {};
+      results.forEach((result: any) => {
+        responses[result.category] = {
+          readiness_rating: result.readiness_rating || "No Data",
+          readiness_text: result.readiness_text || "We don't have enough information to calculate a score."
+        }
+      })
 
+      console.log('YYY responses', responses)
 
-  //   // const categoriesToFetch = ['Overall', 'Behavioral', 'Technical', 'Role', 'Case'];
-
-  //   // Promise.all(
-  //   //   categoriesToFetch.map(category =>
-  //   //     fetch(`/api/interview-readiness?profileId=${storedProfileId}&interviewId=${interviewId}&category=${category}`)
-  //   //       .then(response => {
-  //   //         if (!response.ok) throw new Error(`Failed to fetch ${category} evaluation`);
-  //   //         return response.json();
-  //   //       })
-  //   //       .then(data => ({ category, data: data.content }))
-  //   //   )
-  //   // )
-  //   // .then(results => {
-  //   //   console.log('Results:', results);
-  //   //   const responses: Record<string, CategoryResponse> = {};
-  //   //   results.forEach(({ category, data }) => {
-  //   //     console.log('Category:', category, 'Data:', data);
-  //   //     responses[category] = {
-  //   //       readiness_rating: data ? data.readiness_rating : "No Data",
-  //   //       readiness_text: data ? data.readiness_text : "We don't have enough information to calculate a score."
-  //   //     };
-  //   //   });
-  //   //   console.log('XXXX Responses:', responses);
-  //   //   setCategoryResponses(responses);
-  //   // })
-  //   // .catch(error => {
-  //   //   console.error('Error fetching evaluations:', error);
-  //   // });
-  // }, [searchParams])
+      setCategoryResponses(responses);
+    })
+    .catch(error => {
+      console.error('Error fetching evaluations:', error);
+    });
+  }, [searchParams])
 
   useEffect(() => {
     fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`)
@@ -217,12 +196,12 @@ export function InterviewReady() {
             </CardContent>
           </Card>
 
-          {categoryResponses.Overall?.readiness_rating && (
+          {categoryResponses.overall?.readiness_rating && (
             <>
               <Card className="bg-[#1a1f2b] text-white mb-6">
                 <CardContent className="p-4 sm:p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <ReadinessIndicator readiness={categoryResponses.Overall.readiness_rating} />
+                    <ReadinessIndicator readiness={categoryResponses.overall.readiness_rating} />
                   </div>
                   <ReactMarkdown
                     components={{
@@ -230,7 +209,7 @@ export function InterviewReady() {
                         <ul className="list-disc pl-4 space-y-1 mb-4" {...props} />
                       )
                     }}
-                  >{categoryResponses.Overall.readiness_text ?? ''}</ReactMarkdown>
+                  >{categoryResponses.overall.readiness_text ?? ''}</ReactMarkdown>
                   <Button
                     className="w-full bg-[#10B981] hover:bg-[#0D9668] text-white font-medium py-2 rounded-lg text-sm mt-4"
                     onClick={() => router.push('/interview-practice')}
@@ -280,7 +259,7 @@ export function InterviewReady() {
                 <CardContent className="p-4 sm:p-6">
                   <div>
                     <p>
-                      Practicing answering questions is the best way to prepare for an interview...
+                      FIXME: shouldn't how when we have results. Practicing answering questions is the best way to prepare for an interview...
                     </p>
                   </div>
                   <Button

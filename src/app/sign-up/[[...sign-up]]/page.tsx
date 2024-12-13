@@ -23,7 +23,7 @@ export default function Page() {
           signInUrl="/sign-in"
         forceRedirectUrl="/profile-setup"
       />
-        <Button variant="outline" onClick={() => router.push('/home')}>&lt; Back</Button>
+        <Button variant="outline" onClick={() => router.push('/start')}>&lt; Back</Button>
       </div>
     </div>
 

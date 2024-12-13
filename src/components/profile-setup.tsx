@@ -235,24 +235,24 @@ export function ProfileSetup() {
     }
 
     try {
-      const {profileId, clerkId, ticket} = await saveProfile(formData)
+      const {profileId, ticket} = await saveProfile(formData)
       if (profileId < 0) {
         setIsSubmitting(false)
         return
       }
 
-      const signInResult = await signIn?.create({
-        strategy: "ticket",
-        ticket: ticket,
-      });
+      // const signInResult = await signIn?.create({
+      //   strategy: "ticket",
+      //   ticket: ticket,
+      // });
 
-      if (signInResult?.status === "complete") {
-        const sessionId = signInResult.createdSessionId
-        if (sessionId) {
-          await clerk.setActive({ session: sessionId })
-          console.log("Session activated successfully!")
-        }
-      }
+      // if (signInResult?.status === "complete") {
+      //   const sessionId = signInResult.createdSessionId
+      //   if (sessionId) {
+      //     await clerk.setActive({ session: sessionId })
+      //     console.log("Session activated successfully!")
+      //   }
+      // }
 
 
       router.push(`/interview-setup`)

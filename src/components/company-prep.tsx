@@ -77,7 +77,7 @@ export default function CompanyPrep() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ profileId, interviewId }),
-      });
+      })
 
       if (!response.ok) {
         throw new Error('Failed to generate questions');
@@ -138,7 +138,7 @@ export default function CompanyPrep() {
                 </Button>
                 <p className="text-sm mt-1 text-center">
                 {isSubmitting && (
-                  'Takes about 30 seconds, please be patient. Thank you.'
+                  'Takes about 10 seconds, please be patient. Thank you.'
                 )}
                 </p>
               </div>

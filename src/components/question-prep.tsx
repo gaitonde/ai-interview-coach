@@ -38,9 +38,16 @@ export default function QuestionPrep() {
           setContent('# Question Scoop\n\n' + data.content)
         } else {
           // Generate new prep content
-          const generateResponse = await fetch(`/api/generate-question-prep?profileId=${profileId}&interviewId=${interviewId}`)
-          if (!generateResponse.ok) throw new Error(`Failed to generate question prep`)
-          const newData = await generateResponse.json()
+          const response = await fetch('/api/generate-question-prep', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ profileId, interviewId }),
+          })
+          // const generateResponse = await fetch(`/api/generate-question-prep?profileId=${profileId}&interviewId=${interviewId}`)
+          if (!response.ok) throw new Error(`Failed to generate question prep`)
+          const newData = await response.json()
           setContent('# Question Scoop\n\n' + newData.content)
         }
       })

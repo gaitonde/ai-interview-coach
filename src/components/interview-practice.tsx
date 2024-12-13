@@ -1,16 +1,16 @@
 'use client'
 
 import AudioRecorder from '@/components/audio-recorder'
-import { useState, useEffect, Suspense } from 'react'
-import Scoring from './scoring'
-import { get } from 'idb-keyval'
-import { useRouter, useSearchParams } from 'next/navigation'
-import styles from '../styles/interview-practice.module.css'
 import { Button } from '@/components/ui/button'
+import { interviewIdAtom, isDemoAtom, profileIdAtom } from '@/stores/profileAtoms'
 import { removeDemoData } from '@/utils/auth'
+import { get } from 'idb-keyval'
 import { useAtom } from 'jotai'
-import { profileIdAtom, interviewIdAtom, isDemoAtom } from '@/stores/profileAtoms'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
+import styles from '../styles/interview-practice.module.css'
 import { ConditionalHeader } from "./conditional-header"
+import Scoring from './scoring'
 
 type EvaluatingState = 'Ready' | 'Evaluating'
 
@@ -90,7 +90,6 @@ export function InterviewPracticeContent() {
 
   const handleTranscriptionComplete = async (newTranscript: string, newAudioUrl: string) => {
     const answerId = await saveAnswer(question?.id?.toString() || '', newTranscript)
-    console.log('YYY ANSWER ID ', answerId)
 
     const versionNumber = getNextVersionNumber();
     const key = `audio_v${versionNumber}`;
@@ -126,7 +125,8 @@ export function InterviewPracticeContent() {
           answerId: answerId.toString(),
           interviewId,
           profileId,
-          questionId
+          questionId,
+          category: question?.category
         }),
       });
       if (!response.ok) {
@@ -401,25 +401,25 @@ export function InterviewPracticeContent() {
                 />
                 <button
                   className="text-white bg-[#10B981] hover:bg-[#059669] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
-                  disabled={questions.length < 0 || !manualTranscript.trim()}
+                  disabled={questions.length < 0 || !manualTranscript.trim() || evaluatingState === 'Evaluating'}
                   onClick={async () => {
-                  setEvaluatingState('Evaluating');
-                  const answerId = await saveAnswer(question?.id?.toString() || '', manualTranscript)
-                  console.log('XXXX ANSWER ID ', answerId)
-                  const newVersion = {
-                    answerId: answerId.toString(),
-                    questionId: question?.id?.toString() || '',
-                    transcript: manualTranscript,
-                    aiScoringResult: null,
-                    audioUrl: '',
-                    recordingTimestamp: new Date(),
-                  };
-                  setVersions(prevVersions => [newVersion, ...prevVersions])
-                  handleAiScoring(answerId, 0)
-                  setManualTranscript('')
-                }}
-              >
-                {evaluatingState === 'Ready' ? 'Evaluate Answer' : 'Evaluating...'}
+                    setEvaluatingState('Evaluating')
+                    const answerId = await saveAnswer(question?.id?.toString() || '', manualTranscript)
+                    console.log('XXXX ANSWER ID ', answerId)
+                    const newVersion = {
+                      answerId: answerId.toString(),
+                      questionId: question?.id?.toString() || '',
+                      transcript: manualTranscript,
+                      aiScoringResult: null,
+                      audioUrl: '',
+                      recordingTimestamp: new Date(),
+                    }
+                    setVersions(prevVersions => [newVersion, ...prevVersions])
+                    handleAiScoring(answerId, 0)
+                    setManualTranscript('')
+                  }}
+                >
+                  {evaluatingState === 'Ready' ? 'Evaluate Answer' : 'Evaluating...'}
               </button>
             </div>
           ) : null }
@@ -467,7 +467,7 @@ export function InterviewPracticeContent() {
               onClick={() => {
                 if (isDemo) {
                   removeDemoData()
-                  router.push('/home')
+                  router.push('/start')
                 } else {
                   router.push('/interview-ready')
                 }
