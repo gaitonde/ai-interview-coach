@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const questionsJson = JSON.parse(generatedContent || '{}')
 
     for (const questionJson of questionsJson) {
-      const category = questionJson.category
+      const category = questionJson.category.toLowerCase()
       const questions = questionJson.questions
 
       for (const question of questions) {

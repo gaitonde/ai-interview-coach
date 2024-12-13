@@ -40,7 +40,7 @@ export default function InterviewerPrep() {
     } else {
       router.push('/')
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (!isSubmitting) return
@@ -63,11 +63,36 @@ export default function InterviewerPrep() {
     }
 
     setIsSubmitting(true)
-    // if (!isDemoMode && profileId) {
-    //   await generateInterviewQuestions(profileId)
-    // }
+    if (!isDemoMode && profileId) {
+      await generateQuestionPrep(profileId, interviewId)
+    }
 
     router.push(`/question-prep`)
+  }
+
+  const generateQuestionPrep = async (profileId: string, interviewId: string) => {
+    try {
+      const response = await fetch('/api/generate-question-prep', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ profileId, interviewId }),
+      })
+
+      if (!response.ok) {
+        console.log('XXX response', response)
+        const result = await response.json()
+        console.log('XXX result message', result.message)
+        return
+      }
+
+      const result = await response.json()
+      return result.content
+    } catch (error) {
+      console.error('Error generating company prep:', error)
+      throw error
+    }
   }
 
   return (
@@ -96,7 +121,7 @@ export default function InterviewerPrep() {
                       if (content) {
                         navigator.clipboard.writeText(content)
                           .then(() => alert('Content copied to clipboard!'))
-                          .catch(err => console.error('Failed to copy: ', err));
+                          .catch(err => console.error('Failed to copy: ', err))
                       }
                     }
                   }}
@@ -114,7 +139,7 @@ export default function InterviewerPrep() {
                 </Button>
                 <p className="text-sm mt-1 text-center">
                   {isSubmitting && (
-                    'Takes about 10 seconds, please be patient. Thank you.'
+                    'Takes about 30 seconds, please be patient. Thank you.'
                   )}
                 </p>
               </div>

@@ -111,7 +111,7 @@ export async function POST(request: Request) {
 
   // Insert interview readiness records for each category
   const table = getTable('interview_readiness')
-  const categories = ['Overall', 'Behavioral', 'Case', 'Role', 'Technical', ]
+  const categories = ['overall', 'behavioral', 'case', 'role', 'technical', ]
 
   const readinessQuery = `
     INSERT INTO "${table}" (

@@ -15,29 +15,41 @@ export async function GET(request: NextRequest) {
   console.log('interviewId', interviewId)
 
   let interviewReadiness = await getInteriewReadiness(profileId, interviewId)
-  let result = interviewReadiness.rows
+
+  let interviewReadinessData
   if (interviewReadiness.needsUpdate) {
-    let messages: ChatCompletionMessageParam[] = []
-    await addChatHistory(profileId, interviewId, messages)
-    await getUnsentFeedback(profileId, interviewId, messages)
-    if (messages.length > 0) {
-      console.log('XXX after chat history')
-      const evaluation = await runPrompt(profileId, interviewId, messages)
-      console.log('XXX evaluation', evaluation)
-      //insert new chat history for assistant message
-      const newChatHistory = await insertChatHistory(profileId, interviewId, 'assistant', evaluation)
-      //make sure feedback is marked so we don't use it again
-      await updateFeedback(profileId, interviewId, newChatHistory.id)
-      //TODO: post result stuff - db,
-      await upsertInterviewReadiness(profileId, interviewId, newChatHistory.id, result)
-      interviewReadiness = await getInteriewReadiness(profileId, interviewId)
-      result = interviewReadiness.rows
-    } else {
-      console.warn('Interview readiness needs updating but there is no new feedback to use')
-    }
+    interviewReadinessData = await getUpdatedInteriewReadiness(profileId, interviewId)
+  } else if (!interviewReadiness.hasOverallRating) {
+    interviewReadinessData = []
+  } else {
+    interviewReadinessData = interviewReadiness.rows
   }
-  console.log('XXX result', result)
-  return NextResponse.json({content: result})
+
+  console.log('XXX returning interiew readiness: ', interviewReadinessData)
+  return NextResponse.json({content: interviewReadinessData})
+}
+
+// user should see initial state of interview readiness page -
+//assuming that there are no records
+async function getInteriewReadiness(profileId: string, interviewId: string) {
+  const table = await getTable('interview_readiness')
+
+  const result = await sql.query(`
+    SELECT * FROM ${table}
+    WHERE profile_id = $1
+    AND interview_id = $2
+  `, [profileId, interviewId])
+
+  const needsUpdate = result.rows.some(row => !row.is_up_to_date)
+  const hasOverallRating = result.rows.some(row =>
+    row.category === 'overall' && row.readiness_rating !== null
+  )
+
+  return {
+    needsUpdate: needsUpdate,
+    hasOverallRating: hasOverallRating,
+    rows: result.rows,
+  }
 }
 
 async function updateFeedback(profileId: string, interviewId: string, interviewReadinessChatHistoryId: string) {
@@ -60,31 +72,7 @@ async function insertChatHistory(profileId: string, interviewId: string, role: s
     RETURNING *
   `
   const result = await sql.query(query, [profileId, interviewId, role, content])
-  return result.rows[0]
-}
-
-async function a(profileId: string, interviewId: string) {
-  const result = await getInteriewReadiness(profileId, interviewId)
-  return NextResponse.json(result)
-}
-
-// user should see initial state of interview readiness page -
-//assuming that there are no records
-async function getInteriewReadiness(profileId: string, interviewId: string) {
-  const table = await getTable('interview_readiness')
-
-  const result = await sql.query(`
-    SELECT * FROM ${table}
-    WHERE profile_id = $1
-    AND interview_id = $2
-  `, [profileId, interviewId])
-
-  const needsUpdate = result.rows.some(row => !row.is_up_to_date)
-
-  return {
-    needsUpdate: needsUpdate,
-    rows: result.rows,
-  }
+  return result.rows
 }
 
 async function upsertInterviewReadiness(profileId: string, interviewId: string, chatHistoryId: string, data: any) {
@@ -93,10 +81,15 @@ async function upsertInterviewReadiness(profileId: string, interviewId: string, 
   console.log('XXX data', data)
 
   for (const key of Object.keys(data)) {
+    console.log('XXX key', key)
     if (key.endsWith('_readiness_rating')) {
       const category = key.replace('_readiness_rating', '')
       const ratingKey = `${category}_readiness_rating`
       const textKey = `${category}_readiness_text`
+
+      console.log('XXX category', category)
+      console.log('XXX ratingKey', ratingKey, data[ratingKey])
+      console.log('XXX textKey', textKey, data[textKey])
 
       const query = `
         INSERT INTO ${table}
@@ -121,7 +114,8 @@ async function upsertInterviewReadiness(profileId: string, interviewId: string, 
 async function getUnsentFeedback(profileId: string, interviewId: string, messages: ChatCompletionMessageParam[]) {
   const table = getTable('feedback')
   const query = `
-    SELECT id, category, feedback, created_at, interview_readiness_chat_history_id FROM ${table}
+    SELECT id, category, feedback, created_at, interview_readiness_chat_history_id
+    FROM ${table}
     WHERE profile_id = $1
     AND interview_id = $2
     AND interview_readiness_chat_history_id IS NULL
@@ -166,12 +160,12 @@ async function runPrompt(profileId: string, interviewId: string, messages: ChatC
     temperature: prompt.temperature,
   })
 
-  console.log('XXX completion', completion)
 
   const generatedContent = completion.choices[0]?.message?.content
   if (!generatedContent) {
     throw new Error('Unable to generate interview readiness evaluation')
   }
+  console.log('XXX content from interview readiness prompt', generatedContent)
   const jsonContent = generatedContent.replace('```json', '').replace('```', '')
   const jsonObject = JSON.parse(jsonContent)
   return jsonObject
@@ -201,6 +195,35 @@ async function addChatHistory(profileId: string, interviewId: string, messages: 
       content: chat.content
     })
   }
+}
+
+async function getUpdatedInteriewReadiness(profileId: string, interviewId: string) {
+  let interviewReadiness = []
+  let messages: ChatCompletionMessageParam[] = []
+
+  await addChatHistory(profileId, interviewId, messages)
+  await getUnsentFeedback(profileId, interviewId, messages)
+  if (messages.length > 0) {
+    console.log('XXX after chat history')
+    const evaluation = await runPrompt(profileId, interviewId, messages)
+    console.log('XXX evaluation', evaluation)
+
+    //insert new chat history for assistant message
+    const newChatHistory = await insertChatHistory(profileId, interviewId, 'assistant', evaluation)
+
+    //make sure feedback is marked so we don't use it again
+    await updateFeedback(profileId, interviewId, newChatHistory[0].id)
+
+
+    await upsertInterviewReadiness(profileId, interviewId, newChatHistory[0].id, evaluation)
+
+    //refetch interview readiness to get updated rows
+    interviewReadiness = (await getInteriewReadiness(profileId, interviewId)).rows
+  } else {
+    console.warn('Interview readiness needs updating but there is no new feedback to use')
+  }
+
+  return interviewReadiness
 }
 
 

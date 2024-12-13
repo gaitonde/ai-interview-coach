@@ -115,7 +115,7 @@ export function InterviewSetup() {
     }
   };
 
-  const generateJobPrep = async (profileId: string, interviewId: string) => {
+  const generateCompanyPrep = async (profileId: string, interviewId: string) => {
     try {
       const response = await fetch('/api/generate-company-prep', {
         method: 'POST',
@@ -139,7 +139,7 @@ export function InterviewSetup() {
       console.error('Error generating company prep:', error);
       throw error;
     }
-  };
+  }
 
   const validateForm = (formData: FormData): string | null => {
     const requiredFields = [
@@ -204,7 +204,7 @@ export function InterviewSetup() {
       }
       const interviewId = await saveInterview(profileId, formData)
       if (interviewId) {
-        await generateJobPrep(profileId, interviewId)
+        await generateCompanyPrep(profileId, interviewId)
         router.push(`/company-prep`)
       } else {
         setIsSubmitting(false)

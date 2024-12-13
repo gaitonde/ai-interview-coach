@@ -36,19 +36,19 @@ export default function QuestionPrep() {
         if (data.content) {
           // Use existing prep content
           setContent('# Question Scoop\n\n' + data.content)
-        } else {
-          // Generate new prep content
-          const response = await fetch('/api/generate-question-prep', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ profileId, interviewId }),
-          })
-          // const generateResponse = await fetch(`/api/generate-question-prep?profileId=${profileId}&interviewId=${interviewId}`)
-          if (!response.ok) throw new Error(`Failed to generate question prep`)
-          const newData = await response.json()
-          setContent('# Question Scoop\n\n' + newData.content)
+        // } else {
+        //   // Generate new prep content
+        //   const response = await fetch('/api/generate-question-prep', {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ profileId, interviewId }),
+        //   })
+        //   // const generateResponse = await fetch(`/api/generate-question-prep?profileId=${profileId}&interviewId=${interviewId}`)
+        //   if (!response.ok) throw new Error(`Failed to generate question prep`)
+        //   const newData = await response.json()
+        //   setContent('# Question Scoop\n\n' + newData.content)
         }
       })
       .catch(error => {
@@ -175,7 +175,7 @@ export default function QuestionPrep() {
                   {isSubmitting ? statusMessage : 'Next'}
                 </Button>
                 <p className="text-sm mt-1 text-center">
-                  {isSubmitting && 'Takes about 10 seconds, please be patient. Thank you.'}
+                  {isSubmitting && 'Takes about 30 seconds, please be patient. Thank you.'}
                 </p>
               </div>
             </div>

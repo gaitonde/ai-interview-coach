@@ -161,7 +161,7 @@ export function InterviewPracticeContent() {
       setExpandedVersionIndex(0);
     }
 
-    const fetchJob = async () => {
+    const fetchInterview = async () => {
       try {
         if (profileId) {
           const response = await fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`);
@@ -290,7 +290,7 @@ export function InterviewPracticeContent() {
     }
 
     if (!whom) {
-      fetchJob();
+      fetchInterview();
     }
     if (questionIndex < 0) {
       fetchQuestions();

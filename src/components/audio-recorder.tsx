@@ -231,7 +231,7 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
           // disabled={recorderState === 'Transcribing'}
           disabled={true}
         >
-          {recorderState === 'Ready' ? 'Record Answerx' : recorderState === 'Recording' ? 'Stop' : 'Transcribing...'}
+          {recorderState === 'Ready' ? 'Record Answer' : recorderState === 'Recording' ? 'Stop' : 'Transcribing...'}
         </button>
       </div>
 

@@ -95,11 +95,11 @@ export default function Dashboard() {
     .then(response => {
       console.log('YYY response', response)
       if (!response.ok) {
-        console.error('YYY Failed to fetch job data:', response)
+        console.error('YYY Failed to fetch interview data:', response)
         logout().then(() => {
           router.push('/sign-in');
         });
-        throw new Error('Failed to fetch job data');
+        throw new Error('Failed to fetch interview data');
       }
       return response.json()
     })

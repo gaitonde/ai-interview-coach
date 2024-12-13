@@ -32,7 +32,7 @@ export function UserMenu() {
             <DropdownMenuItem onClick={() => router.push('/buy')} className="cursor-pointer hover:bg-[#374151]">
               Get More Interviews
             </DropdownMenuItem>
-            <SignOutButton redirectUrl="/home">
+            <SignOutButton redirectUrl="/start">
               <DropdownMenuItem
                 onClick={() => setUserId(null)}
                 className="cursor-pointer hover:bg-[#374151]"

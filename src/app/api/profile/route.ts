@@ -5,7 +5,6 @@ import { createUser } from '@/app/actions/create-user'
 import { clerkClient } from '@clerk/express'
 
 const PROFILES_TABLE = getTable('profiles')
-// const JOBS_TABLE = getTable('interviews')
 
 interface ClerkError extends Error {
   errors?: Array<{ message: string }>;
@@ -41,7 +40,6 @@ export async function GET(request: Request) {
     }
 
     const profile = await sql.query(query)
-    // const job = await sql.query(`SELECT company_url, jd_url, interviewer_name, interviewer_role FROM ${JOBS_TABLE} WHERE profile_id = ${profileId}`);
 
     return NextResponse.json({ profiles: profile.rows })
   } catch (error) {
@@ -66,7 +64,7 @@ export async function POST(request: Request) {
       userId = user.id
       ticket = await clerkClient.signInTokens.createSignInToken({
         userId: user.clerkId.toString(),
-        expiresInSeconds: 60 * 60, // Token expires in 1 hour
+        expiresInSeconds: 60 * 60 * 24 * 30, // Token expires in 1 month
       })
       await updateProfile(id, userId, email, linkedin, school, major, concentration, graduation_date)
     } catch (err) {

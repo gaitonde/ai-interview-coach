@@ -9,11 +9,11 @@ export async function POST(request: Request) {
   const interviewId = body.interviewId;
 
   if (!profileId || !interviewId) {
-    return NextResponse.json({ error: 'Profile ID and Job ID are required' }, { status: 400 });
+    return NextResponse.json({ error: 'Profile ID and Interview ID are required' }, { status: 400 });
   }
 
   try {
-    const { content, usage } = await generateCompletion(profileId, 'prompt-company-prep')
+    const { content, usage } = await generateCompletion(profileId, 'prompt-company-prep', interviewId)
     const aiResponsesTable = getTable('airesponses');
     const query = `
       INSERT INTO ${aiResponsesTable} (profile_id, interview_id, generated_company_prep, usage)
@@ -24,13 +24,14 @@ export async function POST(request: Request) {
 
     await sql.query(query, [profileId, interviewId, content, usage]);
 
-    const companyMatch = content?.match(/\*\*Company\*\*:\s*([^\n]*)/);
-    const companyName = companyMatch ? companyMatch[1].trim() : null;
-    const roleMatch = content?.match(/\*\*Position\*\*:\s*([^\n]*)/);
-    const roleName = roleMatch ? roleMatch[1].trim() : null;
-    const jobsTable = getTable('interviews');
+    const companyMatch = content?.match(/\*\*Company\*\*:\s*([^\n]*)/)
+    const companyName = companyMatch ? companyMatch[1].trim() : null
+    const roleMatch = content?.match(/\*\*Position\*\*:\s*([^\n]*)/)
+    const roleName = roleMatch ? roleMatch[1].trim() : null
+
+    const interviewsTable = getTable('interviews');
     const query2 = `
-      UPDATE ${jobsTable}
+      UPDATE ${interviewsTable}
       SET company_name = $1, role_name = $2
       WHERE profile_id = $3
       AND id = $4;

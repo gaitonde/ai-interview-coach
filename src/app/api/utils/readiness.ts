@@ -6,8 +6,6 @@ export interface ReadinessData {
   readiness_rating: string
 }
 
-export const CATEGORIES = ['Overall', 'Behavioral', 'Technical', 'Role', 'Case']
-
 export async function getExistingReadiness(profileId: string, interviewId: string) {
   const table = getTable('interview_readiness')
   const result = await sql.query(`
@@ -18,7 +16,7 @@ export async function getExistingReadiness(profileId: string, interviewId: strin
     `,
     [profileId, interviewId]
   )
-  console.log('XXX result', result.rows)
+
   return result.rows
 }
 

@@ -259,7 +259,8 @@ export function InterviewReady() {
                 <CardContent className="p-4 sm:p-6">
                   <div>
                     <p>
-                      FIXME: shouldn't how when we have results. Practicing answering questions is the best way to prepare for an interview...
+                      Personalized questions have been created to help you prepare for your interview.
+                      Jam sessions are a great way to practice your answers and see what you're at!
                     </p>
                   </div>
                   <Button

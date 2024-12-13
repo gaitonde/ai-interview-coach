@@ -115,8 +115,8 @@ export function ProfileSetup() {
 
       return {profileId, clerkId, ticket}
     } catch (error) {
-      console.error('Error in saveProfile:', error);
-      throw error;
+      console.error('Error in saveProfile:', error)
+      throw error
     }
   }
 
@@ -235,25 +235,31 @@ export function ProfileSetup() {
     }
 
     try {
-      const {profileId, ticket} = await saveProfile(formData)
+      const {profileId, clerkId, ticket} = await saveProfile(formData)
       if (profileId < 0) {
         setIsSubmitting(false)
         return
       }
 
-      // const signInResult = await signIn?.create({
-      //   strategy: "ticket",
-      //   ticket: ticket,
-      // });
+      const signInResult = await signIn?.create({
+        strategy: "ticket",
+        ticket: ticket,
+      });
 
-      // if (signInResult?.status === "complete") {
-      //   const sessionId = signInResult.createdSessionId
-      //   if (sessionId) {
-      //     await clerk.setActive({ session: sessionId })
-      //     console.log("Session activated successfully!")
-      //   }
-      // }
+      if (signInResult?.status === "complete") {
+        const sessionId = signInResult.createdSessionId
+        if (sessionId) {
+          await clerk.setActive({ session: sessionId })
 
+          // The atoms will automatically persist to localStorage
+          await Promise.all([
+            setAtomProfileId(profileId),
+            setAtomUserId(clerkId)
+          ]);
+
+          console.log("Session activated successfully!")
+        }
+      }
 
       router.push(`/interview-setup`)
     } catch (error: any) {
@@ -428,21 +434,6 @@ export function ProfileSetup() {
                   </div>
                 </>
               )}
-
-{/*
-              <div>
-                <label htmlFor="current-courses" className="block text-sm font-medium text-white">
-                  Current Courses
-                </label>
-                <textarea
-                  id="current-courses"
-                  name="current-courses"
-                  rows={4}
-                  placeholder="List your current courses (e.g. MKT 4350, ISOM 352)"
-                  className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md text-sm px-3 py-2"
-                ></textarea>
-              </div>
-               */}
             </div>
             <Button
               type="submit"

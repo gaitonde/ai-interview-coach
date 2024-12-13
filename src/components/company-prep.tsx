@@ -138,7 +138,7 @@ export default function CompanyPrep() {
                 </Button>
                 <p className="text-sm mt-1 text-center">
                 {isSubmitting && (
-                  'Takes about 10 seconds, please be patient. Thank you.'
+                  'Takes about 30 seconds, please be patient. Thank you.'
                 )}
                 </p>
               </div>

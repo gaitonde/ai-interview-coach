@@ -3,7 +3,6 @@ import { sql } from '@vercel/postgres'
 import { getTable } from "@/lib/db"
 
 const PROFILES_TABLE = getTable('profiles')
-const JOBS_TABLE = getTable('interviews')
 
 export async function GET(request: Request) {
   try {
@@ -36,7 +35,6 @@ export async function GET(request: Request) {
     }
 
     const profile = await sql.query(query)
-    // const job = await sql.query(`SELECT company_url, jd_url, interviewer_name, interviewer_role FROM ${JOBS_TABLE} WHERE profile_id = ${profileId}`);
 
     return NextResponse.json({ profiles: profile.rows })
   } catch (error) {
