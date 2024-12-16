@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { clerkMiddleware, type ClerkMiddlewareAuth } from '@clerk/nextjs/server'
 import { getProfileByUserId } from '@/app/actions/get-profile'
 
-const publicRoutes = ['/start', '/sign-up', '/sign-in', '/api', '/profile-setup']
+const publicRoutes = ['/start', '/sign-in', '/sign-up', '/sign-up-start', '/api', '/profile-setup']
 
 const isPublicRoute = (pathname: string): boolean => {
   return publicRoutes.some(route => {
@@ -21,12 +21,8 @@ const afterAuth = async (auth: ClerkMiddlewareAuth, req: NextRequest) => {
 
   const { userId } = await auth()
 
-  // console.log('AAA userId', userId)
-  console.log('AAA req.nextUrl.pathname', req.nextUrl.pathname)
-  console.log('AAA isPublicPath', isPublicPath)
   if (!userId && !isPublicPath) {
     const signInUrl = new URL('/start', req.url);
-    // console.log('AAA signInUrl', signInUrl)
     return NextResponse.redirect(signInUrl);
   }
 

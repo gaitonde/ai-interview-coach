@@ -107,6 +107,17 @@ async function upsertInterviewReadiness(profileId: string, interviewId: string, 
         data[ratingKey],
         data[textKey],
       ])
+
+      if (category === 'overall') {
+        const interviewsTable = getTable('interviews')
+        const query = `
+          UPDATE ${interviewsTable}
+          SET readiness = $1
+          WHERE profile_id = $2
+          AND id = $3
+        `
+        await sql.query(query, [data[ratingKey], profileId, interviewId])
+      }
     }
   }
 }

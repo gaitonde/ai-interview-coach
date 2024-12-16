@@ -44,7 +44,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   }, [isLoaded, user, router, profileId, setProfileId])
 
   if (!isLoaded || !user) {
-    return <div>Loading...</div>
+    return <div/>
   }
 
   return <>{children}</>

@@ -4,8 +4,10 @@ import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useAtomValue } from "jotai"
 import { profileIdAtom } from "@/stores/profileAtoms"
+import { useRouter } from 'next/navigation'
 
 export default function PurchasedPage() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const stripeSessionId = searchParams.get('session_id')
   const profileId = useAtomValue(profileIdAtom)
@@ -23,8 +25,7 @@ export default function PurchasedPage() {
         const data = await response.json()
 
         if (data.success) {
-          // Handle successful payment verification
-          // e.g., update UI, save to database, etc.
+          router.push('/interview-setup')
         }
       } catch (error) {
         console.error('Error verifying payment:', error)
@@ -36,11 +37,5 @@ export default function PurchasedPage() {
     }
   }, [stripeSessionId])
 
-  return (
-    // Your success page UI
-    <div>
-      <h1>Purchased Page</h1>
-      <p>Payment verified successfully</p>
-    </div>
-  )
+  return null
 }

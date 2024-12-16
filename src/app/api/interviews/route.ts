@@ -15,7 +15,6 @@ export async function GET(request: Request) {
   const profileId = searchParams.get('profileId')
   const interviewId = searchParams.get('interviewId')
 
-
   if (!profileId) {
     return NextResponse.json({ error: 'Profile ID is required' }, { status: 400 })
   }

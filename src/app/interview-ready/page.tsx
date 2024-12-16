@@ -1,5 +1,10 @@
-import { InterviewReady } from '@/components/interview-ready'
+import InterviewReady from '@/components/interview-ready'
+import ProtectedLayout from "@/components/layouts/ProtectedLayout"
 
 export default function InterviewReadyPage() {
-  return <InterviewReady />
+  return <>
+    <ProtectedLayout>
+      <InterviewReady />
+    </ProtectedLayout>
+  </>
 }

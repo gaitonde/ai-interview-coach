@@ -9,8 +9,8 @@ import { useAtom } from 'jotai'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import styles from '../styles/interview-practice.module.css'
-import { ConditionalHeader } from "./conditional-header"
-import Scoring from './scoring'
+import ConditionalHeader from '@/components/conditional-header'
+import Scoring from '@/components/scoring'
 
 type EvaluatingState = 'Ready' | 'Evaluating'
 

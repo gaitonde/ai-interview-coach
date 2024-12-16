@@ -1,6 +1,6 @@
 'use client'
 
-import { ConditionalHeader } from '@/components/conditional-header'
+import ConditionalHeader from '@/components/conditional-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -70,7 +70,7 @@ const getScoreInfo = (score?: string): { icon: React.ReactNode; text: string; co
   }
 }
 
-export function InterviewReady() {
+export default function InterviewReady() {
   const router = useRouter()
   const [interview, setInterview] = useState<Interview | null>(null)
   const [categoryRatings, setCategoryRatings] = useState<Record<string, CategoryResponse>>({})

@@ -1,8 +1,10 @@
 'use client'
 
-import { ConditionalHeader } from '@/components/conditional-header'
+import ConditionalHeader from '@/components/conditional-header'
 import { Button } from '@/components/ui/button'
+import { profileIdAtom } from "@/stores/profileAtoms"
 import { loadStripe } from '@stripe/stripe-js'
+import { useAtomValue } from "jotai"
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -10,6 +12,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 export default function BuyPage() {
   const router = useRouter()
+  const profileId = useAtomValue(profileIdAtom)
   const [loading, setLoading] = useState(false)
 
   const handleCheckout = async () => {
@@ -24,6 +27,7 @@ export default function BuyPage() {
         body: JSON.stringify({
           productName: 'Interview Prep Session',
           price: 500, // Amount in cents
+          profileId: profileId,
         }),
       })
 

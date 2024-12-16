@@ -275,5 +275,5 @@ CREATE TABLE aic_preview_payments (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (profile_id) REFERENCES aic_preview_profiles(id) ON DELETE CASCADE,
-    UNIQUE (profile_id)
+    UNIQUE (profile_id, stripe_session_id)
 );

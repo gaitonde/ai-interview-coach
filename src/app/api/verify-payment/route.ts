@@ -19,14 +19,14 @@ export async function POST(req: Request) {
     console.log('session', session)
     console.log('payment_status', session.payment_status)
     if (session.payment_status === 'paid') {
-      console.log('todo: payment_status is paid')
+      console.log('adding new payment')
 
       // Upsert payments record using SQL
       const table = getTable('payments')
       const query = `
         INSERT INTO ${table} (profile_id, stripe_session_id)
         VALUES ($1, $2)
-        ON CONFLICT (profile_id)
+        ON CONFLICT (profile_id, stripe_session_id)
         DO UPDATE SET
           stripe_session_id = $2
       `

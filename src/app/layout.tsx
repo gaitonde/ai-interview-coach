@@ -22,7 +22,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "AI Interview Coach",
-  description: "Nail your first interview!",
+  description: "Nail your next interview!",
 };
 
 export default async function RootLayout({
@@ -35,12 +35,12 @@ export default async function RootLayout({
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black`}>
           <div className="min-h-screen flex flex-col">
-            <div className="max-w-7xl mx-auto w-full bg-[#1a1f2b]">
+            <main className="max-w-7xl mx-auto w-full bg-[#1a1f2b] flex-1">
               <AtomProvider>
                 {children}
               </AtomProvider>
-              <Footer />
-            </div>
+            </main>
+            <Footer />
             <Toaster />
             <Analytics />
           </div>

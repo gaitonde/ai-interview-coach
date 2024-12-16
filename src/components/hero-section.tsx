@@ -2,7 +2,7 @@ export function HeroSection() {
   return (
     <div className="max-w-2xl text-center space-y-6 mb-12">
       <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
-        Nail Your First Interview
+        Nail Your Next Interview
       </h1>
       <p className="text-xl text-muted-foreground">
         Streamline your company research. Sneak a peek at role specific, tailored interview questions.

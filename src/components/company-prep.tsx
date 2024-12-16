@@ -6,7 +6,7 @@ import { useAtom } from "jotai"
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ConditionalHeader } from "./conditional-header"
+import ConditionalHeader from '@/components/conditional-header'
 import MarkdownRenderer from './markdown-renderer'
 import { RubricScorer } from './rubric-scorer'
 
@@ -16,6 +16,7 @@ export default function CompanyPrep() {
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
   const [showScore] = useAtom(showScoreAtom)
+
   useEffect(() => {
     if (profileId) {
       fetch(`/api/company-prep?profileId=${profileId}&interviewId=${interviewId}`)
@@ -42,27 +43,6 @@ export default function CompanyPrep() {
     router.push('/interviewer-prep');
   }
 
-  const generateInterviewPrep = async (profileId: string) => {
-    try {
-      const response = await fetch('/api/generate-interviewer-prep', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ profileId, interviewId }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to generate questions');
-      }
-
-      const result = await response.json();
-      return result.content;
-    } catch (error) {
-      console.error('Error generating questions:', error);
-      throw error;
-    }
-  };
 
   return (
     <>

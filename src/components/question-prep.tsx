@@ -6,8 +6,8 @@ import { useAtom } from 'jotai'
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { ConditionalHeader } from "./conditional-header"
-import MarkdownRenderer from './markdown-renderer'
+import ConditionalHeader from '@/components/conditional-header'
+import MarkdownRenderer from '@/components/markdown-renderer'
 
 export default function QuestionPrep() {
   const router = useRouter()

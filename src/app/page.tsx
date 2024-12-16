@@ -1,6 +1,6 @@
 'use client'
 
-import { ConditionalHeader } from '@/components/conditional-header'
+import ConditionalHeader from '@/components/conditional-header'
 import Dashboard from '@/components/dashboard'
 import { userIdAtom } from '@/stores/profileAtoms'
 import { useAtom } from 'jotai'
