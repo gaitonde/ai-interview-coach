@@ -7,7 +7,7 @@ import { SignUp } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect } from "react"
 
-export default function Page() {
+export default function SignUpPage() {
   const router = useRouter()
 
   useEffect(() => {
@@ -21,8 +21,8 @@ export default function Page() {
       <div className="flex flex-col gap-4 w-full max-w-sm">
         <SignUp
           signInUrl="/sign-in"
-        forceRedirectUrl="/profile-setup"
-      />
+          forceRedirectUrl="/profile-setup"
+        />
         <Button variant="outline" onClick={() => router.push('/start')}>&lt; Back</Button>
       </div>
     </div>

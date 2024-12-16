@@ -1,13 +1,13 @@
-import { getTable } from "@/lib/db";
-import { sql } from "@vercel/postgres";
-import { NextResponse } from 'next/server';
+import { getTable } from '@/lib/db'
+import { sql } from '@vercel/postgres'
+import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const table = getTable('profiles');
+  const table = getTable('profiles')
   const profiles = await sql.query(`
     SELECT * FROM ${table}
     WHERE is_demo = TRUE
     ORDER BY created_at DESC
-  `);
-  return NextResponse.json({ profiles: profiles.rows }, { status: 200 });
+  `)
+  return NextResponse.json({ profiles: profiles.rows })
 }

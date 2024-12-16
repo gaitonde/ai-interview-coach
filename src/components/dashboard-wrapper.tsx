@@ -10,11 +10,11 @@ export default function DashboardWrapper() {
   const router = useRouter()
   const [profileId] = useAtom(profileIdAtom)
 
-  useEffect(() => {
-    if (!profileId) {
-      router.push('/profile-setup')
-    }
-  }, [profileId])
+  // useEffect(() => {
+  //   if (!profileId) {
+  //     router.push('/profile-setupa')
+  //   }
+  // }, [profileId])
 
   return (
     <div>

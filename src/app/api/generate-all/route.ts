@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { generateCompletion } from '../utils/openAiCompletion'
 import { getTable } from '@/lib/db'
 import { sql } from '@vercel/postgres'
+import { getBaseUrl } from "@/lib/utils"
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -57,8 +58,7 @@ async function generateCompanyPrep(profileId: string, interviewId: string) {
 }
 
 async function generateOtherPreps(profileId: string, interviewId: string) {
-  const protocol = process.env.NEXT_PUBLIC_VERCEL_URL?.startsWith('localhost') ? 'http' : 'https';
-  const baseUrl = `${protocol}://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+  const baseUrl = getBaseUrl()
 
   const generateEndpoints = [
     'generate-interviewer-prep',

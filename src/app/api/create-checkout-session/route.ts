@@ -1,3 +1,4 @@
+import { getBaseUrl } from "@/lib/utils"
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -6,7 +7,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const { productName, price } = await req.json()
+    const { profileId, productName, price } = await req.json()
+
+    const baseUrl = getBaseUrl()
 
     // Create a Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -24,8 +27,8 @@ export async function POST(req: Request) {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`, //TODO: handle session id
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/buy`,
+      success_url: `${baseUrl}/purchased?profile_id=${profileId}&session_id={CHECKOUT_SESSION_ID}`, //TODO: handle session id
+      cancel_url: `${baseUrl}/buy`,
     })
 
     return NextResponse.json({ sessionId: session.id })

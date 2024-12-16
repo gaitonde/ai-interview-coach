@@ -4,24 +4,13 @@ import { Header } from '@/components/header'
 import { isDemoAtom } from '@/stores/profileAtoms'
 import { useAuth } from '@clerk/nextjs'
 import { useAtomValue } from 'jotai'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 
 export function ConditionalHeader() {
-  const router = useRouter()
-  const { userId, signOut } = useAuth()
+  const { userId } = useAuth()
 
-  useEffect(() => {
-    if (!userId) {
-      signOut()
-      router.push('/start')
-    }
-  }, [userId, signOut, router])
+  console.log('userId in conditional-header', userId)
 
   const isDemo = useAtomValue(isDemoAtom)
-
-  //console.log('In ConditionalHeader userId', userId)
-  //console.log('In ConditionalHeader isDemo', isDemo)
 
   if (!userId) return null
 

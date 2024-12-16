@@ -1,7 +1,8 @@
 import { useClerk } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { profileIdAtom } from "@/stores/profileAtoms";
 import { useSetAtom } from "jotai";
+// import { currentUser } from "@clerk/nextjs/server";
 
 export const useLogout = () => {
   const { signOut } = useClerk()
@@ -28,3 +29,12 @@ export function removeDemoData() {
   localStorage.removeItem('userId')
 }
 
+// export async function requireAuth() {
+//   const user = await currentUser();
+
+//   if (!user) {
+//     redirect("/sign-in");
+//   }
+
+//   return user;
+// }

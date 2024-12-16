@@ -1,30 +1,94 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { clerkMiddleware, type ClerkMiddlewareAuth } from '@clerk/nextjs/server'
+import { getProfileByUserId } from '@/app/actions/get-profile'
 
-const isPublicRoute = createRouteMatcher(['/', '/start', '/privacy', '/terms', '/api/(.*)', '/sign-in(.*)', '/sign-up(.*)'])
+const publicRoutes = ['/start', '/sign-up', '/sign-in', '/xxx', '/api']
 
-export function middleware(request: NextRequest) {
-  //TODO: re-enable logging
-  // Only log API routes
-  // if (request.nextUrl.pathname.startsWith('/api')) {
-  //   console.log(`API Request: ${request.method} ${request.nextUrl.pathname}`)
-  // }
+const isPublicRoute = (pathname: string): boolean => {
+  return publicRoutes.some(route => {
+    // Escape special regex characters in the route
+    const escapedRoute = route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    // Create a regex that matches the start of the pathname
+    const regex = new RegExp(`^${escapedRoute}`)
 
-  return NextResponse.next()
+    return regex.test(pathname)
+  })
 }
-export default clerkMiddleware(async (auth, request) => {
-  const isDemoMode = request.cookies.get('mode')?.value === 'demo';
 
-  // if (!isPublicRoute(request) && !isDemoMode) {
-  //   await auth.protect()
-  // }
-})
+const afterAuth = async (auth: ClerkMiddlewareAuth, req: NextRequest) => {
+  const isPublicPath = isPublicRoute(req.nextUrl.pathname)
+
+  const { userId } = await auth()
+
+  // console.log('AAA userId', userId)
+  console.log('AAA req.nextUrl.pathname', req.nextUrl.pathname)
+  console.log('AAA isPublicPath', isPublicPath)
+  if (!userId && !isPublicPath) {
+    const signInUrl = new URL('/start', req.url);
+    // console.log('AAA signInUrl', signInUrl)
+    return NextResponse.redirect(signInUrl);
+  }
+
+  if (userId && !isPublicPath) {
+    console.log('In Middleware fetching profile for userId', userId)
+    const profile = await getProfileByUserId(userId)
+    console.log('In Middleware profile', profile)
+  }
+
+  return NextResponse.next();
+}
+
+export default clerkMiddleware((auth, req) => afterAuth(auth, req));
+
+// export default clerkMiddleware(async (auth: ClerkMiddlewareAuth, req: NextRequest) => {
+//   const isPublicPath = isPublicRoute(req.nextUrl.pathname)
+
+//   const { userId, redirectToSignIn } = await auth()
+//   console.log('XXX =======================')
+//   console.log('XXX req.url', req.url)
+//   console.log('XXX req.nextUrl.pathname', req.nextUrl.pathname)
+//   // console.log('XXX redirectToSignIn', redirectToSignIn)
+//   console.log('XXX isPublicPath', isPublicPath)
+//   console.log('XXX userId', userId)
+
+
+//   if (!userId && !isPublicPath) {
+//     // const startePath = new URL('/start', req.url)
+//     // return NextResponse.redirect(startePath)
+//     console.log('XXX here redirectToSignIn()')
+//     const protocol = process.env.NEXT_PUBLIC_VERCEL_URL?.startsWith('localhost') ? 'http' : 'https';
+//     const signInUrl = new URL('/start', `${protocol}://${process.env.NEXT_PUBLIC_VERCEL_URL}`)
+
+//     // signInUrl.searchParams.set('redirect_url', req.url)
+//     console.log('XXX signInUrl', signInUrl)
+//     return NextResponse.redirect(signInUrl)
+
+//     // return redirectToSignIn()
+//   } else if (userId) {
+//     console.log('XXX userId', userId)
+
+//   }
+
+//   return NextResponse.next()
+// }
+// )
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-  ],
-};
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+}
+
+// export default clerkMiddleware({
+  // beforeAuth: (req) => {
+  //   // Your before auth logic
+  // },
+  // afterAuth: (auth, req) => {
+  //   const isPublicPath = isPublicRoute(req.nextUrl.pathname)
+  //   if (!auth.userId && !isPublicPath) {
+  //     const signInUrl = new URL('/start', req.url)
+  //     return NextResponse.redirect(signInUrl)
+  //   }
+  //   return NextResponse.next()
+  // },
+
+// });

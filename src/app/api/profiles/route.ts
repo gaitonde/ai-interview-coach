@@ -6,9 +6,10 @@ const PROFILES_TABLE = getTable('profiles')
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const profileId = searchParams.get('profileId')
-    const isDemo = searchParams.get('loadDemo')
+    const params = Object.fromEntries(new URL(request.url).searchParams)
+    const { profileId, userId, isDemo } = params
+
+    console.log('BKAG AAAXXX params', params)
 
     let query
 
@@ -27,6 +28,18 @@ export async function GET(request: Request) {
         `
       }
 
+    } else if (userId) {
+      const usersTable = getTable('users')
+      query = `
+        SELECT * FROM ${PROFILES_TABLE}, ${usersTable}
+        WHERE ${PROFILES_TABLE}.user_id = ${usersTable}.id
+        AND ${usersTable}.clerk_id = '${userId}'
+      `
+      console.log('AAAXXX query', query)
+      const profileRows = await sql.query(query)
+      const profile = profileRows.rows.length > 0 ? profileRows.rows[0] : null
+      console.log('AAAXXX profile', profile)
+      return NextResponse.json({ profile })
     } else {
       query = `
         SELECT * FROM ${PROFILES_TABLE}

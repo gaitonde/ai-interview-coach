@@ -13,10 +13,6 @@ import { RubricScorer } from './rubric-scorer'
 export default function InterviewerPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isDemoMode] = useState(false)
-  const [statusMessage, setStatusMessage] = useState('Thinking...')
-
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
   const [showScore] = useAtom(showScoreAtom)
@@ -42,31 +38,8 @@ export default function InterviewerPrep() {
     }
   }, [])
 
-  useEffect(() => {
-    if (!isSubmitting) return
-
-    const messages = ['Thinking...', 'Researching...', 'Analyzing...', 'Generating...']
-    let currentIndex = 0
-
-    const interval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % messages.length
-      setStatusMessage(messages[currentIndex])
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [isSubmitting])
-
   const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    if (!profileId) {
-      alert('No profile ID found. Please select a profile.')
-    }
-
-    setIsSubmitting(true)
-    // if (!isDemoMode && profileId) {
-    //   await generateQuestionPrep(profileId, interviewId)
-    // }
-
     router.push(`/question-prep`)
   }
 
@@ -131,17 +104,11 @@ export default function InterviewerPrep() {
                   Copy to Clipboard
                 </Button>
                 <Button
-                  disabled={isSubmitting}
                   onClick={handleSubmit}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
-                  {isSubmitting ? statusMessage : 'Next'}
+                  Next
                 </Button>
-                <p className="text-sm mt-1 text-center">
-                  {isSubmitting && (
-                    'Takes about 30 seconds, please be patient. Thank you.'
-                  )}
-                </p>
               </div>
             </>
           ) : (

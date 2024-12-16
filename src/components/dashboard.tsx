@@ -4,12 +4,11 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { profileIdAtom, userIdAtom } from '@/stores/profileAtoms'
 import { useLogout } from '@/utils/auth'
-import { useClerk } from '@clerk/nextjs'
 import { useAtom } from 'jotai'
 import { AlertCircle, FileText, Frown, Meh, Plus, Smile } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 type InterviewAnalysis = {
   id: string
@@ -36,7 +35,6 @@ const getScoreIcon = (score: string) => {
 
 export default function Dashboard() {
   const router = useRouter()
-  const { signOut } = useClerk();
   const [analyses, setAnalyses] = useState<InterviewAnalysis[]>()
   const [searchTerm] = useState('')
   const [sortColumn, setSortColumn] = useState<keyof InterviewAnalysis>('date')

@@ -266,14 +266,14 @@ CREATE TRIGGER update_interview_readiness_chat_history_last_updated_at
 BEFORE UPDATE ON aic_preview_interview_readiness_chat_history
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
-
 -- Billing
-DROP TABLE IF EXISTS aic_preview_billing CASCADE;
-CREATE TABLE aic_preview_billing (
+DROP TABLE IF EXISTS aic_preview_payments CASCADE;
+CREATE TABLE aic_preview_payments (
     id SERIAL PRIMARY KEY,
     profile_id INTEGER NOT NULL,
-    paid_interviews INTEGER NOT NULL,
+    stripe_session_id VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (profile_id) REFERENCES aic_preview_profiles(id) ON DELETE CASCADE
+    FOREIGN KEY (profile_id) REFERENCES aic_preview_profiles(id) ON DELETE CASCADE,
+    UNIQUE (profile_id)
 );

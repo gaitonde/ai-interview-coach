@@ -14,8 +14,6 @@ export default function QuestionPrep() {
   const [content, setContent] = useState<string | null>(null)
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [statusMessage, setStatusMessage] = useState('Thinking...')
   const fetchedRef = useRef(false)
 
   useEffect(() => {
@@ -57,62 +55,9 @@ export default function QuestionPrep() {
       })
   }, [profileId, interviewId])
 
-  useEffect(() => {
-    if (!isSubmitting) return
-
-    const messages = ['Thinking...', 'Researching...', 'Analyzing...', 'Generating...']
-    let currentIndex = 0
-
-    const interval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % messages.length
-      setStatusMessage(messages[currentIndex])
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [isSubmitting])
-
   const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    if (!profileId) {
-      alert('No profile ID found. Please select a profile.')
-      return
-    }
-
-    setIsSubmitting(true)
-
-    try {
-      // First check if questions already exist
-      const checkResponse = await fetch(`/api/questions?profileId=${profileId}&interviewId=${interviewId}&checkOnly=true`)
-
-      const json = await checkResponse.json()
-      console.log('json for checkOnly', json)
-      const { count } = json
-      console.log('count for checkOnly', count)
-      if (!checkResponse.ok || count < 1) {
-        console.log('No questions! Generating questions')
-        // Only generate questions if they don't exist
-        const generateResponse = await fetch('/api/generate-interview-questions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ profileId, interviewId }),
-        })
-
-        if (!generateResponse.ok) {
-          throw new Error('Failed to generate questions')
-        }
-
-        await generateResponse.json()
-      } else {
-        console.log('Questions already exist!')
-      }
-
-      router.push('/interview-ready')
-    } catch (error) {
-      console.error('Error handling questions:', error)
-      alert('Failed to process questions. Please try again.')
-    }
+    router.push('/interview-ready')
   }
 
   const generateInterviewQuestions = async (profileId: string) => {
@@ -169,14 +114,10 @@ export default function QuestionPrep() {
                 <Button
                   type="submit"
                   onClick={handleSubmit}
-                  disabled={isSubmitting}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
-                  {isSubmitting ? statusMessage : 'Next'}
+                  Next
                 </Button>
-                <p className="text-sm mt-1 text-center">
-                  {isSubmitting && 'Takes about 30 seconds, please be patient. Thank you.'}
-                </p>
               </div>
             </div>
           ) : (
