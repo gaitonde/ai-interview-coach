@@ -5,13 +5,13 @@ export async function getAvailableInterviews(
   profileId: string,
 ): Promise<{ interviewsAvailable: number }> {
   try {
-    const billingTable = getTable('billing')
-    const billingsResult = await sql.query(`
-      SELECT paid_interviews FROM ${billingTable}
+    const paymentsTable = getTable('payments')
+    const paymentsResult = await sql.query(`
+      SELECT count(*) as count FROM ${paymentsTable}
       WHERE profile_id = ${profileId}
     `)
 
-    const paidInterviews = billingsResult?.rows?.[0]?.paid_interviews ?? 0
+    const paidInterviews = paymentsResult?.rows?.[0]?.count ?? 0
 
     const interviewTable = getTable('interviews')
     const interviews = await sql.query(`
@@ -24,7 +24,7 @@ export async function getAvailableInterviews(
 
     return { interviewsAvailable }
   } catch (error: unknown) {
-      console.error('Error getting billing:', error)
+      console.error('Error getting payments:', error)
       throw error
   }
 }

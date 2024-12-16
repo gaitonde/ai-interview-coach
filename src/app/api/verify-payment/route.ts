@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     if (session.payment_status === 'paid') {
       console.log('todo: payment_status is paid')
 
-      // Upsert billing record using SQL
+      // Upsert payments record using SQL
       const table = getTable('payments')
       const query = `
         INSERT INTO ${table} (profile_id, stripe_session_id)

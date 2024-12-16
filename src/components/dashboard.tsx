@@ -122,9 +122,9 @@ export default function Dashboard() {
 
   const handleAddInterview = useCallback(async () => {
     try {
-      const response = await fetch(`/api/billings?profileId=${profileId}`)
+      const response = await fetch(`/api/available-interviews?profileId=${profileId}`)
       if (!response.ok) {
-        throw new Error('Failed to fetch billing info')
+        throw new Error('Failed to fetch payments info')
       }
       const data = await response.json()
 
@@ -134,7 +134,7 @@ export default function Dashboard() {
         router.push('/buy')
       }
     } catch (error) {
-      console.error('Error checking billing status:', error)
+      console.error('Error checking available interviews:', error)
       router.push('/buy')
     }
   }, [profileId, router])

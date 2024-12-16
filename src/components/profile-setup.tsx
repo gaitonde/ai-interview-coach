@@ -14,7 +14,7 @@ const DEFAULT_GRADUATION_YEAR = '2023'
 export function ProfileSetup() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const [formData, setFormData] = useState({
     email: '',
@@ -226,12 +226,12 @@ export function ProfileSetup() {
 
     handleSignOut()
     setIsSubmitting(true)
-    setError(null)
+    setErrorMsg(null)
 
     const formData = new FormData(e.currentTarget)
     const validationError = validateForm(formData)
     if (validationError) {
-      setError(validationError)
+      setErrorMsg(validationError)
       setIsSubmitting(false)
       return
     }
@@ -265,7 +265,7 @@ export function ProfileSetup() {
 
       router.push('/interview-setup')
     } catch (error: any) {
-      setError(error?.message)
+      setErrorMsg(error?.message)
       setIsSubmitting(false)
     }
   }
@@ -470,7 +470,7 @@ export function ProfileSetup() {
               {getButtonText()}
             </Button>
           </form>
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+          {errorMsg && <p className="text-red-500 text-sm mt-2">{errorMsg}</p>}
         </div>
       </div>
     </>

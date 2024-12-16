@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { clerkMiddleware, type ClerkMiddlewareAuth } from '@clerk/nextjs/server'
 import { getProfileByUserId } from '@/app/actions/get-profile'
 
-const publicRoutes = ['/start', '/sign-up', '/sign-in', '/xxx', '/api']
+const publicRoutes = ['/start', '/sign-up', '/sign-in', '/api', '/profile-setup']
 
 const isPublicRoute = (pathname: string): boolean => {
   return publicRoutes.some(route => {
@@ -30,11 +30,12 @@ const afterAuth = async (auth: ClerkMiddlewareAuth, req: NextRequest) => {
     return NextResponse.redirect(signInUrl);
   }
 
-  if (userId && !isPublicPath) {
-    console.log('In Middleware fetching profile for userId', userId)
-    const profile = await getProfileByUserId(userId)
-    console.log('In Middleware profile', profile)
-  }
+  //TODO: fix
+  // if (userId && !isPublicPath) {
+    // console.log('In Middleware fetching profile for userId', userId)
+    // const profile = await getProfileByUserId(userId)
+    // console.log('In Middleware profile', profile)
+  // }
 
   return NextResponse.next();
 }

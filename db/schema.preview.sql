@@ -266,7 +266,7 @@ CREATE TRIGGER update_interview_readiness_chat_history_last_updated_at
 BEFORE UPDATE ON aic_preview_interview_readiness_chat_history
 FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
 
--- Billing
+-- Payments
 DROP TABLE IF EXISTS aic_preview_payments CASCADE;
 CREATE TABLE aic_preview_payments (
     id SERIAL PRIMARY KEY,

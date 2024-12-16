@@ -8,7 +8,7 @@ import { useState } from 'react'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
-export default function BillingPage() {
+export default function BuyPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
