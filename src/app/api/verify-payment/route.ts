@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { sql } from '@vercel/postgres'
-import { getTable } from "@/lib/db"
+import { getTable } from '@/lib/db'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-11-20.acacia',
@@ -30,8 +30,7 @@ export async function POST(req: Request) {
         DO UPDATE SET
           stripe_session_id = $2
       `
-      const result = await sql.query(query, [profileId, sessionId])
-      console.log('result', result)
+      await sql.query(query, [profileId, sessionId])
 
       return NextResponse.json({ success: true })
     } else {

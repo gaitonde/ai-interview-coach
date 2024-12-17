@@ -181,8 +181,8 @@ async function runPrompt(profileId: string, interviewId: string, messages: ChatC
   console.log('XXX messages', messages)
   console.log('XXX messages length', messages.length)
 
-  // const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready-dayal`, interviewId)
-  const prompt = await getPromptByKey('prompt-interview-ready-dayal')
+  // const promptData: PromptData = await fetchPrompt(profileId, `prompt-interview-ready`, interviewId)
+  const prompt = await getPromptByKey('prompt-interview-ready')
   console.log('XXX prompt', prompt)
   const completion = await openai.chat.completions.create({
     model: prompt.model,
@@ -216,7 +216,7 @@ async function addChatHistory(profileId: string, interviewId: string, messages: 
   //lazy insert chat history
   if (chatHistory.length < 1) {
     console.log('inserting initial system prompt for getting interview readiness')
-    const prompt = await getPromptByKey('prompt-interview-ready-dayal')
+    const prompt = await getPromptByKey('prompt-interview-ready')
     chatHistory = await insertChatHistory(profileId, interviewId, 'system', prompt.system_prompt)
   }
 

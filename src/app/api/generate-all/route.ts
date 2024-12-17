@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { generateCompletion } from '../utils/openAiCompletion'
 import { getTable } from '@/lib/db'
 import { sql } from '@vercel/postgres'
-import { getBaseUrl } from "@/lib/utils"
+import { getBaseUrl } from '@/lib/utils'
 
 export async function POST(request: Request) {
   const body = await request.json()
@@ -24,19 +24,19 @@ export async function POST(request: Request) {
     return NextResponse.json(companyPrepResult)
   } catch (error) {
     console.error('Error:', error)
-    return NextResponse.json({ error: error }, { status: 500 });
+    return NextResponse.json({ error: error }, { status: 500 })
   }
 }
 
 async function generateCompanyPrep(profileId: string, interviewId: string) {
   const { content, usage } = await generateCompletion(profileId, 'prompt-company-prep', interviewId)
-  const aiResponsesTable = getTable('airesponses');
+  const aiResponsesTable = getTable('airesponses')
   const query = `
     INSERT INTO ${aiResponsesTable} (profile_id, interview_id, generated_company_prep, usage)
     VALUES ($1, $2, $3, $4)
     ON CONFLICT (profile_id, interview_id)
     DO UPDATE SET generated_company_prep = EXCLUDED.generated_company_prep, usage = EXCLUDED.usage;
-  `;
+  `
 
   await sql.query(query, [profileId, interviewId, content, usage]);
 
@@ -45,16 +45,16 @@ async function generateCompanyPrep(profileId: string, interviewId: string) {
   const roleMatch = content?.match(/\*\*Position\*\*:\s*([^\n]*)/)
   const roleName = roleMatch ? roleMatch[1].trim() : null
 
-  const interviewsTable = getTable('interviews');
+  const interviewsTable = getTable('interviews')
   const query2 = `
     UPDATE ${interviewsTable}
     SET company_name = $1, role_name = $2
     WHERE profile_id = $3
     AND id = $4;
-  `;
-  await sql.query(query2, [companyName, roleName, profileId, interviewId]);
+  `
+  await sql.query(query2, [companyName, roleName, profileId, interviewId])
 
-  return { content };
+  return { content }
 }
 
 async function generateOtherPreps(profileId: string, interviewId: string) {
@@ -71,6 +71,7 @@ async function generateOtherPreps(profileId: string, interviewId: string) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ profileId, interviewId }),
+      priority: 'low',
     })
 
   // Fire all other generations in parallel
