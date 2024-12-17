@@ -58,7 +58,7 @@ const categories: Category[] = [
 ]
 
 const getScoreInfo = (score?: string): { icon: React.ReactNode; text: string; color: string } => {
-  if (score === undefined) return { icon: <AlertCircle className="w-6 h-6" />, text: "No Data", color: "text-yellow-500" }
+  if (score === undefined) return { icon: <AlertCircle className="w-6 h-6" />, text: "No Data", color: "text-slate-400" }
   switch (score) {
     case "Ready":
       return { icon: <Smile className="w-6 h-6" />, text: "Ready", color: "text-green-500" }
@@ -67,7 +67,7 @@ const getScoreInfo = (score?: string): { icon: React.ReactNode; text: string; co
     case "Not Ready":
       return { icon: <Frown className="w-6 h-6" />, text: "Not Ready", color: "text-red-500" }
     default:
-      return { icon: <AlertCircle className="w-6 h-6" />, text: "No Data", color: "text-yellow-500" }
+      return { icon: <AlertCircle className="w-6 h-6" />, text: "No Data", color: "text-slate-400" }
   }
 }
 
@@ -329,7 +329,7 @@ export function ReadinessIndicator({ readiness }: ReadinessIndicatorProps) {
       case "Not Ready":
         return <Frown className="w-6 h-6 text-red-500 mr-2" />
       default:
-        return <AlertCircle className="w-6 h-6 text-yellow-500 mr-2" />
+        return <AlertCircle className="w-6 h-6 text-gray-500 mr-2" />
     }
   }
 
@@ -340,7 +340,7 @@ export function ReadinessIndicator({ readiness }: ReadinessIndicatorProps) {
       case "Not Ready":
         return "text-red-500"
       default:
-        return "text-yellow-500"
+        return "text-gray-500"
     }
   }
 

@@ -74,6 +74,7 @@ export function InterviewPracticeContent() {
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRecordingComplete, setIsRecordingComplete] = useState(false)
   const getQuestionId = (question: Question | null): string => {
     if (!question) return '';
     return question.questionId || question.id?.toString() || ''
@@ -90,6 +91,10 @@ export function InterviewPracticeContent() {
   }
 
   const handleTranscriptionComplete = async (newTranscript: string, newAudioUrl: string) => {
+    setIsRecordingComplete(false)
+    setIsSubmitting(true)
+    setEvaluatingState('Evaluating')
+
     const answerId = await saveAnswer(question?.id?.toString() || '', newTranscript)
 
     const versionNumber = getNextVersionNumber();
@@ -106,9 +111,9 @@ export function InterviewPracticeContent() {
       recordingTimestamp: new Date(),
     }
     setVersions(prevVersions => [newVersion, ...prevVersions])
-    setExpandedVersionIndex(0); // Expand the newest version
+    setExpandedVersionIndex(0)
     await handleAiScoring(answerId, 0)
-  };
+  }
 
   const handleAiScoring = async (answerId: string | number, versionIndex: number) => {
     if (!answerId) {
@@ -384,14 +389,29 @@ export function InterviewPracticeContent() {
             </div>
 
             {(inputMode === 'record' && (question?.id)) ? (
-              <div className="flex items-center space-x-4">
-                <AudioRecorder
-                  onTranscriptionComplete={handleTranscriptionComplete}
-                  version={getNextVersionNumber()}
-                  questionId={question.id.toString()}
-                />
+              <div className="flex flex-col space-y-4">
+                <div className="flex items-center space-x-4">
+                  <AudioRecorder
+                    onTranscriptionComplete={handleTranscriptionComplete}
+                    version={getNextVersionNumber()}
+                    questionId={question.id.toString()}
+                    onRecordingComplete={() => setIsRecordingComplete(true)}
+                  />
+                </div>
+                {isRecordingComplete && (
+                  <div className="text-black my-8">
+                    <div className="p-4 bg-white rounded-lg shadow animate-pulse">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold">Processing recording...</h3>
+                      </div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : (inputMode === 'type' && (question?.id)) ? (
+            ) : (
+              // Show textarea and evaluate button only for type mode
               <div className="flex flex-col space-y-4">
                 <textarea
                   className="w-full h-24 p-2 border border-gray-300 text-black rounded-md"
@@ -420,10 +440,10 @@ export function InterviewPracticeContent() {
                   }}
                 >
                   {evaluatingState === 'Ready' ? 'Evaluate Answer' : 'Evaluating...'}
-              </button>
-            </div>
-          ) : null }
-        </div>
+                </button>
+              </div>
+            )}
+          </div>
         )}
         {isSubmitting && (
           <div className="text-black my-8">

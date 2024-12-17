@@ -29,7 +29,7 @@ const getScoreIcon = (score: string) => {
     case 'Not Ready':
       return <Frown className="w-5 h-5 text-red-500" />;
     default:
-      return <AlertCircle className="w-6 h-6 text-yellow-500" />
+      return <AlertCircle className="w-6 h-6 text-slate-400" />
   }
 };
 

@@ -8,13 +8,14 @@ interface AudioRecorderProps {
   onTranscriptionComplete: (transcript: string, audioUrl: string) => void
   version: number
   questionId: string
+  onRecordingComplete: () => void
 }
 
 type RecorderState = 'Ready' | 'Recording' | 'Transcribing';
 
 const FIXED_TIME_LIMIT = 30;
 
-export default function AudioRecorder({ onTranscriptionComplete, version, questionId }: AudioRecorderProps) {
+export default function AudioRecorder({ onTranscriptionComplete, version, questionId, onRecordingComplete }: AudioRecorderProps) {
   console.log('AudioRecorder component initialized', { version, questionId });
 
   const [recorderState, setRecorderState] = useState<RecorderState>('Ready')
