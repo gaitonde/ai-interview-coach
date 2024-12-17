@@ -16,6 +16,7 @@ export default function InterviewerPrep() {
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
   const [showScore] = useAtom(showScoreAtom)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (profileId) {
@@ -40,6 +41,7 @@ export default function InterviewerPrep() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
+    setIsSubmitting(true)
     router.push(`/question-prep`)
   }
 
@@ -105,6 +107,7 @@ export default function InterviewerPrep() {
                 </Button>
                 <Button
                   onClick={handleSubmit}
+                  disabled={isSubmitting}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
                   Next

@@ -14,6 +14,7 @@ export async function POST(request: Request) {
 
   try {
     const promptData: PromptData = await fetchPrompt(profileId, 'prompt-questions', interviewId)
+    const processedCategories = new Set<string>()
 
     const completion = await openai.chat.completions.create({
       model: promptData.model,
@@ -26,11 +27,13 @@ export async function POST(request: Request) {
     })
 
     const generatedContent = completion.choices[0]?.message?.content?.replace('```json', '').replace('```', '')
-
     const questionsJson = JSON.parse(generatedContent || '{}')
+
+    console.log('ZZZ questionsJson', questionsJson)
 
     for (const questionJson of questionsJson) {
       const category = questionJson.category.toLowerCase()
+      console.log('ZZZ category', category)
       const questions = questionJson.questions
 
       for (const question of questions) {
@@ -45,6 +48,12 @@ export async function POST(request: Request) {
         `
         await sql.query(query, [profileId, interviewId, category, sanitizedQuestion, question.why, question.focus])
       }
+
+      // Only insert interview readiness once per category
+      if (!processedCategories.has(category)) {
+        await insertInterviewReadiness(profileId, interviewId, category)
+        processedCategories.add(category)
+      }
     }
 
     return NextResponse.json({ content: generatedContent })
@@ -52,4 +61,22 @@ export async function POST(request: Request) {
     console.error('Error:', error)
     return NextResponse.json({ content: "unable to get content" }, { status: 500 })
   }
+}
+
+async function insertInterviewReadiness(profileId: string, interviewId: string, category: string) {
+  // Insert interview readiness records for each category
+  const table = getTable('interview_readiness')
+  const query = `
+    INSERT INTO "${table}" (
+      profile_id,
+      interview_id,
+      category,
+      is_up_to_date
+    )
+    VALUES ($1, $2, $3, TRUE)
+  `
+
+  console.log('ZZZ query for interview readiness category ', category, query)
+
+  await sql.query(query, [profileId, interviewId, category])
 }

@@ -109,25 +109,25 @@ export async function POST(request: Request) {
   const interviewId = interviews.rows[0].id
 
   // Insert interview readiness records for each category
-  const table = getTable('interview_readiness')
-  const categories = ['overall', 'behavioral', 'case', 'role', 'technical', ]
+  // const table = getTable('interview_readiness')
+  // const categories = ['overall', 'behavioral', 'case', 'role', 'technical', ]
 
-  const readinessQuery = `
-    INSERT INTO "${table}" (
-      profile_id,
-      interview_id,
-      category,
-      is_up_to_date
-    )
-    VALUES ($1, $2, $3, TRUE)
-  `
+  // const readinessQuery = `
+  //   INSERT INTO "${table}" (
+  //     profile_id,
+  //     interview_id,
+  //     category,
+  //     is_up_to_date
+  //   )
+  //   VALUES ($1, $2, $3, TRUE)
+  // `
 
-  // Insert a record for each category
-  await Promise.all(
-    categories.map(category =>
-      sql.query(readinessQuery, [profileId, interviewId, category])
-    )
-  )
+  // // Insert a record for each category
+  // await Promise.all(
+  //   categories.map(category =>
+  //     sql.query(readinessQuery, [profileId, interviewId, category])
+  //   )
+  // )
 
   return NextResponse.json({ id: interviewId })
 }

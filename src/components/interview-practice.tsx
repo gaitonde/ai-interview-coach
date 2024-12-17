@@ -103,10 +103,10 @@ export function InterviewPracticeContent() {
       aiScoringResult: null,
       audioUrl: newAudioUrl,
       recordingTimestamp: new Date(),
-    };
-    setVersions(prevVersions => [newVersion, ...prevVersions]);
+    }
+    setVersions(prevVersions => [newVersion, ...prevVersions])
     setExpandedVersionIndex(0); // Expand the newest version
-    await handleAiScoring(answerId, 0);
+    await handleAiScoring(answerId, 0)
   };
 
   const handleAiScoring = async (answerId: string | number, versionIndex: number) => {
@@ -354,7 +354,7 @@ export function InterviewPracticeContent() {
                 </div>
               </div>
             )}
-            {!isDemo && (
+            {!isDemo && questions.length > 0 && question?.category &&(
             <div className="p-4 bg-white rounded-lg shadow mt-4">
               <div className="mb-4">
                 <div className="flex space-x-4">
@@ -416,7 +416,8 @@ export function InterviewPracticeContent() {
                     }
                     setVersions(prevVersions => [newVersion, ...prevVersions])
                     handleAiScoring(answerId, 0)
-                    setManualTranscript('')
+                    //TODO: FIX ME
+                    // setManualTranscript('')
                   }}
                 >
                   {evaluatingState === 'Ready' ? 'Evaluate Answer' : 'Evaluating...'}

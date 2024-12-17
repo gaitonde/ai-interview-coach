@@ -15,7 +15,7 @@ export default function QuestionPrep() {
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
   const fetchedRef = useRef(false)
-
+  const [isSubmitting, setIsSubmitting] = useState(false)
   useEffect(() => {
     // Reset ref when dependencies change
     if (fetchedRef.current && profileId && interviewId) return
@@ -57,6 +57,7 @@ export default function QuestionPrep() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault()
+    setIsSubmitting(true)
     router.push('/interview-ready')
   }
 
@@ -114,6 +115,7 @@ export default function QuestionPrep() {
                 <Button
                   type="submit"
                   onClick={handleSubmit}
+                  disabled={isSubmitting}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
                   Next

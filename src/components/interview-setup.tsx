@@ -71,9 +71,9 @@ export function InterviewSetup() {
           const interviewerRoleInput = form.elements.namedItem('interviewer_role') as HTMLInputElement;
           interviewerRoleInput.value = interview.interviewer_role || '';
 
-          const interviewDateInput = form.elements.namedItem('interview_date') as HTMLInputElement;
-          const dateValue = interview.interview_date ? new Date(interview.interview_date).toISOString().split('T')[0] : '';
-          interviewDateInput.value = dateValue;
+          // const interviewDateInput = form.elements.namedItem('interview_date') as HTMLInputElement;
+          // const dateValue = interview.interview_date ? new Date(interview.interview_date).toISOString().split('T')[0] : '';
+          // interviewDateInput.value = dateValue;
         }
       }
 
@@ -93,14 +93,12 @@ export function InterviewSetup() {
           jd_url: formData.get('jd_url'),
           interviewer_linkedin_url: formData.get('interviewer_linkedin_url'),
           interviewer_role: formData.get('interviewer_role'),
-          interview_date: formData.get('interview_date')
+          // interview_date: formData.get('interview_date')
         }),
       });
 
       if (!response.ok) {
-        console.log('XXX response', response)
         const result = await response.json()
-        console.log('XXX result message', result.message)
         setError(result.message)
         return
       }
@@ -152,16 +150,16 @@ export function InterviewSetup() {
       }
     }
 
-    const interviewDate = formData.get('interview_date') as string;
-    if (interviewDate) {
-      const selectedDate = new Date(interviewDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+    // const interviewDate = formData.get('interview_date') as string;
+    // if (interviewDate) {
+    //   const selectedDate = new Date(interviewDate);
+    //   const today = new Date();
+    //   today.setHours(0, 0, 0, 0);
 
-      if (selectedDate < today) {
-        return 'Interview date cannot be in the past';
-      }
-    }
+    //   if (selectedDate < today) {
+    //     return 'Interview date cannot be in the past';
+    //   }
+    // }
 
     const urlFields = ['company_url', 'jd_url'];
     for (const field of urlFields) {
@@ -280,6 +278,7 @@ export function InterviewSetup() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
+{/*
               <div>
                 <label htmlFor="interview_date" className="block text-sm font-medium text-white">
                   Interview Date (Optional)
@@ -292,6 +291,7 @@ export function InterviewSetup() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
+               */}
             </div>
             <Button
               type="submit"

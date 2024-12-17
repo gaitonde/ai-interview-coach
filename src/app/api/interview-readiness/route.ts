@@ -91,6 +91,26 @@ async function upsertInterviewReadiness(profileId: string, interviewId: string, 
       console.log('XXX ratingKey', ratingKey, data[ratingKey])
       console.log('XXX textKey', textKey, data[textKey])
 
+      if (category !== 'overall') {
+        const table1 = getTable('questions')
+        const categoryQuery = `
+          SELECT count(*)
+          FROM ${table1}
+          WHERE profile_id = $1
+          AND interview_id = $2
+          AND category = $3
+        `
+        const categoryResult = await sql.query(categoryQuery, [profileId, interviewId, category])
+        console.log('XXX result1', categoryResult)
+
+        if (categoryResult.rows[0].count < 1) {
+          console.log('XXX SKIPPING category', category)
+          continue
+        } else {
+        }
+      }
+      console.log('XXX Continue with category', category)
+
       const query = `
         INSERT INTO ${table}
         (profile_id, interview_id, category, readiness_rating, readiness_text, is_up_to_date)
