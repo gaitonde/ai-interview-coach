@@ -73,6 +73,7 @@ export function InterviewPracticeContent() {
   const [isDemo] = useAtom(isDemoAtom)
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const getQuestionId = (question: Question | null): string => {
     if (!question) return '';
     return question.questionId || question.id?.toString() || ''
@@ -117,7 +118,6 @@ export function InterviewPracticeContent() {
 
     try {
       const questionId = question?.id
-
       const response = await fetch('/api/generate-ai-score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -144,6 +144,8 @@ export function InterviewPracticeContent() {
     } catch (error) {
       console.error('AI Scoring error:', error)
     } finally {
+      setManualTranscript('')
+      setIsSubmitting(false)
       setEvaluatingState('Ready')
     }
   }
@@ -395,17 +397,16 @@ export function InterviewPracticeContent() {
                   className="w-full h-24 p-2 border border-gray-300 text-black rounded-md"
                   placeholder="Type or paste your answer here..."
                   value={manualTranscript}
-                  onChange={(e) => {
-                    setManualTranscript(e.target.value);
-                  }}
+                  onChange={(e) => setManualTranscript(e.target.value)}
+                  disabled={isSubmitting}
                 />
                 <button
                   className="text-white bg-[#10B981] hover:bg-[#059669] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
-                  disabled={questions.length < 0 || !manualTranscript.trim() || evaluatingState === 'Evaluating'}
+                  disabled={questions.length < 0 || !manualTranscript.trim() || evaluatingState === 'Evaluating' || isSubmitting}
                   onClick={async () => {
+                    setIsSubmitting(true)
                     setEvaluatingState('Evaluating')
                     const answerId = await saveAnswer(question?.id?.toString() || '', manualTranscript)
-                    console.log('XXXX ANSWER ID ', answerId)
                     const newVersion = {
                       answerId: answerId.toString(),
                       questionId: question?.id?.toString() || '',
@@ -415,9 +416,7 @@ export function InterviewPracticeContent() {
                       recordingTimestamp: new Date(),
                     }
                     setVersions(prevVersions => [newVersion, ...prevVersions])
-                    handleAiScoring(answerId, 0)
-                    //TODO: FIX ME
-                    // setManualTranscript('')
+                    await handleAiScoring(answerId, 0)
                   }}
                 >
                   {evaluatingState === 'Ready' ? 'Evaluate Answer' : 'Evaluating...'}
@@ -425,6 +424,17 @@ export function InterviewPracticeContent() {
             </div>
           ) : null }
         </div>
+        )}
+        {isSubmitting && (
+          <div className="text-black my-8">
+            <div className="p-4 bg-white rounded-lg shadow animate-pulse">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Evaluating your answer...</h3>
+              </div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
         )}
         {versions.map((version, index) => (
         <div key={index} className="text-black my-8">
