@@ -21,7 +21,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "AI Interview Coach",
+  title: "The Interview Playbook",
   description: "Nail your next interview!",
 };
 

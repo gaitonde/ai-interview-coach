@@ -52,8 +52,8 @@ export default function BuyPage() {
       <ConditionalHeader />
       <div className="min-h-screen bg-[#111827] flex flex-col items-center text-white px-8 py-8">
         <div className="max-w-md w-full p-6 bg-gray-800 rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold text-center">Interview Prep</h1>
-          <p className="mt-2 text-sm text-gray-400 mb-6 text-center">Buy an interview prep session</p>
+          <h1 className="text-2xl font-bold text-center">Interview Playbook</h1>
+          <p className="mt-2 text-sm text-gray-400 mb-6 text-center">Buy 1 Interview Playbook</p>
 
           <div className="mb-8">
             <div className="text-lg mb-2">What's included:</div>
