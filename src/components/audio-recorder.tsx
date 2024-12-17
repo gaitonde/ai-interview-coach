@@ -15,6 +15,8 @@ type RecorderState = 'Ready' | 'Recording' | 'Transcribing';
 const FIXED_TIME_LIMIT = 30;
 
 export default function AudioRecorder({ onTranscriptionComplete, version, questionId }: AudioRecorderProps) {
+  console.log('AudioRecorder component initialized', { version, questionId });
+
   const [recorderState, setRecorderState] = useState<RecorderState>('Ready')
   const [recordingTime, setRecordingTime] = useState(0)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
@@ -23,7 +25,16 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
   const profileId = useAtomValue(profileIdAtom)
 
   const startRecording = async () => {
+    console.log('startRecording called, current state:', { recorderState, mediaRecorderRef: !!mediaRecorderRef.current });
+
     try {
+      const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      console.log('Microphone permission status:', permissionStatus.state);
+
+      if (permissionStatus.state === 'denied') {
+        throw new Error('Microphone permission denied');
+      }
+
       console.log('Requesting media stream...');
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       console.log('Media stream obtained:', stream);
@@ -144,13 +155,19 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
   }, [recorderState]);
 
   const handleRecordInteraction = useCallback((event: React.MouseEvent | React.TouchEvent) => {
+    console.log('handleRecordInteraction triggered', {
+      recorderState,
+      eventType: event.type,
+      buttonEnabled: !event.currentTarget.getAttribute('disabled'),
+      mediaRecorderExists: !!mediaRecorderRef.current
+    });
+
+    if (event.currentTarget.getAttribute('disabled') === 'true') {
+      console.log('Button is disabled, ignoring click')
+      return
+    }
+
     try {
-      console.log('in handleRecordInteraction', recorderState);
-      console.log('Event type:', event.type);
-
-      // Prevent any default behavior
-      event.preventDefault();
-
       if (recorderState === 'Ready') {
         console.log('Attempting to start recording...');
         startRecording().catch(error => {
@@ -223,13 +240,15 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
     <div className="space-y-4">
       <div className="flex items-center">
         <button
-          className={`text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors
-         ${recorderState === 'Recording' ? 'bg-red-600' : 'bg-[#10B981]'}
-          `}
+          className={`text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors touch-none
+           ${recorderState === 'Recording' ? 'bg-red-600' : 'bg-[#10B981]'}
+            `}
+          disabled={recorderState === 'Transcribing'}
           onClick={handleRecordInteraction}
-          onTouchStart={handleRecordInteraction}
-          // disabled={recorderState === 'Transcribing'}
-          disabled={true}
+          onTouchStart={(e) => {
+            e.stopPropagation()
+            handleRecordInteraction(e)
+          }}
         >
           {recorderState === 'Ready' ? 'Record Answer' : recorderState === 'Recording' ? 'Stop' : 'Transcribing...'}
         </button>
