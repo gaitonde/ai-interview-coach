@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       // Only await company prep result
       generateCompanyPrep(profileId, interviewId),
       // Fire and forget other generations
-      generateOtherPreps(profileId, interviewId)
+      generateOtherPreps(request, profileId, interviewId)
     ])
 
     return NextResponse.json(companyPrepResult)
@@ -57,8 +57,8 @@ async function generateCompanyPrep(profileId: string, interviewId: string) {
   return { content }
 }
 
-async function generateOtherPreps(profileId: string, interviewId: string) {
-  const baseUrl = getBaseUrl()
+async function generateOtherPreps(request: Request, profileId: string, interviewId: string) {
+  const baseUrl = getBaseUrl(request)
 
   const generateEndpoints = [
     'generate-interviewer-prep',

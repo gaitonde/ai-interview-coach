@@ -52,7 +52,6 @@ export function ProfileSetup() {
     const profileData = profiles[0]
 
     if (profileData) {
-      console.log('CCC profile', profileData)
       await setStoredProfileId(profileData.id)
       const gradYear = profileData.graduation_date ?
         new Date(profileData.graduation_date).getUTCFullYear().toString() : DEFAULT_GRADUATION_YEAR

@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   try {
     const { profileId, productName, price } = await req.json()
 
-    const baseUrl = getBaseUrl()
+    const baseUrl = getBaseUrl(req)
 
     // Create a Stripe checkout session
     const session = await stripe.checkout.sessions.create({

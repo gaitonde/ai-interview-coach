@@ -1,11 +1,11 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function getBaseUrl() {
-  const protocol = process.env.NEXT_PUBLIC_VERCEL_URL?.startsWith('localhost') ? 'http' : 'https';
-  return `${protocol}://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+export function getBaseUrl(request: Request) {
+  const url = new URL(request.url)
+  return `${url.protocol}//${url.host}`
 }
