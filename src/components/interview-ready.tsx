@@ -96,6 +96,7 @@ export default function InterviewReady() {
   const [interviewId] = useAtom(interviewIdAtom)
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
   useEffect(() => {
     console.log('storedProfileId', profileId)
     console.log('interviewId', interviewId)
@@ -150,64 +151,41 @@ export default function InterviewReady() {
         <div className="p-6 sm:p-8">
           <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-6 text-center text-white">Interview Readiness</h2>
 
-          <Card className="bg-[#1a1f2b] text-white mb-6">
-            <CardContent className="p-4 sm:p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-
-{/*
-                <div className="flex items-start">
-                    <Calendar className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
-                    <div>
-                      <p className="text-sm font-semibold">Interview Date</p>
-                      <p className="text-sm text-gray-300">
-                        {interview?.interview_date ? new Date(interview.interview_date).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        }) : ''}
-                      </p>
-                  </div>
-                </div>
-                 */}
-                <div className="flex flex-col space-y-4">
-                  <div className="flex items-start">
-                    <Briefcase className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
-                    <div>
-                      <p className="text-sm font-semibold">Company</p>
-                      <p className="text-sm text-gray-300">{interview?.company_name}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <Target className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
-                    <div>
-                      <p className="text-sm font-semibold">Target Job</p>
-                      <p className="text-sm text-gray-300">{interview?.role_name}</p>
-                    </div>
-                  </div>
-                </div>
-                {interview?.interviewer_role && (
-                <div className="flex flex-col space-y-4">
-{/*
-                  <div className="flex items-start">
-                    <User className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
-                    <div>
-                      <p className="text-sm font-semibold">Interviewer</p>
-                      <p className="text-sm text-gray-300">{interview?.interviewer_name}</p>
-                    </div>
-                  </div>
- */}
+          {interview && (
+            <Card className="bg-[#1a1f2b] text-white mb-6">
+              <CardContent className="p-4 sm:p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                  <div className="flex flex-col space-y-4">
                     <div className="flex items-start">
-                      <User className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
+                      <Briefcase className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
                       <div>
-                        <p className="text-sm font-semibold">Interviewer Role</p>
-                      <p className="text-sm text-gray-300">{interview?.interviewer_role}</p>
+                        <p className="text-sm font-semibold">Company</p>
+                        <p className="text-sm text-gray-300">{interview.company_name}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start">
+                      <Target className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
+                      <div>
+                        <p className="text-sm font-semibold">Target Job</p>
+                        <p className="text-sm text-gray-300">{interview.role_name}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                  {interview.interviewer_role && (
+                    <div className="flex flex-col space-y-4">
+                      <div className="flex items-start">
+                        <User className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
+                        <div>
+                          <p className="text-sm font-semibold">Interviewer Role</p>
+                          <p className="text-sm text-gray-300">{interview.interviewer_role}</p>
+                        </div>
+                      </div>
+                    </div>
                   )}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {(isLoading && interview?.id) ? (
             <>
@@ -274,7 +252,7 @@ export default function InterviewReady() {
                   );
                 })}
             </>
-          ) : (
+          ) : interview && !interview.readiness ? (
             <div className="mt-0">
               <Card className="bg-[#1a1f2b] text-white mb-6">
                 <CardContent className="p-4 sm:p-6">
@@ -306,7 +284,7 @@ export default function InterviewReady() {
                 </CardContent>
               </Card>
             </div>
-          )}
+          ) : null}
 
           {interview && interview.readiness && (
             <div className="mt-6 flex justify-center">
