@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { profileIdAtom, userIdAtom } from '@/stores/profileAtoms'
 import { useLogout } from '@/utils/auth'
+import { useUser } from "@clerk/nextjs"
 import { useAtom } from 'jotai'
 import { AlertCircle, FileText, Frown, Meh, Plus, Smile } from 'lucide-react'
 import Link from 'next/link'
@@ -40,10 +41,11 @@ export default function Dashboard() {
   const [sortColumn, setSortColumn] = useState<keyof InterviewAnalysis>('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
-  const [profileId] = useAtom(profileIdAtom)
+  const [profileId, setProfileId] = useAtom(profileIdAtom)
   const [userId] = useAtom(userIdAtom)
   // const [interviewData, setInterviewData] = useState<InterviewData | null>(null)
-  const logout = useLogout();
+  const logout = useLogout()
+  const { user, isLoaded, isSignedIn } = useUser()
 
   const handleSort = (column: keyof InterviewAnalysis) => {
     if (column === sortColumn) {
@@ -66,24 +68,27 @@ export default function Dashboard() {
                 analysis.interviewer.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // console.log('filteredAnalyses', filteredAnalyses);
-
   useEffect(() => {
+    console.log('XXX in Dashboard useEffect Clerk user', user)
+    console.log('XXX in Dashboard useEffect profileId', profileId)
+    console.log('XXX in Dashboard useEffect userId', userId)
+    debugger
 
     if (!profileId) {
-      if (!userId) {
+      if (!user?.id) {
         logout().then(() => {
           router.push('/sign-in');
         });
       } else {
-        fetch(`/api/users?id=${userId}`)
+        fetch(`/api/users?clerk_id=${user.id}`)
         .then(response => response.json())
         .then(json => {
           console.log('user: ', json)
+          setProfileId(json.profile.id)
           if (json.error) {
             logout().then(() => {
               router.push('/sign-in');
-            });
+            })
           }
         })
       }

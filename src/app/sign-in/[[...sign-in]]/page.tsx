@@ -16,16 +16,30 @@ export default function SignInPage() {
     // Log all search params
     const params = Object.fromEntries(searchParams.entries())
     console.log('Clerk verification params:', params)
-
+    console.log('Current URL:', window.location.href)
+    console.log('Search Params:', searchParams.toString())
     // Log specific params
     const sessionId = searchParams.get('__clerk_created_session')
     const status = searchParams.get('__clerk_status')
 
-    if (sessionId && status) {
-      console.log('Clerk Session ID:', sessionId)
-      console.log('Clerk Status:', status)
+
+    console.log('sessionId', sessionId)
+    console.log('status', status)
+    // More detailed debug logging
+    console.log('Auth State in SignInPage:', {
+      sessionId,
+      status,
+      allParams: Object.fromEntries(searchParams.entries()),
+      pathname: window.location.pathname,
+      search: window.location.search
+    })
+
+    if (sessionId && status === 'verified') {
+      console.log('✅ Redirecting to dashboard...')
+      router.push('/dashboard')
+      // router.refresh()
     }
-  }, [searchParams])
+  }, [searchParams, router])
 
   return (
     <div className="flex flex-col items-center min-h-screen px-4 py-12 bg-gradient-to-b from-background to-muted">
