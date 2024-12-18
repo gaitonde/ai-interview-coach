@@ -9,7 +9,7 @@ import { useAtom, useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 
-const DEFAULT_GRADUATION_YEAR = '2023'
+const DEFAULT_GRADUATION_YEAR = '2025'
 
 export function ProfileSetup() {
   const router = useRouter()
@@ -31,6 +31,7 @@ export function ProfileSetup() {
   const isDemo = useAtomValue(isDemoAtomWithStorage)
   const [storedProfileId, setStoredProfileId] = useAtom(profileIdAtomWithStorage)
   const [storedUserId, setStoredUserId] = useAtom(userIdAtomWithStorage)
+  const [isLoading, setIsLoading] = useState(false)
 
   // const [isDemoMode, setIsDemoMode] = useState(false)
   // const [includeResume, setIncludeResume] = useState(false)
@@ -67,18 +68,9 @@ export function ProfileSetup() {
       setGraduationYear(gradYear);
     }
 
+    setIsLoading(false)
     return profileData
   }
-
-  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (e.target.files && e.target.files.length > 0) {
-  //     setFileName(e.target.files[0].name)
-  //     setResumeFile(e.target.files[0])
-  //   } else {
-  //     setFileName('No file chosen')
-  //     setResumeFile(null)
-  //   }
-  // }
 
   const saveProfile = async (formData: FormData) => {
     try {
@@ -118,28 +110,6 @@ export function ProfileSetup() {
       console.error('Error in saveProfile:', error)
       throw error
     }
-  }
-
-  const uploadResume = async (profileId: number, resumeFile: File) => {
-    if (resumeFile && resumeFile.name !== 'No file chosen') {
-      const resumeFormData = new FormData()
-      resumeFormData.append('resume', resumeFile)
-      resumeFormData.append('profileId', profileId.toString()) // Associate resume with profile
-
-      const resumeResponse = await fetch('/api/resume', {
-        method: 'POST',
-        body: resumeFormData
-      })
-
-      if (!resumeResponse.ok) {
-        throw new Error('Failed to upload resume')
-      }
-
-      const {success: resumeSuccess, resumeUrl} = await resumeResponse.json()
-      console.log('Resume response: ', resumeSuccess, resumeUrl)
-      return resumeSuccess
-    }
-    return false
   }
 
   const validateEmail = (email: string): boolean => {

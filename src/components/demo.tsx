@@ -1,13 +1,16 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useToast } from '@/hooks/use-toast'
-import { removeDemoData } from '@/utils/auth'
+import {
+  isDemoAtomWithStorage,
+  profileIdAtomWithStorage,
+  showScoreAtomWithStorage,
+} from '@/stores/profileAtoms'
 import { useAtom } from 'jotai'
-import { interviewIdAtom, isDemoAtom, profileIdAtom, showScoreAtom } from '@/stores/profileAtoms'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 interface Profile {
   id: string
@@ -18,59 +21,52 @@ interface Profile {
 
 export function Demo() {
   const router = useRouter()
-  const [profiles, setProfiles] = useState<Profile[]>([])
-  // const [profileId, setprofileId] = useState<string>('')
-  // const [isDemo, setisDemo] = useState(false)
-  // const [showScore, setShowScore] = useState(false)
   const { toast } = useToast()
-  const [isDemo, setIsDemo] = useAtom(isDemoAtom)
-  const [profileId, setProfileId] = useAtom(profileIdAtom)
-  const [interviewId, setInterviewId] = useAtom(interviewIdAtom)
-  const [showScore, setShowScore] = useAtom(showScoreAtom)
+  const [profiles, setProfiles] = useState<Profile[]>([])
+  const [profileId, setProfileId] = useAtom(profileIdAtomWithStorage)
+  const [isDemo, setIsDemo] = useAtom(isDemoAtomWithStorage)
+  const [showScore, setShowScore] = useAtom(showScoreAtomWithStorage)
+
+  const fetchDemoProfiles = async () => {
+    const response = await fetch(`/api/demo-profiles`)
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch demo profiles')
+    }
+    const data = await response.json()
+    setProfiles(data.profiles)
+  }
+
+  const handleProfileClick = (selectedProfileId: string) => {
+    console.log('selectedProfileId', selectedProfileId)
+    console.log('profileId', profileId)
+    setIsDemo(true)
+    setProfileId(selectedProfileId)
+    // if (profileId === profileId) {
+    //   removeDemoData()
+    //   // setprofileId('')
+    //   // setisDemo(false)
+    // } else {
+    //   // localStorage.setItem('profileId', profileId)
+    //   // setprofileId(profileId)
+    //   // setisDemo(true)
+    //   // localStorage.setItem('mode', 'demo')
+    // }
+  }
+
+  const handleSubmit = () => {
+    const url = isDemo ? '/profile-setup' : '/start'
+    router.push(url)
+  }
 
   useEffect(() => {
-
-    // if (!isDemo) {
-    //   setProfileId('normal')
-    //   setIsDemo(false)
-    // }
-
-    const fetchDemoProfiles = async () => {
-      const response = await fetch(`/api/demo-profiles`)
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch prep sheet response')
-      }
-      const data = await response.json()
-      setProfiles(data.profiles)
-    }
-
     fetchDemoProfiles()
   }, [])
-
-  const handleProfileClick = (profileId: string) => {
-    if (profileId === profileId) {
-      removeDemoData()
-      // setprofileId('')
-      // setisDemo(false)
-    } else {
-      // localStorage.setItem('profileId', profileId)
-      // setprofileId(profileId)
-      // setisDemo(true)
-      // localStorage.setItem('mode', 'demo')
-    }
-  }
-
-  const handleButtonClick = () => {
-    const mode = isDemo ? 'demo' : 'normal'
-    // localStorage.setItem('mode', mode)
-    router.push('/')
-  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#111827]">
       <div className="flex-grow flex flex-col items-center">
-      <div className="w-full max-w-6xl">
+        <div className="w-full max-w-6xl">
           <h2 className="text-2xl font-bold my-4 mx-4">Testing</h2>
 
           <div className="mx-4 mb-4">
@@ -80,12 +76,6 @@ export function Demo() {
                 checked={showScore}
                 onCheckedChange={(checked: boolean) => {
                   setShowScore(checked)
-                  //TODO: fix this
-                  // if (checked) {
-                  //   localStorage.setItem('showScore', 'true')
-                  // } else {
-                  //   localStorage.removeItem('showScore')
-                  // }
                   toast({
                     variant: "default",
                     duration: 2000,
@@ -108,19 +98,17 @@ export function Demo() {
           </div>
         </div>
         <div className="w-full max-w-6xl">
-          <h2 className="text-2xl font-bold my-4 mx-4">Example Student Profiles</h2>
+          <h2 className="text-2xl font-bold my-4 mx-4">Example Profiles</h2>
 
           <div className="flex flex-wrap gap-4 mx-4 mb-6">
             <div
               onClick={() => {
-                // setisDemo(false)
-                // setprofileId('normal')
-                // localStorage.removeItem('profileId')
-                // localStorage.removeItem('mode')
+                setIsDemo(false)
+                setProfileId('')
               }}
               className={`
                 p-4 rounded-lg border cursor-pointer
-                ${(!isDemo || profileId === 'normal')
+                ${(!isDemo || profileId === -1)
                   ? 'border-[#10B981] bg-[#10B981]/10'
                   : 'border-gray-700 hover:border-[#10B981]/50'}
               `}
@@ -147,20 +135,19 @@ export function Demo() {
           </div>
           <div className="mx-4 mb-4">
             <Button
-                type="submit"
-                onClick={handleButtonClick}
-                disabled={isDemo && !profileId}
-                className={`w-full ${
-                  isDemo
-                    ? 'bg-orange-400 hover:bg-orange-500'
-                    : 'bg-[#10B981] hover:bg-[#0e9370]'
-                } text-[#F9FAFB] py-3 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
-                {isDemo
-                  ? `Continue in Demo Mode with Profile (ID: ${profileId})`
-                  : `Continue in Normal Mode`}
-              </Button>
-
+              type="submit"
+              onClick={handleSubmit}
+              disabled={isDemo && !profileId}
+              className={`w-full ${isDemo
+                  ? 'bg-orange-400 hover:bg-orange-500'
+                  : 'bg-[#10B981] hover:bg-[#0e9370]'
+                } text-[#F9FAFB] py-3 rounded-md font-medium transition-colors
+                disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {isDemo
+                ? `Continue in Demo Mode with Profile (ID: ${profileId})`
+                : `Continue in Normal Mode`}
+            </Button>
           </div>
         </div>
       </div>

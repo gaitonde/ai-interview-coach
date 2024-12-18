@@ -1,5 +1,5 @@
 -- Update last_updated_at function
-CREATE OR REPLACE FUNCTION update_last_updated_at()
+CREATE OR REPLACE FUNCTION preview_update_last_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.last_updated_at = CURRENT_TIMESTAMP;
@@ -16,9 +16,9 @@ CREATE TABLE aic_preview_users (
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TRIGGER update_users_last_updated_at
+CREATE TRIGGER preview_update_users_last_updated_at
 BEFORE UPDATE ON aic_preview_users
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Profiles
 DROP TABLE IF EXISTS aic_preview_profiles CASCADE;
@@ -42,9 +42,9 @@ CREATE TABLE aic_preview_profiles (
     CONSTRAINT unique_user_id UNIQUE (user_id)
 );
 
-CREATE TRIGGER update_profiles_last_updated_at
+CREATE TRIGGER preview_update_profiles_last_updated_at
 BEFORE UPDATE ON aic_preview_profiles
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Interviews
 DROP TABLE IF EXISTS aic_preview_interviews CASCADE;
@@ -70,9 +70,9 @@ CREATE TABLE aic_preview_interviews (
     CHECK (jd_url IS NOT NULL OR jd_text IS NOT NULL)
 );
 
-CREATE TRIGGER update_interviews_last_updated_at
+CREATE TRIGGER preview_update_interviews_last_updated_at
 BEFORE UPDATE ON aic_preview_interviews
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Resumes
 DROP TABLE IF EXISTS aic_preview_resumes CASCADE;
@@ -88,9 +88,9 @@ CREATE TABLE aic_preview_resumes (
     CHECK (url IS NOT NULL OR text IS NOT NULL)
 );
 
-CREATE TRIGGER update_resumes_last_updated_at
+CREATE TRIGGER preview_update_resumes_last_updated_at
 BEFORE UPDATE ON aic_preview_resumes
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 CREATE OR REPLACE FUNCTION check_resume_fields()
 RETURNS TRIGGER AS $$
@@ -102,7 +102,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER enforce_resume_fields
+CREATE TRIGGER preview_enforce_resume_fields
 BEFORE INSERT OR UPDATE ON aic_preview_resumes
 FOR EACH ROW EXECUTE FUNCTION check_resume_fields();
 
@@ -123,9 +123,9 @@ CREATE TABLE aic_preview_airesponses (
     CONSTRAINT unique_airesponses UNIQUE (profile_id, interview_id)
 );
 
-CREATE TRIGGER update_airesponses_last_updated_at
+CREATE TRIGGER preview_update_airesponses_last_updated_at
 BEFORE UPDATE ON aic_preview_airesponses
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Prompts
 DROP TABLE IF EXISTS aic_preview_prompts CASCADE;
@@ -141,9 +141,9 @@ CREATE TABLE aic_preview_prompts (
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TRIGGER update_prompts_last_updated_at
+CREATE TRIGGER preview_update_prompts_last_updated_at
 BEFORE UPDATE ON aic_preview_prompts
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Questions for an interview
 DROP TABLE IF EXISTS aic_preview_questions CASCADE;
@@ -161,9 +161,9 @@ CREATE TABLE aic_preview_questions (
     FOREIGN KEY (interview_id) REFERENCES aic_preview_interviews(id) ON DELETE CASCADE
 );
 
-CREATE TRIGGER update_questions_last_updated_at
-BEFORE UPDATE ON aic_questions_preview
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+CREATE TRIGGER preview_update_questions_last_updated_at
+BEFORE UPDATE ON aic_preview_questions
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Answers to questions
 DROP TABLE IF EXISTS aic_preview_answers CASCADE;
@@ -180,9 +180,9 @@ CREATE TABLE aic_preview_answers (
     FOREIGN KEY (question_id) REFERENCES aic_preview_questions(id) ON DELETE CASCADE
 );
 
-CREATE TRIGGER update_answers_last_updated_at
-BEFORE UPDATE ON aic_answers_preview
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+CREATE TRIGGER preview_update_answers_last_updated_at
+BEFORE UPDATE ON aic_preview_answers
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Scores for answers
 DROP TABLE IF EXISTS aic_preview_scores CASCADE;
@@ -199,9 +199,9 @@ CREATE TABLE aic_preview_scores (
     CONSTRAINT unique_score UNIQUE (profile_id, answer_id)
 );
 
-CREATE TRIGGER update_scores_last_updated_at
+CREATE TRIGGER preview_update_scores_last_updated_at
 BEFORE UPDATE ON aic_scores_preview
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Feedback
 DROP TABLE IF EXISTS aic_preview_feedback CASCADE;
@@ -223,9 +223,9 @@ CREATE TABLE aic_preview_feedback (
     FOREIGN KEY (interview_readiness_chat_history_id) REFERENCES aic_preview_interview_readiness_chat_history(id) ON DELETE CASCADE
 );
 
-CREATE TRIGGER update_feedback_last_updated_at
+CREATE TRIGGER preview_update_feedback_last_updated_at
 BEFORE UPDATE ON aic_preview_feedback
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Interview Readiness
 DROP TABLE IF EXISTS aic_preview_interview_readiness CASCADE;
@@ -244,9 +244,9 @@ CREATE TABLE aic_preview_interview_readiness (
     UNIQUE (profile_id, interview_id, category)
 );
 
-CREATE TRIGGER update_interview_readiness_last_updated_at
+CREATE TRIGGER preview_update_interview_readiness_last_updated_at
 BEFORE UPDATE ON aic_preview_interview_readiness
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Interview Readiness Chat History
 DROP TABLE IF EXISTS aic_preview_interview_readiness_chat_history CASCADE;
@@ -262,9 +262,9 @@ CREATE TABLE aic_preview_interview_readiness_chat_history (
     FOREIGN KEY (interview_id) REFERENCES aic_preview_interviews(id) ON DELETE CASCADE
 );
 
-CREATE TRIGGER update_interview_readiness_chat_history_last_updated_at
+CREATE TRIGGER preview_update_interview_readiness_chat_history_last_updated
 BEFORE UPDATE ON aic_preview_interview_readiness_chat_history
-FOR EACH ROW EXECUTE FUNCTION update_last_updated_at();
+FOR EACH ROW EXECUTE FUNCTION preview_update_last_updated_at();
 
 -- Payments
 DROP TABLE IF EXISTS aic_preview_payments CASCADE;

@@ -46,3 +46,11 @@ export const isDemoAtomWithStorage = atom(
     setToLocalStorage('isDemo', newValue)
   }
 )
+
+export const showScoreAtomWithStorage = atom(
+  (get) => get(showScoreAtom),
+  (get, set, newValue: boolean) => {
+    set(showScoreAtom, newValue)
+    setToLocalStorage('showScore', newValue)
+  }
+)

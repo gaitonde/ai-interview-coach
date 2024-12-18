@@ -5,7 +5,8 @@
     "no-relative-import-paths/no-relative-import-paths": [
       "error",
       { "allowSameFolder": true, "rootDir": "src", "prefix": "@" }
-    ]
+    ],
+    "max-len": ["error", { "code": 80 }]
   },
   "plugins": ["no-relative-import-paths"]
 }

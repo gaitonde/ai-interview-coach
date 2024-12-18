@@ -155,30 +155,28 @@ export default function InterviewReady() {
             <Card className="bg-[#1a1f2b] text-white mb-6">
               <CardContent className="p-4 sm:p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex items-start">
-                      <Briefcase className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
-                      <div>
-                        <p className="text-sm font-semibold">Company</p>
-                        <p className="text-sm text-gray-300">{interview.company_name}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <Target className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
-                      <div>
-                        <p className="text-sm font-semibold">Target Job</p>
-                        <p className="text-sm text-gray-300">{interview.role_name}</p>
-                      </div>
+                  <div className="flex items-start">
+                    <Briefcase className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
+                    <div>
+                      <p className="text-sm font-semibold">Company</p>
+                      <p className="text-sm text-gray-300">{interview.company_name}</p>
                     </div>
                   </div>
+
+                  <div className="flex items-start">
+                    <Target className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
+                    <div>
+                      <p className="text-sm font-semibold">Target Job</p>
+                      <p className="text-sm text-gray-300">{interview.role_name}</p>
+                    </div>
+                  </div>
+
                   {interview.interviewer_role && (
-                    <div className="flex flex-col space-y-4">
-                      <div className="flex items-start">
-                        <User className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
-                        <div>
-                          <p className="text-sm font-semibold">Interviewer Role</p>
-                          <p className="text-sm text-gray-300">{interview.interviewer_role}</p>
-                        </div>
+                    <div className="flex items-start">
+                      <User className="w-5 h-5 mr-2 text-[#10B981] mt-1" />
+                      <div>
+                        <p className="text-sm font-semibold">Interviewer Role</p>
+                        <p className="text-sm text-gray-300">{interview.interviewer_role}</p>
                       </div>
                     </div>
                   )}

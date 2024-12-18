@@ -25,7 +25,7 @@ export default function PurchasedPage() {
         const data = await response.json()
 
         if (data.success) {
-          router.push('/interview-setup')
+          router.push('/add-interview')
         }
       } catch (error) {
         console.error('Error verifying payment:', error)

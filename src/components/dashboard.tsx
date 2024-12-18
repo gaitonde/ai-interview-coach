@@ -134,7 +134,7 @@ export default function Dashboard() {
       const data = await response.json()
 
     if (data.interviewsAvailable > 0) {
-        router.push('/interview-setup')
+        router.push('/add-interview')
       } else {
         router.push('/buy')
       }
