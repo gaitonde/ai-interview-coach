@@ -72,7 +72,6 @@ export default function Dashboard() {
     console.log('XXX in Dashboard useEffect Clerk user', user)
     console.log('XXX in Dashboard useEffect profileId', profileId)
     console.log('XXX in Dashboard useEffect userId', userId)
-    debugger
 
     if (!profileId) {
       if (!user?.id) {

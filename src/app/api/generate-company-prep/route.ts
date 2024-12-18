@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { sql } from '@vercel/postgres';
-import { generateCompletion } from "../utils/openAiCompletion";
-import { getTable } from "@/lib/db";
+import { NextResponse } from 'next/server'
+import { sql } from '@vercel/postgres'
+import { generateCompletion } from '../utils/openAiCompletion'
+import { getTable } from '@/lib/db'
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
   try {
     const { content, usage } = await generateCompletion(profileId, 'prompt-company-prep', interviewId)
-    const aiResponsesTable = getTable('airesponses');
+    const aiResponsesTable = getTable('airesponses')
     const query = `
       INSERT INTO ${aiResponsesTable} (profile_id, interview_id, generated_company_prep, usage)
       VALUES ($1, $2, $3, $4)

@@ -22,7 +22,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                 ul: ({ node, ...props }) => <ul className="list-disc pl-5 space-y-2 mb-4" {...props} />,
                 ol: ({ node, ...props }) => <ol className="list-decimal pl-5 space-y-2 mb-4" {...props} />,
                 li: ({ node, ...props }) => <li className="mb-1" {...props} />,
-                a: ({ node, ...props }) => <a className="text-[#10B981] hover:underline" {...props} />,
+                a: ({ node, ...props }) => <a className="text-[#10B981] hover:underline" target="_blank" {...props} />,
                 strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
               }}
             >
