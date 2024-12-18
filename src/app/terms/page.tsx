@@ -4,26 +4,26 @@ export default function TermsPage() {
   return (
     <div>
       <MarkdownRenderer content={`
-## Terms of Service for InterviewCoach
-Effective Date: November 19, 2024
+## Terms of Service for The Interview Playbook
+Effective Date: December 1, 2024
 
 ### Introduction
-These Terms of Service ("Terms") govern your use of the InterviewCoach website and the services provided by GreenPen AI Labs ("we," "us," or "our"). By accessing or using InterviewCoach (the "Service"), you agree to comply with and be bound by these Terms. If you do not agree to these Terms, please do not use our Service.
+These Terms of Service ("Terms") govern your use of The Interview Playbook website and the services provided by GreenPen AI Labs ("we," "us," or "our"). By accessing or using The Interview Playbook (the "Service"), you agree to comply with and be bound by these Terms. If you do not agree to these Terms, please do not use our Service.
 
 ### 1. Description of Service
-InterviewCoach is an online platform that helps users prepare for job interviews by providing personalized interview prep guides, mock interview sessions, and tailored feedback. The Service uses the user’s resume, job descriptions, and interview-related data to create these personalized tools.
+The Interview Playbook is an online platform that helps users prepare for job interviews by providing personalized interview prep guides, mock interview sessions, and tailored feedback. The Service uses the user’s resume, job descriptions, and interview-related data to create these personalized tools.
 
 ### 2. Eligibility
-You must be at least 18 years old to use InterviewCoach. By using the Service, you represent and warrant that you are of legal age and have the capacity to enter into a binding agreement.
+You must be at least 13 years old to use The Interview Playbook. If you are under the age of 18, you may only use the Service with the consent and supervision of a parent or legal guardian. By using the Service, you represent and warrant that you (i) are at least 13 years of age; (ii) have obtained the necessary parental or guardian consent if under 18; and (iii) have the capacity to understand and agree to these Terms of Service. If you are a parent or guardian, you agree to these Terms of Service on behalf of your minor.
 
 ### 3. User Account
-To use the full features of InterviewCoach, you must create an account. When registering, you agree to provide accurate and complete information and to update this information if it changes. You are responsible for maintaining the confidentiality of your account and password and for all activities that occur under your account.
+To use the full features of The Interview Playbook, you must create an account. When registering, you agree to provide accurate and complete information and to update this information if it changes. You are responsible for maintaining the confidentiality of your account and password and for all activities that occur under your account.
 
 ### 4. Data Collection and Use
-By using InterviewCoach, you agree to provide your resume, job descriptions, and interview-related data to generate personalized prep materials. We will use this data solely for the purpose of delivering our services, and we do not share or sell this data to third parties. For details on how we handle your data, please refer to our Privacy Policy.
+By using The Interview Playbook, you agree to provide your resume, job descriptions, and interview-related data to generate personalized prep materials. We will use this data solely for the purpose of delivering our services, and we do not share or sell this data to third parties. For details on how we handle your data, please refer to our Privacy Policy.
 
 ### 5. License to Use the Service
-Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable license to access and use InterviewCoach for personal, non-commercial purposes. You may not reproduce, distribute, or create derivative works based on the Service without our express consent.
+Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable license to access and use The Interview Playbook for personal, non-commercial purposes. You may not reproduce, distribute, or create derivative works based on the Service without our express consent.
 
 ### 6. Restrictions
 You agree not to:
@@ -36,10 +36,10 @@ You agree not to:
 Some features of the Service may require a paid subscription or one-time payment. If you purchase a subscription or service, you agree to pay the applicable fees, which are subject to change. All payments are processed through third-party payment providers, and we are not responsible for any issues related to payments or processing.
 
 ### 8. Intellectual Property
-The content, features, and functionality of InterviewCoach, including text, graphics, logos, software, and other materials, are owned by GreenPen AI Labs or its licensors and are protected by copyright and other intellectual property laws. You may not use, copy, or distribute any of these materials without express permission.
+The content, features, and functionality of The Interview Playbook, including text, graphics, logos, software, and other materials, are owned by GreenPen AI Labs or its licensors and are protected by copyright and other intellectual property laws. You may not use, copy, or distribute any of these materials without express permission.
 
 ### 9. Termination
-We reserve the right to suspend or terminate your access to InterviewCoach at any time, without notice, for any reason, including but not limited to violation of these Terms. Upon termination, all rights granted to you under these Terms will cease immediately.
+We reserve the right to suspend or terminate your access to The Interview Playbook at any time, without notice, for any reason, including but not limited to violation of these Terms. Upon termination, all rights granted to you under these Terms will cease immediately.
 
 ### 10. Disclaimers
 The Service is provided "as is" and "as available." We do not guarantee that the Service will be uninterrupted, error-free, or free from harmful components. We disclaim all warranties, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
@@ -62,14 +62,14 @@ We may update or modify these Terms at any time. When we make changes, we will p
 ### 16. Contact Us
 If you have any questions or concerns about these Terms, please contact us at:
 
-**Email:** [support@greenpenailabs.com](mailto:support@greenpenailabs.com)
+**Email:** [support@theinterviewplaybook.com](mailto:support@theinterviewplaybook.com)
 
-**Address:**<br />
-GreenPen AI Labs<br />
-2625 Middlefield Rd #435<br />
-Palo Alto, CA 94306
+**Address:**<br/>
+GreenPen AI Labs<br/>
+2625 Middlefield Rd #435<br/>
+Palo Alto, CA 94306<br/>
 
-By using InterviewCoach, you acknowledge that you have read and understood these Terms of Service and agree to be bound by them.
+By using The Interview Playbook, you acknowledge that you have read and understood these Terms of Service and agree to be bound by them.
 `} />
     </div>
   );
