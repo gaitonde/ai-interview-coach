@@ -118,7 +118,7 @@ export default function StartPage() {
 
         <div className="text-center mt-4">
           <span className="text-sm">
-            Already have an account?{' '}
+            Already have an account??{' '}
             <Link
               href="/#"
               onClick={handleSignIn}
