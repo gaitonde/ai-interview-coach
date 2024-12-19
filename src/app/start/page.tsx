@@ -125,7 +125,7 @@ export default function StartPage() {
               className="text-blue-500 hover:underline"
               prefetch={true}
             >
-              Sign in_
+              Sign in
             </Link>
           </span>
         </div>
