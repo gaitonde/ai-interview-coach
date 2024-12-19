@@ -10,9 +10,9 @@ export function Header() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex-grow flex justify-center">
-        <div className="w-full md:max-w-4xl lg:max-w-none lg:px-4">
-          <header className="p-4 md:py-8">
+      <div className="flex justify-center">
+        <div className="w-full max-w-4xl overflow-hidden">
+          <header className="p-8 md:py-8">
             <div className={`container max-w-7xl mx-auto flex justify-between items-center`}>
               <Link href="/">
                 <h1 className="md:text-4xl text-2xl font-bold text-white-500">Interview Playbook</h1>

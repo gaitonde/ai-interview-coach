@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { profileIdAtom, userIdAtom } from '@/stores/profileAtoms'
 import { useLogout } from '@/utils/auth'
-import { useUser } from "@clerk/nextjs"
+import { useUser } from '@clerk/nextjs'
 import { useAtom } from 'jotai'
 import { AlertCircle, FileText, Frown, Meh, Plus, Smile } from 'lucide-react'
 import Link from 'next/link'
@@ -24,15 +24,15 @@ type InterviewAnalysis = {
 const getScoreIcon = (score: string) => {
   switch (score) {
     case 'Ready':
-      return <Smile className="w-5 h-5 text-green-500" />;
+      return <Smile className="w-5 h-5 text-green-500" />
     case 'Kinda Ready':
       return <Meh className="w-5 h-5 text-yellow-500" />
     case 'Not Ready':
-      return <Frown className="w-5 h-5 text-red-500" />;
+      return <Frown className="w-5 h-5 text-red-500" />
     default:
       return <AlertCircle className="w-6 h-6 text-slate-400" />
   }
-};
+}
 
 export default function Dashboard() {
   const router = useRouter()
@@ -45,7 +45,7 @@ export default function Dashboard() {
   const [userId] = useAtom(userIdAtom)
   // const [interviewData, setInterviewData] = useState<InterviewData | null>(null)
   const logout = useLogout()
-  const { user, isLoaded, isSignedIn } = useUser()
+  const { user } = useUser()
 
   const handleSort = (column: keyof InterviewAnalysis) => {
     if (column === sortColumn) {
@@ -69,15 +69,11 @@ export default function Dashboard() {
   )
 
   useEffect(() => {
-    console.log('XXX in Dashboard useEffect Clerk user', user)
-    console.log('XXX in Dashboard useEffect profileId', profileId)
-    console.log('XXX in Dashboard useEffect userId', userId)
-
     if (!profileId) {
       if (!user?.id) {
         logout().then(() => {
-          router.push('/sign-in');
-        });
+          router.push('/sign-in')
+        })
       } else {
         fetch(`/api/users?clerk_id=${user.id}`)
         .then(response => response.json())
@@ -86,7 +82,7 @@ export default function Dashboard() {
           setProfileId(json.profile.id)
           if (json.error) {
             logout().then(() => {
-              router.push('/sign-in');
+              router.push('/sign-in')
             })
           }
         })
@@ -98,9 +94,9 @@ export default function Dashboard() {
       if (!response.ok) {
         console.error('Failed to fetch interview data:', response)
         logout().then(() => {
-          router.push('/sign-in');
-        });
-        throw new Error('Failed to fetch interview data');
+          router.push('/sign-in')
+        })
+        throw new Error('Failed to fetch interview data')
       }
       return response.json()
     })
@@ -113,14 +109,14 @@ export default function Dashboard() {
         interviewer: item.interviewer_name || '',
         interviewerRole: item.interviewer_role || '',
         readiness: item.readiness || 'No Data'
-      }));
+      }))
 
-      console.log('mappedAnalyses', mappedAnalyses);
+      console.log('mappedAnalyses', mappedAnalyses)
       setAnalyses(mappedAnalyses)
     })
     .catch(error => {
       console.error('Error fetching interview data:', error)
-    });
+    })
   }, [profileId, userId])
 
   const handleAddInterview = useCallback(async () => {
@@ -191,6 +187,11 @@ export default function Dashboard() {
                             </Button>
                           </Link>
                           <Link href={`/interviewer-prep`}>
+                            <Button variant="ghost" size="sm" className="p-1 md:p-2">
+                              <FileText className="h-3 w-3 md:h-4 md:w-4 text-[#10B981]" />
+                            </Button>
+                          </Link>
+                          <Link href={`/question-prep`}>
                             <Button variant="ghost" size="sm" className="p-1 md:p-2">
                               <FileText className="h-3 w-3 md:h-4 md:w-4 text-[#10B981]" />
                             </Button>

@@ -31,7 +31,6 @@ export function ProfileSetup() {
   const isDemo = useAtomValue(isDemoAtomWithStorage)
   const [storedProfileId, setStoredProfileId] = useAtom(profileIdAtomWithStorage)
   const [storedUserId, setStoredUserId] = useAtom(userIdAtomWithStorage)
-  const [isLoading, setIsLoading] = useState(false)
 
   // const [isDemoMode, setIsDemoMode] = useState(false)
   // const [includeResume, setIncludeResume] = useState(false)
@@ -68,7 +67,6 @@ export function ProfileSetup() {
       setGraduationYear(gradYear);
     }
 
-    setIsLoading(false)
     return profileData
   }
 
@@ -242,7 +240,6 @@ export function ProfileSetup() {
   const getButtonText = () => {
     if (isSubmitting) return 'Saving...'
     if (isDemo) return 'Next'
-    // if (isSignup) return 'Continue'
     return 'Continue'
   }
 
@@ -267,36 +264,6 @@ export function ProfileSetup() {
           <div className="text-center">
             <h2 className="mt-2 text-3xl font-bold text-white">Verify Profile</h2>
             <p className="mt-2 text-sm text-gray-400">Confirm your information to get started</p>
-{/*
-            <p className="mt-2 text-sm text-gray-400">
-              (or
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  const demoProfileId = process.env.NEXT_PUBLIC_DEMO_PROFILE_ID as string
-                  console.log('Demo profile ID: ', demoProfileId)
-
-
-                  toast({
-                    variant: "default",
-                    duration: 4000,
-                    className: "bg-green-800 text-white border-0",
-                    title: "Example Loaded - Marketing Profile",
-                    description:
-                      "Scroll down and keep clicking 'Next' through the app to see example data and get a feel for how it works.",
-                  })
-
-                  loadProfile(demoProfileId)
-                  setIsDemoMode(true)
-                }}
-                className="text-[#10B981] hover:text-[#059669] underline mx-1"
-              >
-                view an example
-              </a>
-              first)
-            </p>
-             */}
           </div>
           <form
             ref={formRef}
@@ -319,33 +286,6 @@ export function ProfileSetup() {
                   className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                 />
               </div>
-{/*
-              {includeResume && (
-                <div>
-                  <label htmlFor="resume" className="block text-sm font-medium text-white">
-                    Upload Resume (PDF)
-                </label>
-                <div className="mt-1 flex items-center">
-                  <label
-                    htmlFor="resume"
-                    className="cursor-pointer bg-white text-gray-700 px-3 py-2 text-sm rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
-                  >
-                    Choose File
-                  </label>
-                  <input
-                    id="resume"
-                    name="resume"
-                    type="file"
-                    accept=".pdf,application/pdf"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                  <span className="ml-3 text-sm text-gray-400 truncate">{fileName}</span>
-                  </div>
-                </div>
-              )}
-                 */}
-
               <div>
                 <label htmlFor="linkedin" className="block text-sm font-medium text-white">
                   LinkedIn

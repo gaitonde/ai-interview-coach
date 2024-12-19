@@ -31,6 +31,14 @@ export async function DELETE(request: NextRequest) {
 
   await sql.query(query, [profileId, interviewId])
 
+  table = getTable('interview_readiness_chat_history')
+  query = `
+    DELETE FROM ${table}
+    WHERE profile_id = $1
+    AND interview_id = $2
+  `
+  await sql.query(query, [profileId, interviewId])
+
   table = getTable('interview_readiness')
   query = `
     DELETE FROM ${table}

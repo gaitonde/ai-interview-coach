@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button'
 import {
   interviewIdAtomWithStorage,
-  isDemoAtomWithStorage,
   profileIdAtomWithStorage,
   showScoreAtomWithStorage
 } from '@/stores/profileAtoms'
@@ -22,7 +21,6 @@ export default function CompanyPrep() {
   const [profileId] = useAtom(profileIdAtomWithStorage)
   const [interviewId] = useAtom(interviewIdAtomWithStorage)
   const [showScore] = useAtom(showScoreAtomWithStorage)
-  // const [isDemo] = useAtom(isDemoAtomWithStorage)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
