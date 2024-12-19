@@ -50,7 +50,8 @@ export default function Scoring({
   const [feedbackMarkdown, setFeedbackMarkdown] = useState<string>('');
   const [audioError, setAudioError] = useState<string | null>(null);
   const feedbackRefs = useRef<{ [key: string]: React.RefObject<HTMLDivElement> }>({});
-  const hasFetchedRef = useRef(false);
+  const hasFetchedRef = useRef(false)
+  const hasGeneratedRef = useRef(false)
   const [questionText, setQuestionText] = useState<string>(question)
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
@@ -100,12 +101,14 @@ export default function Scoring({
       }
     }
 
-    if (isDemo && !hasFetchedRef.current && questionId && answerId) {
-      hasFetchedRef.current = true;
-      fetchFeedback()
-    } else if (!hasFetchedRef.current) {
-      hasFetchedRef.current = true;
+    if (!hasGeneratedRef.current) {
+      hasGeneratedRef.current = true
       generateFeedback()
+    }
+
+    if (!hasFetchedRef.current && questionId && answerId) {
+      hasFetchedRef.current = true
+      fetchFeedback()
     }
 
     // Initialize refs for each category

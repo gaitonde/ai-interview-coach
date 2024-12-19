@@ -21,14 +21,48 @@ export async function DELETE(request: NextRequest) {
   const profileId = request.nextUrl.searchParams.get('profileId')
   const interviewId = request.nextUrl.searchParams.get('interviewId')
 
-  const table = getTable('interview_readiness')
-  const query = `
-    SELECT * FROM ${table}
+  let table = getTable('interviews')
+  let query = `
+    UPDATE ${table}
+    SET readiness = null
     WHERE profile_id = $1
-    AND interview_id = $2
-    ORDER BY id DESC
+    AND id = $2
   `
 
-  const result = await sql.query(query, [profileId, interviewId])
-  return NextResponse.json({ profiles: result.rows })
+  await sql.query(query, [profileId, interviewId])
+
+  table = getTable('interview_readiness')
+  query = `
+    DELETE FROM ${table}
+    WHERE profile_id = $1
+    AND interview_id = $2
+  `
+  await sql.query(query, [profileId, interviewId])
+
+  table = getTable('feedback')
+  query = `
+    DELETE FROM ${table}
+    WHERE profile_id = $1
+    AND interview_id = $2
+  `
+  await sql.query(query, [profileId, interviewId])
+
+  table = getTable('scores')
+  const answersTable = getTable('answers')
+  query = `
+    DELETE FROM ${table}
+    USING ${answersTable}
+    WHERE ${table}.answer_id =  ${answersTable}.id
+    AND ${table}.profile_id = $1
+  `
+  await sql.query(query, [profileId])
+
+  query = `
+    DELETE FROM ${answersTable}
+    WHERE profile_id = $1
+    AND interview_id = $2
+  `
+  await sql.query(query, [profileId, interviewId])
+
+  return NextResponse.json({ sucess: true })
 }

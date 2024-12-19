@@ -11,7 +11,7 @@ export function Header() {
   return (
     <div className="flex flex-col">
       <div className="flex-grow flex justify-center">
-        <div className="w-full max-w-4xl">
+        <div className="w-full md:max-w-4xl lg:max-w-none lg:px-4">
           <header className="p-4 md:py-8">
             <div className={`container max-w-7xl mx-auto flex justify-between items-center`}>
               <Link href="/">

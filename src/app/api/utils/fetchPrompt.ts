@@ -148,10 +148,8 @@ export function fetchGradeClass(graduationYear: number, currentDate: Date): stri
 }
 
 async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: string; user_prompt: string; model: string; temperature: number; max_completion_tokens: number }> {
-  console.log('process.env.NEXT_PUBLIC_VERCEL_URL: ', process.env.NEXT_PUBLIC_VERCEL_URL)
   const protocol = process.env.NEXT_PUBLIC_VERCEL_URL?.startsWith('localhost') ? 'http' : 'https'
   const promptUrl = `${protocol}://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prompts?key=${promptKey}`
-  console.log('prompt url: ', promptUrl)
   const promptResponse = await fetch(promptUrl)
   if (!promptResponse.ok) throw new Error("Failed to fetch prompt")
   const promptData = await promptResponse.json()

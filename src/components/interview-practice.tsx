@@ -75,6 +75,7 @@ export function InterviewPracticeContent() {
   const [interviewId] = useAtom(interviewIdAtom)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isRecordingComplete, setIsRecordingComplete] = useState(false)
+
   const getQuestionId = (question: Question | null): string => {
     if (!question) return '';
     return question.questionId || question.id?.toString() || ''
@@ -85,9 +86,9 @@ export function InterviewPracticeContent() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ profileId, interviewId, questionId, transcript }),
-    });
-    const json = await response.json();
-    return json.id;
+    })
+    const json = await response.json()
+    return json.id
   }
 
   const handleTranscriptionComplete = async (newTranscript: string, newAudioUrl: string) => {
@@ -133,7 +134,7 @@ export function InterviewPracticeContent() {
           questionId,
           category: question?.category
         }),
-      });
+      })
       if (!response.ok) {
         throw new Error('AI Scoring failed')
       }
@@ -143,9 +144,9 @@ export function InterviewPracticeContent() {
         newVersions[versionIndex] = {
           ...newVersions[versionIndex],
           aiScoringResult: result,
-        };
+        }
         return newVersions
-      });
+      })
     } catch (error) {
       console.error('AI Scoring error:', error)
     } finally {
@@ -157,8 +158,8 @@ export function InterviewPracticeContent() {
 
   // Add this new function to handle expanding/collapsing versions
   const handleVersionToggle = (index: number) => {
-    setExpandedVersionIndex(prevIndex => prevIndex === index ? null : index);
-  };
+    setExpandedVersionIndex(prevIndex => prevIndex === index ? null : index)
+  }
 
   // Use useEffect to collapse all versions except the most recent when a new recording is added
   useEffect(() => {
@@ -257,10 +258,7 @@ export function InterviewPracticeContent() {
             return acc;
           }, []);
 
-          console.log('UNIQUE QUESTIONS!!', questions);
           setQuestions(questions)
-          console.log('XXXX QUESTION 0 ', questions[0])
-          console.log('XXXX QUESTION 0 ID ', questions[0].id)
           setQuestion(questions[0])
           setQuestionIndex(0)
 
@@ -361,7 +359,7 @@ export function InterviewPracticeContent() {
                 </div>
               </div>
             )}
-            {!isDemo && questions.length > 0 && question?.category &&(
+            {questions.length > 0 && question?.category &&(
             <div className="p-4 bg-white rounded-lg shadow mt-4">
               <div className="mb-4">
                 <div className="flex space-x-4">
@@ -496,16 +494,11 @@ export function InterviewPracticeContent() {
           {questions.length > 0 && (<div className="my-4">
             <Button
               onClick={() => {
-                if (isDemo) {
-                  removeDemoData()
-                  router.push('/start')
-                } else {
-                  router.push('/interview-ready')
-                }
+                router.push('/interview-ready')
               }}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
             >
-              {isDemo ? 'Exit Demo' : 'See Interview Readiness Report'}
+              See Interview Readiness Report
             </Button>
           </div>
           )}

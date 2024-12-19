@@ -69,14 +69,16 @@ export function Demo() {
   }
 
   const clearDemoData = async () => {
-    console.log('TODO: clear demo data')
-    // const response = await fetch(`/api/demo-interviews?profileId=${profileId}`)
+    const response = await fetch(
+      `/api/demo-interviews?profileId=${profileId}&interviewId=${interviewId}`,
+      {
+        method: 'DELETE',
+      }
+    )
 
-    // if (!response.ok) {
-    //   throw new Error('Failed to fetch demo interview')
-    // }
-    // const data = await response.json()
-    // setInterviewId(data.content[0].id)
+    if (!response.ok) {
+      throw new Error('Failed to clear demo data')
+    }
   }
   const setDemoMode = async (isDemo: boolean) => {
     setIsDemo(isDemo)
@@ -161,7 +163,7 @@ export function Demo() {
                 onClick={() => handleProfileClick(`${profile.id}`)}
                 className={`
                   p-4 rounded-lg border cursor-pointer
-                  ${profileId === `${profile.id}`
+                  ${profileId.toString() === `${profile.id}`
                     ? 'border-orange-400 bg-orange-400/10'
                     : 'border-gray-700 hover:border-orange-400/50'}
                 `}
