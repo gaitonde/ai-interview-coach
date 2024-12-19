@@ -22,10 +22,6 @@ export function InterviewSetup() {
   const isDemo = useAtomValue(isDemoAtomWithStorage)
 
   useEffect(() => {
-    console.log('x isDemo: ', isDemo)
-    console.log('x profileId: ', profileId)
-    console.log('x interviewId: ', interviewId)
-
     if (isDemo && profileId && interviewId) {
       loadInterview(profileId!, interviewId!)
     }

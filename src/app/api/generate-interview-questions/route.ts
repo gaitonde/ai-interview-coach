@@ -29,11 +29,8 @@ export async function POST(request: Request) {
     const generatedContent = completion.choices[0]?.message?.content?.replace('```json', '').replace('```', '')
     const questionsJson = JSON.parse(generatedContent || '{}')
 
-    console.log('ZZZ questionsJson', questionsJson)
-
     for (const questionJson of questionsJson) {
       const category = questionJson.category.toLowerCase()
-      console.log('ZZZ category', category)
       const questions = questionJson.questions
 
       for (const question of questions) {
@@ -75,8 +72,6 @@ async function insertInterviewReadiness(profileId: string, interviewId: string, 
     )
     VALUES ($1, $2, $3, TRUE)
   `
-
-  console.log('ZZZ query for interview readiness category ', category, query)
 
   await sql.query(query, [profileId, interviewId, category])
 }

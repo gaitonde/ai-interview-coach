@@ -36,6 +36,7 @@ CREATE TABLE aic_production_profiles (
     major VARCHAR(255),
     concentration VARCHAR(255),
     graduation_date DATE,
+    num_free_interviews INTEGER DEFAULT 1,
     is_demo BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

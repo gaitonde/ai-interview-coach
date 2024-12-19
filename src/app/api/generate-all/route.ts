@@ -39,10 +39,8 @@ async function generateCompanyPrep(profileId: string, interviewId: string) {
   `
 
   await sql.query(query, [profileId, interviewId, content, usage])
-
-  console.log('PPP content', content)
   const details = await extractDetailsFromCompanyScoutingReport(content!!)
-  console.log('PPP details: ', details)
+
   let companyName, roleName
   if (!details) {
     console.warn('Could not extract company and role details')
@@ -61,8 +59,6 @@ async function generateCompanyPrep(profileId: string, interviewId: string) {
     AND id = $4;
   `
 
-  console.log('PPP companyName: ', companyName)
-  console.log('PPP roleName: ', roleName)
   await sql.query(query2, [companyName, roleName, profileId, interviewId])
 
   return { content }

@@ -1,10 +1,21 @@
 import { getTable } from '@/lib/db'
 import { sql } from '@vercel/postgres'
 
+const DEFAULT_NUM_FREE_INTERVIEWS = 1
+
 export async function getAvailableInterviews(
   profileId: string,
 ): Promise<{ interviewsAvailable: number }> {
   try {
+    //
+    const profilesTable = getTable('profiles')
+    const profilesResult = await sql.query(`
+      SELECT num_free_interviews FROM ${profilesTable}
+      WHERE id = ${profileId}
+    `)
+
+    const freeInterviews = profilesResult?.rows?.[0]?.num_free_interviews ?? DEFAULT_NUM_FREE_INTERVIEWS
+
     const paymentsTable = getTable('payments')
     const paymentsResult = await sql.query(`
       SELECT count(*) as count FROM ${paymentsTable}
@@ -20,7 +31,7 @@ export async function getAvailableInterviews(
     `)
 
     const interviewsDone = interviews?.rows[0].count ?? paidInterviews
-    const interviewsAvailable = Math.max(0, paidInterviews - interviewsDone)
+    const interviewsAvailable = Math.max(0, freeInterviews + paidInterviews - interviewsDone)
 
     return { interviewsAvailable }
   } catch (error: unknown) {

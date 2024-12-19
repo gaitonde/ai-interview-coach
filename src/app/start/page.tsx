@@ -2,20 +2,28 @@
 
 import { HeroSection } from '@/components/hero-section'
 import { Button } from '@/components/ui/button'
-import { profileIdAtom } from '@/stores/profileAtoms'
+import {
+  interviewIdAtomWithStorage,
+  isDemoAtomWithStorage,
+  profileIdAtomWithStorage,
+  showScoreAtomWithStorage,
+} from '@/stores/profileAtoms'
+
 import { removeDemoData } from '@/utils/auth'
 import { useClerk } from '@clerk/nextjs'
 import { useAtom } from 'jotai'
 import Cookies from 'js-cookie'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function StartPage() {
   const router = useRouter()
   const [isUploading, setIsUploading] = useState(false)
-  const [, setProfileId] = useAtom(profileIdAtom)
+  const [, setProfileId] = useAtom(profileIdAtomWithStorage)
+  const [, setInterviewId] = useAtom(interviewIdAtomWithStorage)
   const { signOut } = useClerk()
+  const [, setIsDemo] = useAtom(isDemoAtomWithStorage)
 
   const handleUploadResume = async () => {
     removeDemoData()
@@ -85,6 +93,12 @@ export default function StartPage() {
       input.click()
     })
   }
+
+  useEffect(() => {
+    setIsDemo(false)
+    setProfileId('')
+    setInterviewId('')
+  }, [])
 
    return (
     <div className="flex flex-col items-center min-h-[100dvh] px-4 py-12 bg-gradient-to-b from-background to-muted">
