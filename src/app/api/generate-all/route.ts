@@ -38,12 +38,20 @@ async function generateCompanyPrep(profileId: string, interviewId: string) {
     DO UPDATE SET generated_company_prep = EXCLUDED.generated_company_prep, usage = EXCLUDED.usage;
   `
 
-  await sql.query(query, [profileId, interviewId, content, usage]);
+  await sql.query(query, [profileId, interviewId, content, usage])
 
-  const companyMatch = content?.match(/\*\*Company\*\*:\s*([^\n]*)/)
-  const companyName = companyMatch ? companyMatch[1].trim() : null
-  const roleMatch = content?.match(/\*\*Position\*\*:\s*([^\n]*)/)
-  const roleName = roleMatch ? roleMatch[1].trim() : null
+  console.log('PPP content', content)
+  const details = await extractDetailsFromCompanyScoutingReport(content!!)
+  console.log('PPP details: ', details)
+  let companyName, roleName
+  if (!details) {
+    console.warn('Could not extract company and role details')
+    companyName = 'Stealth Mode'
+    roleName = 'No formal role title'
+  } else {
+    companyName  = details.companyName
+    roleName = details.roleName
+  }
 
   const interviewsTable = getTable('interviews')
   const query2 = `
@@ -52,6 +60,9 @@ async function generateCompanyPrep(profileId: string, interviewId: string) {
     WHERE profile_id = $3
     AND id = $4;
   `
+
+  console.log('PPP companyName: ', companyName)
+  console.log('PPP roleName: ', roleName)
   await sql.query(query2, [companyName, roleName, profileId, interviewId])
 
   return { content }
@@ -76,4 +87,18 @@ async function generateOtherPreps(request: Request, profileId: string, interview
 
   // Fire all other generations in parallel
   await Promise.all(generateEndpoints.map(makeRequest))
+}
+
+async function extractDetailsFromCompanyScoutingReport(text: string) {
+  if (!text) return
+
+  const regex = /This Company Scouting Report is personalized for .+ for (.+?) at ([^.]+)\./;
+  const match = text.match(regex)
+
+  if (match) {
+    const [, roleName, companyName] = match
+    return { roleName, companyName }
+  }
+
+  return null // No match found
 }

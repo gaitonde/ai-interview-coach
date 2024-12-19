@@ -31,7 +31,7 @@ const afterAuth = async (auth: ClerkMiddlewareAuth, req: NextRequest) => {
   const { userId } = await auth()
   const isDemo = req.cookies.get('isDemo')?.value === 'true'
 
-  console.log('IN MIDDLEWAREXX: ', isDemo)
+  // console.log('IN MIDDLEWAREXX: ', isDemo)
 
   if (!userId && !isPublicPath && !isDemo) {
     const signInUrl = new URL('/start', req.url);
