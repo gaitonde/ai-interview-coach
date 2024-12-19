@@ -1,4 +1,4 @@
-# template-1
+# The Interview Playbook
 Template for rapid fire AI apps
 
 # Background
@@ -43,6 +43,6 @@ export default async function Cart({
 ```
 
 ## For exposing localhost to the internet
-We use localhost.run for a reverse tunnel to 
+We use localhost.run for a reverse tunnel to
 - `ssh -R 80:localhost:3000 localhost.run`
 - Visit `https://<random-hash>.localhost.run` to see the app
