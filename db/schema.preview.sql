@@ -156,6 +156,7 @@ CREATE TABLE aic_preview_questions (
     question TEXT,
     why TEXT,
     focus TEXT,
+    example_answer TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (profile_id) REFERENCES aic_preview_profiles(id) ON DELETE CASCADE,

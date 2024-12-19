@@ -39,11 +39,11 @@ export async function POST(request: Request) {
         const table = getTable('questions')
         const query = `
           INSERT INTO ${table}
-            (profile_id, interview_id, category, question, why, focus)
+            (profile_id, interview_id, category, question, why, focus, example_answer)
           VALUES
-            ($1, $2, $3, $4, $5, $6)
+            ($1, $2, $3, $4, $5, $6, $7)
         `
-        await sql.query(query, [profileId, interviewId, category, sanitizedQuestion, question.why, question.focus])
+        await sql.query(query, [profileId, interviewId, category, sanitizedQuestion, question.why, question.focus, question.exampleAnswer])
       }
 
       // Only insert interview readiness once per category

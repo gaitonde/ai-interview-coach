@@ -1,16 +1,15 @@
 'use client'
 
 import AudioRecorder from '@/components/audio-recorder'
+import ConditionalHeader from '@/components/conditional-header'
+import Scoring from '@/components/scoring'
 import { Button } from '@/components/ui/button'
 import { interviewIdAtom, isDemoAtom, profileIdAtom } from '@/stores/profileAtoms'
-import { removeDemoData } from '@/utils/auth'
 import { get } from 'idb-keyval'
 import { useAtom } from 'jotai'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import styles from '../styles/interview-practice.module.css'
-import ConditionalHeader from '@/components/conditional-header'
-import Scoring from '@/components/scoring'
 
 type EvaluatingState = 'Ready' | 'Evaluating'
 
@@ -27,6 +26,7 @@ interface Question {
   category: string
   question: string
   why: string
+  exampleAnswer: string
   focus: string
   // For demo data
   answerId?: string  // Optional fields from the API response
@@ -336,9 +336,10 @@ export function InterviewPracticeContent() {
                     className="flex-1 text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
                     disabled={questionIndex === 0}
                     onClick={() => {
-                      const previousIndex = questionIndex - 1;
-                      setQuestionIndex(previousIndex);
-                      setQuestion(questions[previousIndex]);
+                      const previousIndex = questionIndex - 1
+                      setQuestionIndex(previousIndex)
+                      setQuestion(questions[previousIndex])
+                      setManualTranscript('')
                     }}
                   >
                     <span className="sm:hidden">Previous</span>
@@ -348,9 +349,10 @@ export function InterviewPracticeContent() {
                     className="flex-1 text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
                     disabled={questionIndex === questions.length - 1}
                     onClick={() => {
-                      const nextIndex = questionIndex + 1;
-                      setQuestionIndex(nextIndex);
-                      setQuestion(questions[nextIndex]);
+                      const nextIndex = questionIndex + 1
+                      setQuestionIndex(nextIndex)
+                      setQuestion(questions[nextIndex])
+                      setManualTranscript('')
                     }}
                   >
                     <span className="sm:hidden">Next</span>
@@ -418,6 +420,20 @@ export function InterviewPracticeContent() {
                   onChange={(e) => setManualTranscript(e.target.value)}
                   disabled={isSubmitting}
                 />
+                {isDemo && question?.exampleAnswer && (
+                  <a
+                    href="#"
+                    className="text-blue-500 hover:underline"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      console.log('in here: ', question?.exampleAnswer, question)
+                      setManualTranscript(question?.exampleAnswer)
+                    }}
+                  >
+                    Use Example Answer
+                  </a>
+                )}
+
                 <button
                   className="text-white bg-[#10B981] hover:bg-[#059669] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
                   disabled={questions.length < 0 || !manualTranscript.trim() || evaluatingState === 'Evaluating' || isSubmitting}
@@ -486,7 +502,7 @@ export function InterviewPracticeContent() {
               recordingTimestamp={version.recordingTimestamp}
               versionNumber={versions.length - index}
               isExpanded={index === expandedVersionIndex}
-              onToggle={() => handleVersionToggle(index)} // Add this line
+              onToggle={() => handleVersionToggle(index)}
             />
           )}
           </div>

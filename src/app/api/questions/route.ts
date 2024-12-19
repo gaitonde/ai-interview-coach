@@ -70,6 +70,7 @@ export async function GET(request: NextRequest) {
          questions.question,
          questions.why,
          questions.focus,
+         questions.example_answer as "exampleAnswer",
          answers.id AS "answerId",
          answers.answer,
          answers.created_at AS "recordingTimestamp",
