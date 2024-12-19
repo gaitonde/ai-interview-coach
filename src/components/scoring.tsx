@@ -56,59 +56,31 @@ export default function Scoring({
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
   const [isDemo] = useAtom(isDemoAtom)
+  const [hasGeneratedFeedback, setHasGeneratedFeedback] = useState<boolean>(false)
 
   useEffect(() => {
-    const fetchFeedback = async () => {
-      console.log('Fetching feedback with:', {
-        profileId,
-        questionId,
-        answerId
-      })
+    const checkExistingFeedback = async () => {
       try {
         const response = await fetch(`/api/feedback?profileId=${profileId}&questionId=${questionId}&answerId=${answerId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch feedback');
         }
 
-        const data = await response.json();
-        setFeedbackMarkdown(data.feedback);
-      } catch (error) {
-        console.error('Error fetching feedback:', error);
-        // Handle error (e.g., show an error message to the user)
-      }
-    }
-
-    const generateFeedback = async () => {
-
-      try {
-        const response = await fetch('/api/generate-feedback', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ profileId, interviewId, answerId, questionId, categories }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch feedback');
+        const data = await response.json()
+        if (data.feedback) {
+          setFeedbackMarkdown(data.feedback)
+          setHasGeneratedFeedback(true)
+        } else if (!hasGeneratedRef.current) {
+          hasGeneratedRef.current = true
+          generateFeedback()
         }
-
-        const data = await response.json();
-        setFeedbackMarkdown(data.feedback);
       } catch (error) {
-        console.error('Error fetching feedback:', error);
-        // Handle error (e.g., show an error message to the user)
+        console.error('Error checking feedback:', error)
       }
     }
 
-    if (!hasGeneratedRef.current) {
-      hasGeneratedRef.current = true
-      generateFeedback()
-    }
-
-    if (!hasFetchedRef.current && questionId && answerId) {
-      hasFetchedRef.current = true
-      fetchFeedback()
+    if (!hasGeneratedRef.current && questionId && answerId) {
+      checkExistingFeedback()
     }
 
     // Initialize refs for each category
@@ -116,6 +88,38 @@ export default function Scoring({
       feedbackRefs.current[category.name] = React.createRef<HTMLDivElement>();
     });
   }, [categories, isExpanded]);
+
+  const generateFeedback = async () => {
+    try {
+      const response = await fetch('/api/generate-feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // profileId, interviewId, questionId, answerId, categories
+        body: JSON.stringify({
+          profileId,
+          interviewId,
+          questionId,
+          answerId,
+          transcript,
+          categories,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate feedback');
+      }
+
+      const data = await response.json();
+      if (data.feedback) {
+        setFeedbackMarkdown(data.feedback);
+        setHasGeneratedFeedback(true);
+      }
+    } catch (error) {
+      console.error('Error generating feedback:', error);
+    }
+  };
 
   // const overallAverageScore = categories.reduce((sum, category) => sum + category.score, 0) / categories.length;
 

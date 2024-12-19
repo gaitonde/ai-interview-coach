@@ -1,21 +1,28 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
-import { interviewIdAtom, profileIdAtom, showScoreAtom } from "@/stores/profileAtoms"
+import { Button } from '@/components/ui/button'
+import {
+  interviewIdAtomWithStorage,
+  isDemoAtomWithStorage,
+  profileIdAtomWithStorage,
+  showScoreAtomWithStorage
+} from '@/stores/profileAtoms'
+
+import ConditionalHeader from '@/components/conditional-header'
 import { useAtom } from "jotai"
 import { Clipboard } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import ConditionalHeader from '@/components/conditional-header'
 import MarkdownRenderer from './markdown-renderer'
 import { RubricScorer } from './rubric-scorer'
 
 export default function CompanyPrep() {
   const router = useRouter()
   const [content, setContent] = useState<string>('')
-  const [profileId] = useAtom(profileIdAtom)
-  const [interviewId] = useAtom(interviewIdAtom)
-  const [showScore] = useAtom(showScoreAtom)
+  const [profileId] = useAtom(profileIdAtomWithStorage)
+  const [interviewId] = useAtom(interviewIdAtomWithStorage)
+  const [showScore] = useAtom(showScoreAtomWithStorage)
+  // const [isDemo] = useAtom(isDemoAtomWithStorage)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {

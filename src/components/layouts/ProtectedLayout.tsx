@@ -1,15 +1,19 @@
 'use client'
 
-import { profileIdAtom } from "@/stores/profileAtoms"
+import {
+  isDemoAtomWithStorage,
+  profileIdAtomWithStorage
+} from '@/stores/profileAtoms'
 import { useUser } from '@clerk/nextjs'
 import { useAtom } from "jotai"
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const { user, isLoaded, isSignedIn } = useUser()
+  const { user, isLoaded } = useUser()
   const router = useRouter()
-  const [profileId, setProfileId] = useAtom(profileIdAtom)
+  const [profileId, setProfileId] = useAtom(profileIdAtomWithStorage)
+  const [isDemo, setIsDemo] = useAtom(isDemoAtomWithStorage)
 
   useEffect(() => {
     if (!isLoaded) return
@@ -35,11 +39,11 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
       }
     }
 
-    if (!user) {
-      console.log('XXX in ProtectedLayout useEffect user not found, redirecting to start')
+    if (!user && !isDemo) {
+      console.log('In ProtectedLayout useEffect user not found, redirecting to start')
       router.push('/start')
     } else {
-      console.log('XXX in ProtectedLayout useEffect user found, fetching profile')
+      console.log('In ProtectedLayout useEffect user found, fetching profile')
       fetchProfile()
     }
   }, [isLoaded, user, router, profileId, setProfileId])
@@ -48,7 +52,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     return <div>Loading...</div>
   }
 
-  if (!isLoaded || !user) {
+  if ((!isLoaded || !user) && !isDemo) {
     return <div/>
   }
 

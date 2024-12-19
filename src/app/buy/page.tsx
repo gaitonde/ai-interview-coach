@@ -65,7 +65,7 @@ export default function BuyPage() {
           </div>
 
           <div className="text-center mb-6">
-            <div className="text-3xl font-bold">$5.00</div>
+            <div className="text-3xl font-bold">$5</div>
             <div className="text-gray-400">One-time payment</div>
           </div>
 

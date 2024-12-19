@@ -8,6 +8,7 @@ import {
   isDemoAtomWithStorage,
   profileIdAtomWithStorage,
   showScoreAtomWithStorage,
+  userIdAtomWithStorage,
 } from '@/stores/profileAtoms'
 import { useAtom } from 'jotai'
 import Cookies from 'js-cookie'
@@ -29,6 +30,7 @@ export function Demo() {
   const [interviewId, setInterviewId] = useAtom(interviewIdAtomWithStorage)
   const [isDemo, setIsDemo] = useAtom(isDemoAtomWithStorage)
   const [showScore, setShowScore] = useAtom(showScoreAtomWithStorage)
+  const [, setUserId] = useAtom(userIdAtomWithStorage)
 
   const fetchDemoProfiles = async () => {
     const response = await fetch(`/api/demo-profiles`)
@@ -61,14 +63,18 @@ export function Demo() {
           Either add an is_demo bit to an interview for this profile or remove the is_demo bit from this profile.
           `,
       })
-      setDemoMode(false)
-
-      setProfileId('')
-      setInterviewId('')
+      unsetDemoMode()
     }
   }
 
-  const clearDemoData = async () => {
+  const unsetDemoMode = async () => {
+    setDemoMode(false)
+    setUserId('')
+    setProfileId('')
+    setInterviewId('')
+  }
+
+  const deleteDemoData = async () => {
     const response = await fetch(
       `/api/demo-interviews?profileId=${profileId}&interviewId=${interviewId}`,
       {
@@ -80,6 +86,7 @@ export function Demo() {
       throw new Error('Failed to clear demo data')
     }
   }
+
   const setDemoMode = async (isDemo: boolean) => {
     setIsDemo(isDemo)
     Cookies.set('isDemo', isDemo.toString(), {
@@ -91,11 +98,18 @@ export function Demo() {
   const handleProfileClick = (selectedProfileId: string) => {
     setDemoMode(true)
     setProfileId(selectedProfileId)
-    fetchDemoInterview(selectedProfileId)
+    if (selectedProfileId) {
+      fetchDemoInterview(selectedProfileId)
+    }
   }
 
   const handleSubmit = async () => {
-    await clearDemoData()
+    if (profileId) {
+      await deleteDemoData()
+    } else {
+      unsetDemoMode()
+    }
+
     const url = isDemo ? '/profile-setup' : '/start'
     router.push(url)
   }

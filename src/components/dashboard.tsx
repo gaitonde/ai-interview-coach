@@ -95,9 +95,8 @@ export default function Dashboard() {
     }
     fetch(`/api/interviews?profileId=${profileId}`)
     .then(response => {
-      console.log('YYY response', response)
       if (!response.ok) {
-        console.error('YYY Failed to fetch interview data:', response)
+        console.error('Failed to fetch interview data:', response)
         logout().then(() => {
           router.push('/sign-in');
         });
