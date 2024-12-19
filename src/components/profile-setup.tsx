@@ -25,7 +25,7 @@ export function ProfileSetup() {
     graduationYear: DEFAULT_GRADUATION_YEAR
   });
   const [graduationYear, setGraduationYear] = useState<string>(DEFAULT_GRADUATION_YEAR)
-  const [isSignup, setIsSignup] = useState(false)
+  const [, setIsSignup] = useState(false)
   const { signIn } = useSignIn()
   const clerk = useClerk()
   const isDemo = useAtomValue(isDemoAtomWithStorage)
@@ -242,8 +242,8 @@ export function ProfileSetup() {
   const getButtonText = () => {
     if (isSubmitting) return 'Saving...'
     if (isDemo) return 'Next'
-    if (isSignup) return 'Continue'
-    return 'Save'
+    // if (isSignup) return 'Continue'
+    return 'Continue'
   }
 
   const handleSignOut = async () => {
@@ -265,8 +265,8 @@ export function ProfileSetup() {
       <div className="flex justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-[#252b3b] px-8 py-4 rounded-lg shadow-lg my-4">
           <div className="text-center">
-            <h2 className="mt-2 text-3xl font-bold text-white">Profile Setup</h2>
-            <p className="mt-2 text-sm text-gray-400">Verify and save your profile to sign up</p>
+            <h2 className="mt-2 text-3xl font-bold text-white">Verify Profile</h2>
+            <p className="mt-2 text-sm text-gray-400">Confirm your information to get started</p>
 {/*
             <p className="mt-2 text-sm text-gray-400">
               (or
@@ -438,6 +438,20 @@ export function ProfileSetup() {
             >
               {getButtonText()}
             </Button>
+            <p className="mt-4 text-sm">
+              <span>
+                By clicking continue, you agree to our{" "}
+                <a
+                  href="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  Terms of Service
+                </a>
+                .
+              </span>
+            </p>
           </form>
           {errorMsg && <p className="text-red-500 text-sm mt-2">{errorMsg}</p>}
         </div>

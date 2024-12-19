@@ -184,7 +184,7 @@ export function InterviewPracticeContent() {
           } else if (data.interviewer_name) {
             interviewer = `${data.interviewer_name}`;
           } else if (data.interviewer_role) {
-            interviewer = `${data.interviewer_role}`;
+            interviewer = `the ${data.interviewer_role}`;
           }
           setWhom(interviewer);
         } else {
@@ -505,7 +505,7 @@ export function InterviewPracticeContent() {
               }}
               className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
             >
-              {isDemo ? 'Exit Demo' : 'Back'}
+              {isDemo ? 'Exit Demo' : 'See Interview Readiness Report'}
             </Button>
           </div>
           )}

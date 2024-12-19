@@ -28,7 +28,7 @@ export default function CompanyPrep() {
           return response.json();
         })
         .then(data => {
-          setContent('# Company Scoop\n\n' + data.content)
+          setContent('# Company Scouting Report\n\n' + data.content)
         })
         .catch(error => {
           console.error('Error fetching prep sheet response:', error)
@@ -89,7 +89,7 @@ export default function CompanyPrep() {
                   disabled={isSubmitting}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
-                  Next
+                  Get Interviewer Scouting Report
                 </Button>
               </div>
             </div>

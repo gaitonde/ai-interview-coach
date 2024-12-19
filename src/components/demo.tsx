@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useToast } from '@/hooks/use-toast'
 import {
+  interviewIdAtomWithStorage,
   isDemoAtomWithStorage,
   profileIdAtomWithStorage,
   showScoreAtomWithStorage,
 } from '@/stores/profileAtoms'
 import { useAtom } from 'jotai'
+import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -24,6 +26,7 @@ export function Demo() {
   const { toast } = useToast()
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [profileId, setProfileId] = useAtom(profileIdAtomWithStorage)
+  const [interviewId, setInterviewId] = useAtom(interviewIdAtomWithStorage)
   const [isDemo, setIsDemo] = useAtom(isDemoAtomWithStorage)
   const [showScore, setShowScore] = useAtom(showScoreAtomWithStorage)
 
@@ -37,24 +40,60 @@ export function Demo() {
     setProfiles(data.profiles)
   }
 
-  const handleProfileClick = (selectedProfileId: string) => {
-    console.log('selectedProfileId', selectedProfileId)
-    console.log('profileId', profileId)
-    setIsDemo(true)
-    setProfileId(selectedProfileId)
-    // if (profileId === profileId) {
-    //   removeDemoData()
-    //   // setprofileId('')
-    //   // setisDemo(false)
-    // } else {
-    //   // localStorage.setItem('profileId', profileId)
-    //   // setprofileId(profileId)
-    //   // setisDemo(true)
-    //   // localStorage.setItem('mode', 'demo')
-    // }
+  const fetchDemoInterview = async (profileId: string) => {
+    console.log('getting interview')
+    const response = await fetch(`/api/demo-interviews?profileId=${profileId}`)
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch demo interview')
+    }
+    const data = await response.json()
+    if (data.interviews.length > 0) {
+      setInterviewId(data.interviews[0].id)
+    } else {
+      toast({
+        variant: "default",
+        duration: 5000,
+        title: "No Interviews Found",
+        className: "bg-red-800 text-white border-0",
+        description: `
+          Unable to get any interviews for the profile with id: ${profileId}.
+          Either add an is_demo bit to an interview for this profile or remove the is_demo bit from this profile.
+          `,
+      })
+      setDemoMode(false)
+
+      setProfileId('')
+      setInterviewId('')
+    }
   }
 
-  const handleSubmit = () => {
+  const clearDemoData = async () => {
+    console.log('TODO: clear demo data')
+    // const response = await fetch(`/api/demo-interviews?profileId=${profileId}`)
+
+    // if (!response.ok) {
+    //   throw new Error('Failed to fetch demo interview')
+    // }
+    // const data = await response.json()
+    // setInterviewId(data.content[0].id)
+  }
+  const setDemoMode = async (isDemo: boolean) => {
+    setIsDemo(isDemo)
+    Cookies.set('isDemo', isDemo.toString(), {
+      secure: true,
+      sameSite: 'strict'
+    })
+  }
+
+  const handleProfileClick = (selectedProfileId: string) => {
+    setDemoMode(true)
+    setProfileId(selectedProfileId)
+    fetchDemoInterview(selectedProfileId)
+  }
+
+  const handleSubmit = async () => {
+    await clearDemoData()
     const url = isDemo ? '/profile-setup' : '/start'
     router.push(url)
   }
@@ -103,7 +142,7 @@ export function Demo() {
           <div className="flex flex-wrap gap-4 mx-4 mb-6">
             <div
               onClick={() => {
-                setIsDemo(false)
+                setDemoMode(false)
                 setProfileId('')
               }}
               className={`
@@ -130,6 +169,7 @@ export function Demo() {
                 <p className="text-sm font-medium">{profile.email}</p>
                 <p className="text-sm text-gray-400">{profile.school}</p>
                 <p className="text-sm text-gray-400">{profile.major}</p>
+                {interviewId && (<p className="text-sm text-gray-400">Interview ID: {interviewId}</p>)}
               </div>
             ))}
           </div>

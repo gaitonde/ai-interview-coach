@@ -77,8 +77,8 @@ export default function StartPage() {
         } catch (error) {
           console.error('Upload error:', error)
           resolve(false)
-        } finally {
-          setIsUploading(false)
+        // } finally {
+        //   setIsUploading(false)
         }
       }
 

@@ -3,7 +3,17 @@ import type { NextRequest } from 'next/server'
 import { clerkMiddleware, type ClerkMiddlewareAuth } from '@clerk/nextjs/server'
 import { getProfileByUserId } from '@/app/actions/get-profile'
 
-const publicRoutes = ['/start', '/sign-in', '/sign-up', '/sign-up-start', '/api', '/profile-setup']
+const publicRoutes = [
+  '/start',
+  '/sign-in',
+  '/sign-up',
+  '/sign-up-start',
+  '/api',
+  '/profile-setup',
+  '/demo',
+  '/terms',
+  '/privacy'
+]
 
 const isPublicRoute = (pathname: string): boolean => {
   return publicRoutes.some(route => {
@@ -18,10 +28,12 @@ const isPublicRoute = (pathname: string): boolean => {
 
 const afterAuth = async (auth: ClerkMiddlewareAuth, req: NextRequest) => {
   const isPublicPath = isPublicRoute(req.nextUrl.pathname)
-
   const { userId } = await auth()
+  const isDemo = req.cookies.get('isDemo')?.value === 'true'
 
-  if (!userId && !isPublicPath) {
+  console.log('IN MIDDLEWAREXX: ', isDemo)
+
+  if (!userId && !isPublicPath && !isDemo) {
     const signInUrl = new URL('/start', req.url);
     return NextResponse.redirect(signInUrl);
   }

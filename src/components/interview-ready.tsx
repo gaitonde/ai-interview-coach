@@ -134,7 +134,6 @@ export default function InterviewReady() {
         const response = await fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`)
         if (!response.ok) throw new Error('Failed to fetch job data')
         const { content: interview } = await response.json()
-        console.log('XXX interview', interview)
         setInterview(interview)
       } catch (error) {
         console.error('Error fetching interview data:', error)
@@ -149,7 +148,7 @@ export default function InterviewReady() {
     <div className="bg-[#1a1f2b] px-4 py-4">
       <div className="max-w-4xl mx-auto bg-[#252b3b] rounded-lg shadow-xl overflow-hidden">
         <div className="p-6 sm:p-8">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-6 text-center text-white">Interview Readiness</h2>
+          <h2 className="sm:text-2xl md:text-3xl font-semibold mb-6 text-center text-[#10B981]">Interview Readiness Report</h2>
 
           {interview && (
             <Card className="bg-[#1a1f2b] text-white mb-6">
@@ -256,16 +255,19 @@ export default function InterviewReady() {
                 <CardContent className="p-4 sm:p-6">
                   <div>
                     <div className="sm:hidden">
-                    <p>
-                        Personalized questions have been created to help you prepare for your interview.
+                      <p>
+                      To get a baseline for your interview readiness do a Interview Jam Session.
                       </p>
                       <p className="mt-4">
-                        Interview Jam sessions are a great way to practice your answers and see what you're at!
+                        Interview Jam sessions are a great way to practice your answers and see where you're at!
+                      </p>
+                      <p className="mt-4">
+                        Personalized questions have been created to help you prepare for your interview.
                       </p>
                     </div>
                     <div className="hidden sm:block">
                       <p>
-                      Personalized questions have been created to help you prepare for your interview. Interview Jam sessions are a great way to practice your answers and see what you're at!
+                        To get a baseline for your interview readiness do a Interview Jam Session. Interview Jam Sessions are a great way to practice your answers and see where you're at! Personalized questions have been created to help you prepare for your interview.
                       </p>
                     </div>
                   </div>
@@ -335,6 +337,8 @@ export function ReadinessIndicator({ readiness }: ReadinessIndicatorProps) {
     switch (readiness) {
       case "Ready":
         return "text-green-500"
+      case "Kinda Ready":
+        return "text-yellow-500"
       case "Not Ready":
         return "text-red-500"
       default:

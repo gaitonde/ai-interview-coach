@@ -28,7 +28,7 @@ export default function InterviewerPrep() {
             return response.json()
           })
           .then(data => {
-            setContent('# Interviewer Scoop\n\n' + data.content)
+            setContent('# Interviewer Scouting Report\n\n' + data.content)
           })
           .catch(error => {
             console.error('Error fetching prep sheet response:', error)
@@ -110,7 +110,7 @@ export default function InterviewerPrep() {
                   disabled={isSubmitting}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
-                  Next
+                  Get Question Scouting Report
                 </Button>
               </div>
             </>

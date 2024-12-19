@@ -15,10 +15,6 @@ export default function Home() {
     router.push('/start')
   }, [router])
 
-  const navigateToProfileSetup = useCallback(() => {
-    router.push('/profile-setup')
-  }, [router])
-
   useEffect(() => {
     if (!atomUserId) {
       navigateToStart()
@@ -27,7 +23,9 @@ export default function Home() {
       .then(response => response.json())
       .then(data => {
         if (!data.profile.school) {
-          navigateToProfileSetup()
+          router.push('/profile-setup')
+        } else {
+          router.push('/dashboard')
         }
       })
       .catch(error => {
@@ -36,7 +34,7 @@ export default function Home() {
         navigateToStart()
       })
     }
-  }, [atomUserId, navigateToStart, navigateToProfileSetup])
+  }, [atomUserId, navigateToStart])
 
   return (
     <>

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { interviewIdAtomWithStorage, profileIdAtom } from '@/stores/profileAtoms'
+import { interviewIdAtomWithStorage, isDemoAtomWithStorage, profileIdAtom } from '@/stores/profileAtoms'
 import { useAtom, useAtomValue } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 import { useRouter } from 'next/navigation'
@@ -18,14 +18,15 @@ export function InterviewSetup() {
   const formRef = useRef<HTMLFormElement>(null)
   const [statusMessage, setStatusMessage] = useState('Thinking...')
   const profileId = useAtomValue(profileIdAtom)
-  // const userId = useAtomValue(userIdAtom)
   const [interviewId, setInterviewId] = useAtom(interviewIdAtomWithStorage)
-
-  const isDemo = useAtomValue(isDemoModeAtom)
-
+  const isDemo = useAtomValue(isDemoAtomWithStorage)
 
   useEffect(() => {
-    if (isDemo && profileId) {
+    console.log('x isDemo: ', isDemo)
+    console.log('x profileId: ', profileId)
+    console.log('x interviewId: ', interviewId)
+
+    if (isDemo && profileId && interviewId) {
       loadInterview(profileId!, interviewId!)
     }
   }, [profileId, interviewId, isDemo])
@@ -221,8 +222,8 @@ export function InterviewSetup() {
       <div className="flex justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8 bg-[#252b3b] p-8 rounded-lg shadow-lg my-4">
           <div className="text-center">
-            <h2 className="mt-2 text-3xl font-bold text-white">Interview Setup</h2>
-            <p className="mt-2 text-sm text-gray-400">Add your first interview</p>
+            <h2 className="mt-2 text-3xl font-bold text-white">Add Interview</h2>
+            <p className="mt-2 text-sm text-gray-400">Enter your interview details</p>
           </div>
           <form
             ref={formRef}
@@ -298,7 +299,7 @@ export function InterviewSetup() {
               className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
               disabled={isSubmitting}
             >
-              {isSubmitting ? statusMessage : isDemo ? 'Next' : 'Save'}
+              {isSubmitting ? statusMessage : isDemo ? 'Next' : 'Generate Interview Playbook'}
             </Button>
             <p className="text-sm mt-1 text-center">
               {isSubmitting && (

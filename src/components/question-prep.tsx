@@ -33,7 +33,7 @@ export default function QuestionPrep() {
       .then(async data => {
         if (data.content) {
           // Use existing prep content
-          setContent('# Question Scoop\n\n' + data.content)
+          setContent('# Question Scouting Report\n\n' + data.content)
         // } else {
         //   // Generate new prep content
         //   const response = await fetch('/api/generate-question-prep', {
@@ -118,7 +118,7 @@ export default function QuestionPrep() {
                   disabled={isSubmitting}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
-                  Next
+                  Get Inteview Readiness Report
                 </Button>
               </div>
             </div>
