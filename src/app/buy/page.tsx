@@ -25,7 +25,7 @@ export default function BuyPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          productName: 'Interview Prep Session',
+          productName: 'The Interview Playbook',
           price: 500, // Amount in cents
           profileId: profileId,
         }),
