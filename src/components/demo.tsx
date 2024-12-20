@@ -20,6 +20,7 @@ interface Profile {
   email: string
   school: string
   major: string
+  interviewId: string
 }
 
 export function Demo() {
@@ -51,6 +52,10 @@ export function Demo() {
     }
     const data = await response.json()
     if (data.interviews.length > 0) {
+      const selectedProfile = profiles.find(profile => profile.id.toString() === profileId)
+      if (selectedProfile) {
+        selectedProfile.interviewId = data.interviews[0].id
+      }
       setInterviewId(data.interviews[0].id)
     } else {
       toast({
@@ -185,7 +190,7 @@ export function Demo() {
                 <p className="text-sm font-medium">{profile.email}</p>
                 <p className="text-sm text-gray-400">{profile.school}</p>
                 <p className="text-sm text-gray-400">{profile.major}</p>
-                {interviewId && (<p className="text-sm text-gray-400">Interview ID: {interviewId}</p>)}
+                {profile.interviewId && (<p className="text-sm text-gray-400">Interview ID: {profile.interviewId}</p>)}
               </div>
             ))}
           </div>
