@@ -118,7 +118,7 @@ export default function QuestionPrep() {
                   disabled={isSubmitting}
                   className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
                 >
-                  Get Inteview Readiness Report
+                  Get Interview Readiness Report
                 </Button>
               </div>
             </div>
