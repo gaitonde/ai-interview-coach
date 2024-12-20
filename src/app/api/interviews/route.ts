@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 
   if (interviewId) {
     const query = `
-    SELECT id, profile_id, company_name, company_url, role_name, jd_url, interviewer_name, interviewer_role, interview_date, readiness
+    SELECT id, profile_id, company_name, company_url, role_name, jd_url, interviewer_name, interviewer_role, interviewer_linkedin_url, interview_date, readiness
     FROM ${INTERVIEWS}
     WHERE profile_id = $1
     AND id = $2
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ content: interviews.rows[0] })
   } else {
     const query = `
-    SELECT id, profile_id, company_name, company_url, role_name, jd_url, interviewer_name, interviewer_role, interview_date, readiness
+    SELECT id, profile_id, company_name, company_url, role_name, jd_url, interviewer_name, interviewer_role, interviewer_linkedin_url, interview_date, readiness
     FROM ${INTERVIEWS}
     WHERE profile_id = $1
     ORDER BY id DESC
