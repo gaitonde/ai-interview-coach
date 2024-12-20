@@ -35,10 +35,8 @@ export async function GET(request: Request) {
         WHERE ${PROFILES_TABLE}.user_id = ${usersTable}.id
         AND ${usersTable}.clerk_id = '${userId}'
       `
-      console.log('AAAXXX query', query)
       const profileRows = await sql.query(query)
       const profile = profileRows.rows.length > 0 ? profileRows.rows[0] : null
-      console.log('AAAXXX profile', profile)
       return NextResponse.json({ profile })
     } else {
       query = `
