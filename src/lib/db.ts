@@ -33,8 +33,10 @@ export function getTable(tableName: string) {
   const env = process.env.VERCEL_ENV
   const isProd = env === 'production'
 
+  console.log('in getTable isProd: ', isProd)
+
   if (isProd) {
-    return tableName
+    return `aic_production_${tableName}`
   } else {
     return `aic_preview_${tableName}`
   }
