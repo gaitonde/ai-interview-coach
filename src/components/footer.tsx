@@ -13,7 +13,7 @@ export function Footer() {
         <Link href="/privacy" className="text-sm hover:text-[#10B981] transition-colors">
           Privacy Policy
         </Link>
-        <Link href="https://forms.gle/BxLHjUy1oyezeADz5" className="text-sm hover:text-[#10B981] transition-colors" target="_blank">
+        <Link href="https://forms.gle/tmUykr1ir5VuwHXZ8" className="text-sm hover:text-[#10B981] transition-colors" target="_blank">
           Feedback Form
         </Link>
       </div>
