@@ -279,3 +279,13 @@ CREATE TABLE aic_preview_payments (
     FOREIGN KEY (profile_id) REFERENCES aic_preview_profiles(id) ON DELETE CASCADE,
     UNIQUE (profile_id, stripe_session_id)
 );
+
+CREATE TABLE aic_preview_emails (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    profile_id INTEGER,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES aic_preview_profiles(id) ON DELETE CASCADE,
+    CONSTRAINT unique_email UNIQUE (email),
+    CONSTRAINT unique_profile_id UNIQUE (profile_id)
+);

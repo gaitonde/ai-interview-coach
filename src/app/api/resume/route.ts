@@ -31,6 +31,7 @@ export interface Profile {
 export async function POST(request: Request) {
   try {
     const formData = await request.formData()
+    const userEnteredEmail = formData.get('email') as string
     const resume = formData.get('resume') as File
     const filename = formData.get('filename') as string
     const resumeUrl = await uploadResume(resume)
@@ -39,6 +40,10 @@ export async function POST(request: Request) {
     const profile = await insertProfile(parsedResume)
     const profileId = profile.id
     await insertResumeRecord(profileId, filename, resumeUrl, parsedResume)
+
+    if (profile.email && profile.id) {
+      await updateEmailRecord(userEnteredEmail, profile.id)
+    }
 
     const data = await sendEmail(resumeUrl, filename, profile)
     console.log('email sent:', data)
@@ -116,6 +121,7 @@ async function insertResumeRecord(profileId: string, filename: string, resumeUrl
       INSERT INTO ${table} (profile_id, filename, url, text)
       VALUES (${profileId}, '${filename}', '${resumeUrl}', '${resumeContent}')
     `
+
     await sql.query(query)
   } catch (error) {
     console.error('Error updating profile with resume URL:', error)
@@ -197,6 +203,7 @@ async function sendEmail(resumeUrl: string, filename: string, profile: Profile):
   try {
     const env = process.env.VERCEL_ENV || 'Unknown'
     console.log('env: ', env)
+    if (env.toLowerCase() !== 'production') return null
     const { data, error } = await resend.emails.send({
       from: 'TIP <internal@theinterviewplaybook.com>',
       to: ['dayal@greenpenailabs.com', 'shaan@greenpenailabs.com'],
@@ -222,4 +229,21 @@ async function sendEmail(resumeUrl: string, filename: string, profile: Profile):
     console.warn('Resume uploaded, but unable to send email')
   }
   return null
+}
+
+async function updateEmailRecord(email: string, profileId: string): Promise<void> {
+  try {
+    const table = getTable('emails')
+    const query = `
+      UPDATE ${table}
+      SET profile_id = $1
+      WHERE email = $2
+    `
+
+    await sql.query(query, [profileId, email])
+  } catch (error) {
+    console.error('Error updating profile with resume URL:', error)
+    throw new Error('Failed to update profile with resume URL')
+  }
+
 }
