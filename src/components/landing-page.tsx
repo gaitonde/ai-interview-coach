@@ -171,6 +171,7 @@ export default function LandingPage() {
             >
               Features
             </Link>
+{/*
             <Link
               href="#success-stories"
               onClick={(e) => {
@@ -181,6 +182,7 @@ export default function LandingPage() {
             >
               Success Stories
             </Link>
+ */}
             <Link
               href="/sign-in"
               className="text-sm font-medium text-white hover:text-emerald-400 transition-colors duration-200"
