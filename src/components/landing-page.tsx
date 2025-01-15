@@ -206,7 +206,7 @@ export default function LandingPage() {
                 e.preventDefault();
               }}
             >
-              <SheetTitle className="text-white">Navigation Menu</SheetTitle>
+              <SheetTitle className="text-white"></SheetTitle>
               <nav className="flex flex-col space-y-4 mt-8">
                 <SheetClose asChild>
                   <button
@@ -298,12 +298,8 @@ export default function LandingPage() {
           </motion.div>
         </section>
 
-        {/* Scrolling Logo Bar */}
-        <section className="mb-20">
-          <ScrollingLogoBar />
-        </section>
-
         {/* Video Section */}
+{/*
         <section className="mb-24">
           <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-center text-emerald-400">
             See Interview Playbook in Action
@@ -328,12 +324,14 @@ export default function LandingPage() {
             />
           </motion.div>
         </section>
-
+ */}
         {/* Feature Boxes */}
         <section id="elevate-skills" className="mb-24">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-12 text-center text-emerald-400">
-            Elevate Your Interview Skills
-          </h2>
+
+            <h2 className="text-3xl sm:text-4xl font-bold mb-12 text-center text-emerald-400">
+              Elevate Your Interview Skills
+            </h2>
+
           <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
@@ -397,6 +395,12 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Scrolling Logo Bar */}
+{/*
+        <section className="mb-20">
+          <ScrollingLogoBar />
+        </section> */}
+
         {/* Testimonial Section */}
 {/*
         <section id="success-stories" className="mb-24">
@@ -434,20 +438,21 @@ export default function LandingPage() {
         </section> */}
 
         {/* CTA Section */}
+{/*
         <section className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-emerald-400">
             Ready to Ace Your Next Interview?
           </h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-            Join thousands of successful job seekers who have transformed their interview skills with Interview Playbook.
+            Join the ranks of successful job seekers who have transformed their interview skills with Interview Playbook.
           </p>
           <Button
             onClick={() => scrollToSection('top')}
             className="h-14 px-10 bg-emerald-500 hover:bg-emerald-600 text-white text-lg font-medium rounded-full transition-all duration-200 transform hover:scale-105"
           >
-            Get Started for Free
+            Get Started Now
           </Button>
-        </section>
+        </section> */}
       </div>
 
       {/* Video Modal */}
