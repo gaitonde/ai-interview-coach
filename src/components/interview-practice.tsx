@@ -56,6 +56,7 @@ export function InterviewPracticeContent() {
   const [versions, setVersions] = useState<Array<{
     answerId: string
     questionId: string
+    question: string | null
     transcript: string | null
     aiScoringResult: ScoringResult | null
     audioUrl: string
@@ -77,7 +78,7 @@ export function InterviewPracticeContent() {
   const [isRecordingComplete, setIsRecordingComplete] = useState(false)
 
   const getQuestionId = (question: Question | null): string => {
-    if (!question) return '';
+    if (!question) return ''
     return question.questionId || question.id?.toString() || ''
   };
 
@@ -106,6 +107,7 @@ export function InterviewPracticeContent() {
     const newVersion = {
       answerId,
       questionId: question?.id?.toString() || '',
+      question: question?.question || '',
       transcript: newTranscript,
       aiScoringResult: null,
       audioUrl: newAudioUrl,
@@ -264,26 +266,29 @@ export function InterviewPracticeContent() {
 
           if (questions.length > 0) {
             // Convert all answers from all questions into versions
-            const demoVersions = questions
-              .flatMap((q: { answers?: Array<{ answerId: string; answer: string; scores: ScoringResult; recordingTimestamp: string }>; }) => q.answers || [])
-              .map((answer: { answerId: string; answer: string; scores: ScoringResult; recordingTimestamp: string }) => ({
-                answerId: answer.answerId,
-                questionId: getQuestionId(question),
-                transcript: answer.answer,
-                aiScoringResult: answer.scores,
-                audioUrl: '',
-                recordingTimestamp: new Date(answer.recordingTimestamp),
-              }))
+            const versions = questions
+              .flatMap((q: Question) =>
+                q.answers?.map(answer => ({
+                  answerId: answer.answerId,
+                  questionId: q.id,
+                  question: q.question,
+                  transcript: answer.answer,
+                  aiScoringResult: answer.scores,
+                  audioUrl: '',
+                  recordingTimestamp: new Date(answer.recordingTimestamp),
+                })) || []
+              )
               .sort((a: { answerId: number }, b: { answerId: number }) => b.answerId - a.answerId) as Array<{
                 answerId: string;
                 questionId: string;
+                question: string;
                 transcript: string | null;
                 aiScoringResult: ScoringResult | null;
                 audioUrl: string;
                 recordingTimestamp: Date;
-              }>;
-            console.log('DEMO VERSIONS', demoVersions)
-            setVersions(demoVersions)
+              }>
+            console.log('YYY versions: ', versions)
+            setVersions(versions)
             setExpandedVersionIndex(0)
           }
         } else {
@@ -444,6 +449,7 @@ export function InterviewPracticeContent() {
                     const newVersion = {
                       answerId: answerId.toString(),
                       questionId: question?.id?.toString() || '',
+                      question: question?.question,
                       transcript: manualTranscript,
                       aiScoringResult: null,
                       audioUrl: '',
@@ -483,8 +489,8 @@ export function InterviewPracticeContent() {
           {version.aiScoringResult && (
             <Scoring
               answerId={version.answerId}
-              question={question?.question || ''}
-              questionId={getQuestionId(question)}
+              question={version.question || ''}
+              questionId={version.questionId}
               finalScore={version.aiScoringResult.finalScore}
               averageScore={version.aiScoringResult.averageScore}
               definedRound={`AI Evaluation (Version ${versions.length - index})`}
