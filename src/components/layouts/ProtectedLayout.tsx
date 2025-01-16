@@ -40,10 +40,8 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     }
 
     if (!user && !isDemo) {
-      console.log('In ProtectedLayout useEffect user not found, redirecting to start')
       router.push('/')
     } else {
-      console.log('In ProtectedLayout useEffect user found, fetching profile')
       fetchProfile()
     }
   }, [isLoaded, user, router, profileId, setProfileId])

@@ -111,7 +111,6 @@ export default function Dashboard() {
         readiness: item.readiness || 'No Data'
       }))
 
-      console.log('mappedAnalyses', mappedAnalyses)
       setAnalyses(mappedAnalyses)
     })
     .catch(error => {
