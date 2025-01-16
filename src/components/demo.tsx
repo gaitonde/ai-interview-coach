@@ -115,7 +115,7 @@ export function Demo() {
       unsetDemoMode()
     }
 
-    const url = isDemo ? '/profile-setup' : '/start'
+    const url = isDemo ? '/profile-setup' : '/'
     router.push(url)
   }
 

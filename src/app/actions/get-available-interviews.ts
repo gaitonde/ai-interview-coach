@@ -1,7 +1,7 @@
 import { getTable } from '@/lib/db'
 import { sql } from '@vercel/postgres'
 
-const DEFAULT_NUM_FREE_INTERVIEWS = 1
+const DEFAULT_NUM_FREE_INTERVIEWS = 10
 
 export async function getAvailableInterviews(
   profileId: string,
@@ -22,7 +22,7 @@ export async function getAvailableInterviews(
       WHERE profile_id = ${profileId}
     `)
 
-    const paidInterviews = paymentsResult?.rows?.[0]?.count ?? 0
+    const paidInterviews = Number(paymentsResult?.rows?.[0]?.count ?? 0)
 
     const interviewTable = getTable('interviews')
     const interviews = await sql.query(`
@@ -30,7 +30,8 @@ export async function getAvailableInterviews(
       WHERE profile_id = ${profileId}
     `)
 
-    const interviewsDone = interviews?.rows[0].count ?? paidInterviews
+    const interviewsDone = Number(interviews?.rows[0].count ?? paidInterviews)
+
     const interviewsAvailable = Math.max(0, freeInterviews + paidInterviews - interviewsDone)
 
     return { interviewsAvailable }

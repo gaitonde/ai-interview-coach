@@ -1,5 +1,6 @@
 'use client'
 
+import LandingPage from "@/components/landing-page"
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -14,10 +15,12 @@ export default function Home() {
 
     if (isSignedIn) {
       router.push('/dashboard')
-    } else {
-      router.push('/start')
+    // } else {
+    //   router.push('/start')
     }
   }, [isLoaded, isSignedIn, router])
 
-  return null
+  return (
+    <LandingPage />
+  )
 }

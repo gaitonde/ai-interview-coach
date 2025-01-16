@@ -1,5 +1,5 @@
 import { useClerk } from "@clerk/nextjs";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { profileIdAtom } from "@/stores/profileAtoms";
 import { useSetAtom } from "jotai";
 // import { currentUser } from "@clerk/nextjs/server";
@@ -16,7 +16,7 @@ export const useLogout = () => {
     // Sign out from Clerk
     await signOut()
     // Redirect to sign-in page
-    router.push('/start')
+    router.push('/')
   };
 
   return logout;

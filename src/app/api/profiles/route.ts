@@ -9,8 +9,6 @@ export async function GET(request: Request) {
     const params = Object.fromEntries(new URL(request.url).searchParams)
     const { profileId, userId, isDemo } = params
 
-    console.log('BKAG AAAXXX params', params)
-
     let query
 
     if (isDemo) {

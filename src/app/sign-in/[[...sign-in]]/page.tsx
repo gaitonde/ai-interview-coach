@@ -46,7 +46,7 @@ export default function SignInPage() {
       <HeroSection />
       <div className="flex flex-col gap-4 w-full max-w-sm">
         <SignIn signUpUrl="/sign-up" />
-        <Button variant="outline" onClick={() => router.push('/start')}>
+        <Button variant="outline" onClick={() => router.push('/')}>
           &lt; Back
         </Button>
       </div>

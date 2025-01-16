@@ -4,7 +4,8 @@ import { clerkMiddleware, type ClerkMiddlewareAuth } from '@clerk/nextjs/server'
 import { getProfileByUserId } from '@/app/actions/get-profile'
 
 const publicRoutes = [
-  '/start',
+  '/',
+  // '/start',
   '/sign-in',
   '/sign-up',
   '/sign-up-start',
@@ -12,11 +13,20 @@ const publicRoutes = [
   '/profile-setup',
   '/demo',
   '/terms',
-  '/privacy'
+  '/privacy',
+  '/public',
+  '/images/*',
+  // '/src/public',
+  // '/_next/image',
 ]
 
 const isPublicRoute = (pathname: string): boolean => {
   return publicRoutes.some(route => {
+    // if (route.endsWith('/*')) {
+    //   // Handle wildcard routes
+    //   const baseRoute = route.slice(0, -2)
+    //   return pathname.startsWith(baseRoute)
+    // }
     // Escape special regex characters in the route
     const escapedRoute = route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     // Create a regex that matches the start of the pathname
@@ -34,7 +44,7 @@ const afterAuth = async (auth: ClerkMiddlewareAuth, req: NextRequest) => {
   // console.log('IN MIDDLEWAREXX: ', isDemo)
 
   if (!userId && !isPublicPath && !isDemo) {
-    const signInUrl = new URL('/start', req.url);
+    const signInUrl = new URL('/', req.url);
     return NextResponse.redirect(signInUrl);
   }
 
@@ -85,7 +95,15 @@ export default clerkMiddleware((auth, req) => afterAuth(auth, req));
 
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  // matcher: [
+  //   // Match all paths except static files and api routes
+  //   "/((?!_next/static|_next/image|images|favicon.ico).*)",
+  //   "/",
+  //   "/(api|trpc)(.*)"
+  // ],
 }
+
+
 
 // export default clerkMiddleware({
   // beforeAuth: (req) => {
