@@ -291,7 +291,7 @@ CREATE TABLE aic_production_payments (
     UNIQUE (profile_id, stripe_session_id)
 );
 
-CREATE TABLE aic_preview_emails (
+CREATE TABLE aic_production_emails (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     profile_id INTEGER,
