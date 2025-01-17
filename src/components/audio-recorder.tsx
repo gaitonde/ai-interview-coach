@@ -16,8 +16,6 @@ type RecorderState = 'Ready' | 'Recording' | 'Transcribing';
 const FIXED_TIME_LIMIT = 30;
 
 export default function AudioRecorder({ onTranscriptionComplete, version, questionId, onRecordingComplete }: AudioRecorderProps) {
-  console.log('AudioRecorder component initialized', { version, questionId });
-
   const [recorderState, setRecorderState] = useState<RecorderState>('Ready')
   const [recordingTime, setRecordingTime] = useState(0)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
@@ -51,28 +49,28 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
         'audio/aac'
       ];
 
-      console.log('Testing MIME type support...');
-      for (const type of mimeTypes) {
-        const isSupported = MediaRecorder.isTypeSupported(type);
-        console.log(`${type}: ${isSupported ? 'supported' : 'not supported'}`);
-      }
+      // console.log('Testing MIME type support...')
+      // for (const type of mimeTypes) {
+      //   const isSupported = MediaRecorder.isTypeSupported(type)
+      //   console.log(`${type}: ${isSupported ? 'supported' : 'not supported'}`)
+      // }
 
-      const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
+      const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type))
       if (!mimeType) {
-        throw new Error('No supported audio MIME type found');
+        throw new Error('No supported audio MIME type found')
       }
 
-      console.log('Selected MIME type:', mimeType);
+      console.log('Selected MIME type:', mimeType)
       setSelectedMimeType(mimeType);
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType,
         audioBitsPerSecond: 128000 // Try a standard bitrate
       });
-      console.log('MediaRecorder created');
+      // console.log('MediaRecorder created')
 
       mediaRecorder.ondataavailable = (event) => {
-        console.log('Data available:', event.data.size, 'bytes');
+        // console.log('Data available:', event.data.size, 'bytes')
         audioChunksRef.current.push(event.data);
       };
 
@@ -120,7 +118,6 @@ export default function AudioRecorder({ onTranscriptionComplete, version, questi
 
           const key = `audio_v${version}`;
           await set(key, audioBlob);
-          console.log('Audio saved to IndexedDB:', key);
 
           const transcription = await getTranscription(audioBlob);
           onTranscriptionComplete(transcription, url);
