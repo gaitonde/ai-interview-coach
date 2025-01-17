@@ -119,22 +119,23 @@ export default function Dashboard() {
   }, [profileId, userId])
 
   const handleAddInterview = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/available-interviews?profileId=${profileId}`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch payments info')
-      }
-      const data = await response.json()
+    router.push('/add-interview')
+    // try {
+    //   const response = await fetch(`/api/available-interviews?profileId=${profileId}`)
+    //   if (!response.ok) {
+    //     throw new Error('Failed to fetch payments info')
+    //   }
+    //   const data = await response.json()
 
-    if (data.interviewsAvailable > 0) {
-        router.push('/add-interview')
-      } else {
-        router.push('/buy')
-      }
-    } catch (error) {
-      console.error('Error checking available interviews:', error)
-      router.push('/buy')
-    }
+    //   if (data.interviewsAvailable > 0) {
+    //     router.push('/add-interview')
+    //   } else {
+    //     router.push('/buy')
+    //   }
+    // } catch (error) {
+    //   console.error('Error checking available interviews:', error)
+    //   router.push('/buy')
+    // }
   }, [profileId, router])
 
   return (

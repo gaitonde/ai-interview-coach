@@ -29,7 +29,7 @@ export function UserMenu() {
               Profile
             </DropdownMenuItem>
              */}
-            <DropdownMenuItem onClick={() => router.push('/buy')} className="cursor-pointer hover:bg-[#374151]">
+            <DropdownMenuItem onClick={() => router.push('/add-interview')} className="cursor-pointer hover:bg-[#374151]">
               Get More Interviews
             </DropdownMenuItem>
             <SignOutButton redirectUrl="/">
