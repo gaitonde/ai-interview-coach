@@ -352,7 +352,7 @@ export default function LandingPage() {
                 description: "Get tailored interview questions and answers based on your profile",
                 icon: (
                   <img
-                    src="/images/feature-1.png"
+                    src="/images/feature-3.png"
                     alt="Personalized preparation icon"
                     width={640}
                     height={640}

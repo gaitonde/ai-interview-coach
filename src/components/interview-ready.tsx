@@ -98,9 +98,6 @@ export default function InterviewReady() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
-    console.log('storedProfileId', profileId)
-    console.log('interviewId', interviewId)
-
     const fetchReadiness = async () => {
       setIsLoading(true)
       try {

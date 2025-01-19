@@ -20,7 +20,6 @@ export default function QuestionPrep() {
     // Reset ref when dependencies change
     if (fetchedRef.current && profileId && interviewId) return
 
-    console.log('storedProfileId', profileId)
     if (!profileId || !interviewId) return
 
     fetchedRef.current = true

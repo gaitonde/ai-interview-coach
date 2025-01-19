@@ -6,7 +6,6 @@ import { UserMenu } from '@/components/user-menu'
 
 export function Header() {
   const { userId } = useAuth()
-  console.log('userId from useAuth', userId)
 
   return (
     <div className="flex flex-col">
