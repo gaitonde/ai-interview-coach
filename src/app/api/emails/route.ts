@@ -3,37 +3,58 @@ import { sql } from '@vercel/postgres'
 import { getTable } from '@/lib/db'
 import { NewEmailTemplate } from '@/components/components/new-email-template'
 import { CreateEmailResponseSuccess, Resend } from 'resend'
+import { Status } from "@/app/types/email"
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   const json = await request.json()
   const { email } = json
 
-  const table = getTable('emails')
-  const insertEmailQuery = `
-    INSERT INTO ${table} (
-      email
-    ) VALUES (
-      $1
-    ) RETURNING *`
+  sendEmail(email, 'attempted')
 
-  try {
-    const result = await sql.query(insertEmailQuery, [
+  const table = getTable('emails')
+
+  const getEmailQuery = `
+    SELECT id
+    FROM ${table}
+    where email = $1
+    `
+
+    const existingEmailsResult = await sql.query(getEmailQuery, [
       email,
     ])
-    const id = result.rows[0].id
 
-    const data = await sendEmail(email)
-    console.log('email sent:', data)
+    if (existingEmailsResult.rows.length > 0) {
+      sendEmail(email, 're-entered')
+      return NextResponse.json({ id: existingEmailsResult.rows[0].id })
 
-    return NextResponse.json({ id })
-  } catch (error) {
-    return NextResponse.json({ id: -1 })
-  }
+    } else {
+      const insertEmailQuery = `
+      INSERT INTO ${table} (
+        email
+      ) VALUES (
+        $1
+      ) RETURNING *`
+
+      try {
+        const result = await sql.query(insertEmailQuery, [
+          email,
+        ])
+        const id = result.rows[0].id
+
+        const data = await sendEmail(email, 'succeeded')
+        console.log('email sent:', data)
+
+        return NextResponse.json({ id })
+      } catch (error) {
+        const data = await sendEmail(email, 'failed')
+        return NextResponse.json({ id: -1 })
+      }
+    }
 }
 
-async function sendEmail(email: string): Promise<CreateEmailResponseSuccess | null> {
+async function sendEmail(email: string, status: Status): Promise<CreateEmailResponseSuccess | null> {
   try {
     const env = process.env.VERCEL_ENV || 'Unknown'
     console.log('env: ', env)
@@ -41,8 +62,8 @@ async function sendEmail(email: string): Promise<CreateEmailResponseSuccess | nu
     const { data, error } = await resend.emails.send({
       from: 'TIP <internal@theinterviewplaybook.com>',
       to: ['dayal@greenpenailabs.com', 'shaan@greenpenailabs.com'],
-      subject: `New Landing Page Email - ${email}`,
-      react: NewEmailTemplate({ email, env: env || '' }),
+      subject: `New Landing Page Email - ${email}]`,
+      react: NewEmailTemplate({ email, status, env: env || '' }),
     })
 
     if (error) {
