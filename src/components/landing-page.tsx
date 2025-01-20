@@ -242,7 +242,7 @@ export default function LandingPage() {
               Master Your Interview Game
             </h1>
             <p className="text-xl sm:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
-              Harness the power of AI to perfect your interview skills and land your dream job.
+              Harness the power of AI to perfect your interview skills and land your dream job. It's free.
             </p>
             {!isStarted ? (
               <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-md mx-auto">
@@ -260,11 +260,12 @@ export default function LandingPage() {
                   />
                   {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
                 </div>
+
                 <Button
                   type="submit"
                   className="h-12 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-full transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
                 >
-                  Start Now <ArrowRight className="ml-2 h-5 w-5" />
+                  Start Now For Free<ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </form>
             ) : (
