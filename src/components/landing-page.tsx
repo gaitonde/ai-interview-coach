@@ -114,7 +114,7 @@ export default function LandingPage() {
       })
 
       if (!response.ok) {
-        throw new Error('xFailed to submit email')
+        throw new Error('Failed to submit email')
       }
 
       const data = await response.json()
