@@ -31,16 +31,18 @@ export default function LandingPage() {
   const [, setProfileId] = useAtom(profileIdAtomWithStorage)
 
   // useEffect(() => {
-  //   // console.log('in here do mixpanel')
-  //   // mixpanel.track("ViewedHomePage")
-  //mixpanel.identify('12345');
+  //   console.log('in here do mixpanel')
+  //   mixpanel.track("ViewedHomePage")
+  // mixpanel.identify('12345');
   // })
 
 
   const handleUploadResume = async () => {
     removeDemoData()
+    // mixpanel.track("ResumeUploadAttempt", { landingPageEmail: email })
     uploadResume().then(uploaded => {
       if (uploaded) {
+        // mixpanel.track("ResumeUploaded", { landingPageEmail: email })
         router.push('/profile-setup')
       }
     })
@@ -108,6 +110,7 @@ export default function LandingPage() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // mixpanel.track("LandingPageEmailAttempt", { landingPageEmail: email })
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       setEmailError('Please enter a valid email address')
@@ -135,6 +138,8 @@ export default function LandingPage() {
         setEmailError('This email may be taken. Did you already sign up?')
         return
       }
+
+      // mixpanel.track("LandingPageEmailSubmitted", { landingPageEmail: email })
 
       setIsEmailSubmitted(true)
       setIsStarted(true)
@@ -326,14 +331,13 @@ export default function LandingPage() {
             <div className="absolute inset-0 flex items-center justify-center">
               <PlayCircle className="w-20 h-20 text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
             </div>
-            {/*
             <img
-              // src="/images/placeholder.png?height=720&width=1280"
+              src="/images/placeholder.jpg?height=720&width=1280"
               alt="Interview Playbook Demo"
               width={1280}
               height={720}
               className="w-full h-full object-cover"
-            /> */}
+            />
           </motion.div>
         </section>
 
