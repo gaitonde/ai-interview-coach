@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import Link from 'next/link'
@@ -13,7 +13,11 @@ import { useRouter } from 'next/navigation'
 import { useClerk } from '@clerk/nextjs'
 import Cookies from 'js-cookie'
 import { useAtom } from "jotai"
-import { profileIdAtomWithStorage } from "@/stores/profileAtoms"
+import { profileIdAtomWithStorage } from '@/stores/profileAtoms'
+// import mixpanel from 'mixpanel-browser'
+
+// //3ba8618be12d005734f09dfbfa7d000d
+// mixpanel.init(`8a38736f5cbb25f4efded4820616036e`)
 
 export default function LandingPage() {
   const router = useRouter()
@@ -26,10 +30,19 @@ export default function LandingPage() {
   const [emailError, setEmailError] = useState('')
   const [, setProfileId] = useAtom(profileIdAtomWithStorage)
 
+  // useEffect(() => {
+  //   console.log('in here do mixpanel')
+  //   mixpanel.track("ViewedHomePage")
+  // mixpanel.identify('12345');
+  // })
+
+
   const handleUploadResume = async () => {
     removeDemoData()
+    // mixpanel.track("ResumeUploadAttempt", { landingPageEmail: email })
     uploadResume().then(uploaded => {
       if (uploaded) {
+        // mixpanel.track("ResumeUploaded", { landingPageEmail: email })
         router.push('/profile-setup')
       }
     })
@@ -97,6 +110,7 @@ export default function LandingPage() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // mixpanel.track("LandingPageEmailAttempt", { landingPageEmail: email })
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       setEmailError('Please enter a valid email address')
@@ -124,6 +138,8 @@ export default function LandingPage() {
         setEmailError('This email may be taken. Did you already sign up?')
         return
       }
+
+      // mixpanel.track("LandingPageEmailSubmitted", { landingPageEmail: email })
 
       setIsEmailSubmitted(true)
       setIsStarted(true)
@@ -300,7 +316,6 @@ export default function LandingPage() {
         </section>
 
         {/* Video Section */}
-{/*
         <section className="mb-24">
           <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-center text-emerald-400">
             See Interview Playbook in Action
@@ -317,7 +332,7 @@ export default function LandingPage() {
               <PlayCircle className="w-20 h-20 text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
             </div>
             <img
-              src="/images/placeholder.svg?height=720&width=1280"
+              src="/images/placeholder.jpg?height=720&width=1280"
               alt="Interview Playbook Demo"
               width={1280}
               height={720}
@@ -325,7 +340,7 @@ export default function LandingPage() {
             />
           </motion.div>
         </section>
- */}
+
         {/* Feature Boxes */}
         <section id="elevate-skills" className="mb-24">
 
@@ -482,7 +497,7 @@ export default function LandingPage() {
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                src="https://www.youtube.com/embed/axK5dJoTmLk?rel=0&modestbranding=1"
                 title="Interview Playbook Demo"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
