@@ -300,3 +300,6 @@ CREATE TABLE aic_production_emails (
     CONSTRAINT unique_production_email UNIQUE (email),
     CONSTRAINT unique_production_profile_id UNIQUE (profile_id)
 );
+
+ALTER TABLE aic_production_profiles ADD COLUMN is_test BOOLEAN DEFAULT FALSE;
+ALTER TABLE aic_production_emails ADD COLUMN is_test BOOLEAN DEFAULT FALSE;

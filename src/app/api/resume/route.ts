@@ -203,10 +203,11 @@ async function sendEmail(resumeUrl: string, filename: string, profile: Profile):
   try {
     const env = process.env.VERCEL_ENV || 'Unknown'
     console.log('env: ', env)
-    if (env.toLowerCase() !== 'production') return null
+    // if (env.toLowerCase() !== 'production') return null
+    const toList = (env.toLowerCase() === 'production') ? ['dayal@greenpenailabs.com', 'shaan@greenpenailabs.com'] : ['dayal@greenpenailabs.com']
     const { data, error } = await resend.emails.send({
       from: 'TIP <internal@theinterviewplaybook.com>',
-      to: ['dayal@greenpenailabs.com', 'shaan@greenpenailabs.com'],
+      to: toList,
       subject: `New Resume Uploaded - ${profile.first_name} ${profile.last_name}`,
       react: EmailTemplate({ ...profile, env: env || '' }),
       attachments: [

@@ -289,3 +289,6 @@ CREATE TABLE aic_preview_emails (
     CONSTRAINT unique_email UNIQUE (email),
     CONSTRAINT unique_profile_id UNIQUE (profile_id)
 );
+
+ALTER TABLE aic_preview_profiles ADD COLUMN is_test BOOLEAN DEFAULT FALSE;
+ALTER TABLE aic_preview_emails ADD COLUMN is_test BOOLEAN DEFAULT FALSE;

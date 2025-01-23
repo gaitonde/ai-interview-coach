@@ -14,9 +14,11 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import MarkdownRenderer from './markdown-renderer'
 import { RubricScorer } from './rubric-scorer'
+import { useMixpanel } from '@/hooks/use-mixpanel'
 
 export default function CompanyPrep() {
   const router = useRouter()
+  const { track } = useMixpanel()
   const [content, setContent] = useState<string>('')
   const [profileId] = useAtom(profileIdAtomWithStorage)
   const [interviewId] = useAtom(interviewIdAtomWithStorage)
@@ -25,6 +27,7 @@ export default function CompanyPrep() {
 
   useEffect(() => {
     if (profileId) {
+      track('ViewedCompanyScoutingReport', { profileId })
       fetch(`/api/company-prep?profileId=${profileId}&interviewId=${interviewId}`)
         .then(response => {
           if (!response.ok) {

@@ -9,9 +9,11 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import MarkdownRenderer from './markdown-renderer'
 import { RubricScorer } from './rubric-scorer'
+import { useMixpanel } from '@/hooks/use-mixpanel'
 
 export default function InterviewerPrep() {
   const router = useRouter()
+  const { track } = useMixpanel()
   const [content, setContent] = useState<string>('')
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
@@ -20,6 +22,7 @@ export default function InterviewerPrep() {
 
   useEffect(() => {
     if (profileId) {
+      track('ViewedInterviewerScoutingReport', { profileId })
       fetch(`/api/interviewer-prep?profileId=${profileId}&interviewId=${interviewId}`)
         .then(response => {
             if (!response.ok) {

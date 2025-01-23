@@ -8,9 +8,11 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import ConditionalHeader from '@/components/conditional-header'
 import MarkdownRenderer from '@/components/markdown-renderer'
+import { useMixpanel } from '@/hooks/use-mixpanel'
 
 export default function QuestionPrep() {
   const router = useRouter()
+  const { track } = useMixpanel()
   const [content, setContent] = useState<string | null>(null)
   const [profileId] = useAtom(profileIdAtom)
   const [interviewId] = useAtom(interviewIdAtom)
@@ -23,6 +25,8 @@ export default function QuestionPrep() {
     if (!profileId || !interviewId) return
 
     fetchedRef.current = true
+
+    track('ViewedQuestionScoutingReport', { profileId })
 
     fetch(`/api/question-prep?profileId=${profileId}&interviewId=${interviewId}`)
       .then(response => {
