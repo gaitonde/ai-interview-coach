@@ -58,7 +58,7 @@ async function sendEmail(email: string, status: Status): Promise<CreateEmailResp
   try {
     const env = process.env.VERCEL_ENV || 'Unknown'
     console.log('env: ', env)
-    const toList = (env.toLowerCase() !== 'production') ? ['dayal@greenpenailabs.com', 'shaan@greenpenailabs.com'] : ['dayal@greenpenailabs.com']
+    const toList = (env.toLowerCase() === 'production') ? ['dayal@greenpenailabs.com', 'shaan@greenpenailabs.com'] : ['dayal@greenpenailabs.com']
     //  return null
     const { data, error } = await resend.emails.send({
       from: 'TIP <internal@theinterviewplaybook.com>',
