@@ -326,7 +326,10 @@ export default function LandingPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             className="relative aspect-video max-w-4xl mx-auto rounded-2xl overflow-hidden group cursor-pointer"
-            onClick={() => setIsVideoModalOpen(true)}
+            onClick={() => {
+              track('ClickedLandingPageVideo', { landingPageEmail: email })
+              setIsVideoModalOpen(true)
+            }}
           >
             <div className="absolute inset-0 bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors duration-300" />
             <div className="absolute inset-0 flex items-center justify-center">
