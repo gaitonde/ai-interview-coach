@@ -10,6 +10,7 @@ import { useAtom } from 'jotai'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import styles from '../styles/interview-practice.module.css'
+import { useMixpanel } from '@/hooks/use-mixpanel'
 
 type EvaluatingState = 'Ready' | 'Evaluating'
 
@@ -50,9 +51,10 @@ interface ScoringResult {
 }
 
 export function InterviewPracticeContent() {
+  const router = useRouter()
+  const { track } = useMixpanel()
   const searchParams = useSearchParams()
   const category = searchParams.get('category')
-  const router = useRouter()
   const [versions, setVersions] = useState<Array<{
     answerId: string
     questionId: string
@@ -174,6 +176,7 @@ export function InterviewPracticeContent() {
     const fetchInterview = async () => {
       try {
         if (profileId) {
+          track('ViewedInterviewJamSession', { profileId })
           const response = await fetch(`/api/interviews?profileId=${profileId}&interviewId=${interviewId}`);
           if (!response.ok) {
             throw new Error('Failed to fetch questions');
@@ -292,23 +295,34 @@ export function InterviewPracticeContent() {
             setExpandedVersionIndex(0)
           }
         } else {
-          router.push('/');
+          router.push('/')
         }
       } catch (error) {
-        console.error('Error fetching questions response:', error);
+        console.error('Error fetching questions response:', error)
       }
     }
 
     if (!whom) {
-      fetchInterview();
+      fetchInterview()
     }
     if (questionIndex < 0) {
-      fetchQuestions();
+      fetchQuestions()
     }
-  }, [versions.length]);
+  }, [versions.length])
 
   // Add this function to get the next version number
-  const getNextVersionNumber = () => versions.length + 1;
+  const getNextVersionNumber = () => versions.length + 1
+
+  const handleNextQuestion = () => {
+    const nextIndex = questionIndex + 1
+    setQuestionIndex(nextIndex)
+    setQuestion(questions[nextIndex])
+    setManualTranscript('')
+    track('ViewedInterviewJamSessionQuestion', {
+      profileId,
+      questionId: questions[nextIndex].id
+    })
+  }
 
   return (
     <>
@@ -353,12 +367,7 @@ export function InterviewPracticeContent() {
                   <button
                     className="flex-1 text-white bg-[#7C3AED] hover:bg-[#4338CA] disabled:bg-gray-400 py-2 px-4 rounded-md transition-colors"
                     disabled={questionIndex === questions.length - 1}
-                    onClick={() => {
-                      const nextIndex = questionIndex + 1
-                      setQuestionIndex(nextIndex)
-                      setQuestion(questions[nextIndex])
-                      setManualTranscript('')
-                    }}
+                    onClick={handleNextQuestion}
                   >
                     <span className="sm:hidden">Next</span>
                     <span className="hidden sm:inline">Next Question</span>

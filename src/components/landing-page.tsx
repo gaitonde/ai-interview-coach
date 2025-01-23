@@ -14,12 +14,10 @@ import { useClerk } from '@clerk/nextjs'
 import Cookies from 'js-cookie'
 import { useAtom } from "jotai"
 import { profileIdAtomWithStorage } from '@/stores/profileAtoms'
-// import mixpanel from 'mixpanel-browser'
-
-// //3ba8618be12d005734f09dfbfa7d000d
-// mixpanel.init(`8a38736f5cbb25f4efded4820616036e`)
+import { useMixpanel } from '@/hooks/use-mixpanel'
 
 export default function LandingPage() {
+  const { track } = useMixpanel()
   const router = useRouter()
   const { signOut } = useClerk()
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
@@ -30,19 +28,16 @@ export default function LandingPage() {
   const [emailError, setEmailError] = useState('')
   const [, setProfileId] = useAtom(profileIdAtomWithStorage)
 
-  // useEffect(() => {
-  //   console.log('in here do mixpanel')
-  //   mixpanel.track("ViewedHomePage")
-  // mixpanel.identify('12345');
-  // })
-
+  useEffect(() => {
+    track('ViewedLandingPage')
+  })
 
   const handleUploadResume = async () => {
     removeDemoData()
-    // mixpanel.track("ResumeUploadAttempt", { landingPageEmail: email })
+    track('AttemptedResumeUpload', { landingPageEmail: email })
     uploadResume().then(uploaded => {
       if (uploaded) {
-        // mixpanel.track("ResumeUploaded", { landingPageEmail: email })
+        track('ResumeUploadSuccess', { landingPageEmail: email })
         router.push('/profile-setup')
       }
     })
@@ -75,6 +70,7 @@ export default function LandingPage() {
 
         try {
           setIsUploading(true)
+          track('SubmittedResumeUpload', { landingPageEmail: email })
           const formData = new FormData()
           formData.append('email', email)
           formData.append('resume', file)
@@ -90,6 +86,10 @@ export default function LandingPage() {
           const result = await response.json()
           const profileId = result.profileId
           setProfileId(profileId)
+          track('ProfileCreatedSuccess', {
+            landingPageEmail: email,
+            profileId
+          })
 
           Cookies.set('profileId', profileId, {
             secure: true,
@@ -110,7 +110,7 @@ export default function LandingPage() {
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // mixpanel.track("LandingPageEmailAttempt", { landingPageEmail: email })
+    track('AttemptedLandingPageEmail', { landingPageEmail: email })
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       setEmailError('Please enter a valid email address')
@@ -119,6 +119,7 @@ export default function LandingPage() {
     setEmailError('')
 
     try {
+      track('SubmittedLandingPageEmail', { landingPageEmail: email })
       const response = await fetch('/api/emails', {
         method: 'POST',
         headers: {
@@ -139,7 +140,7 @@ export default function LandingPage() {
         return
       }
 
-      // mixpanel.track("LandingPageEmailSubmitted", { landingPageEmail: email })
+      track('LandingPageEmailSuccess', { landingPageEmail: email })
 
       setIsEmailSubmitted(true)
       setIsStarted(true)

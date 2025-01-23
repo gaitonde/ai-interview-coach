@@ -8,11 +8,13 @@ import { useClerk, useSignIn } from '@clerk/nextjs'
 import { useAtom, useAtomValue } from 'jotai'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
+import { useMixpanel } from '@/hooks/use-mixpanel'
 
 const DEFAULT_GRADUATION_YEAR = '2025'
 
 export function ProfileSetup() {
   const router = useRouter()
+  const { track, identify } = useMixpanel()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -40,6 +42,8 @@ export function ProfileSetup() {
 
 
   useEffect(() => {
+    track('ViewedUserSignupForm', { profileId: storedProfileId })
+
     setIsSignup(storedUserId === null)
     if (isDemo || storedProfileId) {
       loadProfile(storedProfileId!)
@@ -53,6 +57,7 @@ export function ProfileSetup() {
 
     if (profileData) {
       await setStoredProfileId(profileData.id)
+      identify(profileData.id)
       const gradYear = profileData.graduation_date ?
         new Date(profileData.graduation_date).getUTCFullYear().toString() : DEFAULT_GRADUATION_YEAR
 
@@ -82,6 +87,8 @@ export function ProfileSetup() {
         graduation_year: formData.get('graduation_year'),
       }
 
+      track('AttemptedUserSignup', {profileId: storedProfileId})
+
       const profileResponse = await fetch('/api/profile', {
         method: 'POST',
         headers: {
@@ -102,6 +109,11 @@ export function ProfileSetup() {
         setStoredProfileId(profileId),
         setStoredUserId(clerkId),
       ])
+
+      track('UserSignupSuccess', {
+        profileId: storedProfileId,
+        userId: clerkId
+      })
 
       return {profileId, clerkId, ticket}
     } catch (error) {

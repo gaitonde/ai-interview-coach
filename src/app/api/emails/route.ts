@@ -58,10 +58,11 @@ async function sendEmail(email: string, status: Status): Promise<CreateEmailResp
   try {
     const env = process.env.VERCEL_ENV || 'Unknown'
     console.log('env: ', env)
-    // if (env.toLowerCase() !== 'production') return null
+    const toList = (env.toLowerCase() !== 'production') ? ['dayal@greenpenailabs.com', 'shaan@greenpenailabs.com'] : ['dayal@greenpenailabs.com']
+    //  return null
     const { data, error } = await resend.emails.send({
       from: 'TIP <internal@theinterviewplaybook.com>',
-      to: ['dayal@greenpenailabs.com', 'shaan@greenpenailabs.com'],
+      to: toList,
       subject: `New Landing Page Email - ${email}]`,
       react: NewEmailTemplate({ email, status, env: env || '' }),
     })

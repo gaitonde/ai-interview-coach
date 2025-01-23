@@ -7,11 +7,13 @@ import { useAtom, useAtomValue } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 import { useRouter } from 'next/navigation'
 import { FormEvent, useEffect, useRef, useState } from 'react'
+import { useMixpanel } from '@/hooks/use-mixpanel'
 
 const isDemoModeAtom = atomWithStorage('demoMode', false)
 
 export function InterviewSetup() {
   const router = useRouter()
+  const { track } = useMixpanel()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -71,6 +73,8 @@ export function InterviewSetup() {
           // const interviewDateInput = form.elements.namedItem('interview_date') as HTMLInputElement;
           // const dateValue = interview.interview_date ? new Date(interview.interview_date).toISOString().split('T')[0] : '';
           // interviewDateInput.value = dateValue;
+
+          track("ViewedAddInterview", { profileId })
         }
       }
 
@@ -79,6 +83,7 @@ export function InterviewSetup() {
 
   const saveInterview = async (profileId: string, formData: FormData) => {
     try {
+      track('AttemptedAddInterview', { profileId })
       const response = await fetch(`/api/interviews`, {
         method: 'POST',
         headers: {
@@ -103,6 +108,8 @@ export function InterviewSetup() {
       const result = await response.json()
       const interviewId = result.id
       setInterviewId(interviewId)
+
+      track("AddInterviewSuccess", { profileId })
 
       return interviewId
     } catch (error) {

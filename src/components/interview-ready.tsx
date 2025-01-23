@@ -10,6 +10,7 @@ import { AlertCircle, Briefcase, Calendar, Frown, Meh, Smile, Target, User } fro
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { useMixpanel } from '@/hooks/use-mixpanel'
 
 type Interview = {
   id: string
@@ -89,6 +90,7 @@ const LoadingCard = () => (
 
 export default function InterviewReady() {
   const router = useRouter()
+  const { track } = useMixpanel()
   const [interview, setInterview] = useState<Interview | null>(null)
   const [categoryRatings, setCategoryRatings] = useState<Record<string, CategoryResponse>>({})
   const [isDemoMode] = useAtom(isDemoAtom)
@@ -101,6 +103,7 @@ export default function InterviewReady() {
     const fetchReadiness = async () => {
       setIsLoading(true)
       try {
+        track('ViewedInterviewReadinessReport', { profileId })
         const response = await fetch(`/api/interview-readiness?profileId=${profileId}&interviewId=${interviewId}`)
         if (!response.ok) throw new Error('Failed to fetch evaluation')
         const { content: results } = await response.json()
