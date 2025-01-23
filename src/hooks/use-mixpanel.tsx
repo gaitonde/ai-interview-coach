@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
 import mixpanel from 'mixpanel-browser'
 
-// //3ba8618be12d005734f09dfbfa7d000d
-const MIXPANEL_TOKEN = '8a38736f5cbb25f4efded4820616036e'
+const MIXPANEL_TOKEN = '3ba8618be12d005734f09dfbfa7d000d'
 
 export const useMixpanel = () => {
   useEffect(() => {
