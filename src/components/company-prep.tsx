@@ -74,32 +74,15 @@ export default function CompanyPrep() {
                 />
               )}
 
-              <div className="mx-4 mb-4">
-{/*
-                <Button
-                  onClick={() => {
-                    if (typeof window !== 'undefined') {
-                      const content = document.querySelector('.prep-sheet-content')?.textContent;
-                      if (content) {
-                        navigator.clipboard.writeText(content)
-                          .then(() => alert('Content copied to clipboard!'))
-                          .catch(err => console.error('Failed to copy: ', err));
-                      }
-                    }
-                  }}
-                  className="w-full mb-4 bg-[#4B5563] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#374151] transition-colors items-center justify-center"
-                >
-                  <Clipboard className="w-4 h-4 mr-2" />
-                  Copy to Clipboard
-                </Button>
- */}
+              <div className="mx-4 mt-2 mb-4 flex flex-col items-center">
+                <div className="mb-2">Next up: Interviewer Scouting Report</div>
                 <Button
                   type="submit"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+                  className="w-auto h-12 bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors text-4xl flex items-center"
                 >
-                  Get Interviewer Scouting Report
+                  Next &gt;
                 </Button>
               </div>
             </div>
