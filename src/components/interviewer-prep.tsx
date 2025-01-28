@@ -91,7 +91,10 @@ export default function InterviewerPrep() {
                 />
               )}
 
-              <div className="mx-4 mb-4">
+              <div className="mx-4 mt-2 mb-4 flex flex-col items-center">
+                <div className="mb-2">Next up: Question Scouting Report</div>
+
+{/*
                 <Button
                   onClick={() => {
                     if (typeof window !== 'undefined') {
@@ -108,12 +111,13 @@ export default function InterviewerPrep() {
                   <Clipboard className="w-4 h-4 mr-2" />
                   Copy to Clipboard
                 </Button>
+ */}
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+                  className="w-auto h-12 bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors text-4xl flex items-center"
                 >
-                  Get Question Scouting Report
+                  Next &gt;
                 </Button>
               </div>
             </>

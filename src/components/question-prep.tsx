@@ -98,7 +98,9 @@ export default function QuestionPrep() {
                 <MarkdownRenderer content={content} />
               </div>
 
-              <div className="mx-4 mb-4">
+              <div className="mx-4 mt-2 mb-4 flex flex-col items-center">
+                <div className="mb-2">Next up: Interview Readiness Report</div>
+{/*
                 <Button
                   onClick={() => {
                     if (typeof window !== 'undefined') {
@@ -115,13 +117,14 @@ export default function QuestionPrep() {
                   <Clipboard className="w-4 h-4 mr-2" />
                   Copy to Clipboard
                 </Button>
+ */}
                 <Button
                   type="submit"
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="w-full bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors"
+                  className="w-auto h-12 bg-[#10B981] text-[#F9FAFB] py-3 rounded-md font-medium hover:bg-[#0e9370] transition-colors text-4xl flex items-center"
                 >
-                  Get Interview Readiness Report
+                  Next &gt;
                 </Button>
               </div>
             </div>
