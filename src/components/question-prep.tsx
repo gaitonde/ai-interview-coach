@@ -99,6 +99,7 @@ export default function QuestionPrep() {
               </div>
 
               <div className="mx-4 mb-4">
+{/*
                 <Button
                   onClick={() => {
                     if (typeof window !== 'undefined') {
@@ -115,6 +116,7 @@ export default function QuestionPrep() {
                   <Clipboard className="w-4 h-4 mr-2" />
                   Copy to Clipboard
                 </Button>
+ */}
                 <Button
                   type="submit"
                   onClick={handleSubmit}

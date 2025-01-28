@@ -92,6 +92,7 @@ export default function InterviewerPrep() {
               )}
 
               <div className="mx-4 mb-4">
+{/*
                 <Button
                   onClick={() => {
                     if (typeof window !== 'undefined') {
@@ -108,6 +109,7 @@ export default function InterviewerPrep() {
                   <Clipboard className="w-4 h-4 mr-2" />
                   Copy to Clipboard
                 </Button>
+ */}
                 <Button
                   onClick={handleSubmit}
                   disabled={isSubmitting}

@@ -74,7 +74,7 @@ export function InterviewSetup() {
           // const dateValue = interview.interview_date ? new Date(interview.interview_date).toISOString().split('T')[0] : '';
           // interviewDateInput.value = dateValue;
 
-          track("ViewedAddInterview", { profileId })
+          track('ViewedAddInterview', { profileId })
         }
       }
 
@@ -109,7 +109,7 @@ export function InterviewSetup() {
       const interviewId = result.id
       setInterviewId(interviewId)
 
-      track("AddInterviewSuccess", { profileId })
+      track('AddInterviewSuccess', { profileId })
 
       return interviewId
     } catch (error) {

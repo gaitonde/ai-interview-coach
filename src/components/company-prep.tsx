@@ -75,6 +75,7 @@ export default function CompanyPrep() {
               )}
 
               <div className="mx-4 mb-4">
+{/*
                 <Button
                   onClick={() => {
                     if (typeof window !== 'undefined') {
@@ -91,6 +92,7 @@ export default function CompanyPrep() {
                   <Clipboard className="w-4 h-4 mr-2" />
                   Copy to Clipboard
                 </Button>
+ */}
                 <Button
                   type="submit"
                   onClick={handleSubmit}
