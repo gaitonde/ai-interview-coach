@@ -1,3 +1,4 @@
+import { PageProps } from ".next/types/app/blog/page";
 import { client } from "@/sanity/client";
 import imageUrlBuilder from "@sanity/image-url";
 import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
@@ -16,7 +17,7 @@ const urlFor = (source: SanityImageSource) =>
 const options = { next: { revalidate: 30 } };
 
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   // This would typically fetch data from a CMS or database
   const title = "test";
   // params.slug
@@ -30,7 +31,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function BlogPost({ params }: { params: { slug: string } }) {
+// { params }: PageProps
+// export default async function BlogPost({ params }: { params: { slug: string } }) {
+export default async function BlogPost({ params }: PageProps): Promise<JSX.Element> {
 
   const post = await client.fetch<SanityDocument>(POST_QUERY, await params, options);
   const postImageUrl = post.image
