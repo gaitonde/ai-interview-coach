@@ -5,8 +5,7 @@ import { getTable } from '@/lib/db'
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const profileId = body.profileId;
-  const interviewId = body.interviewId;
+  const { profileId, interviewId } = body
 
   if (!profileId || !interviewId) {
     return NextResponse.json({ error: 'Profile ID and Interview ID are required' }, { status: 400 });
