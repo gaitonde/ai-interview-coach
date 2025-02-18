@@ -345,7 +345,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
 
         {/* Output */}
         {showOutput && (
-          <div className="overflow-auto max-h-[calc(100vh-200px)] w-full max-w-full">
+          <div>
             <MarkdownRenderer content={content} />
           </div>
         )}
