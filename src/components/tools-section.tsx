@@ -2,9 +2,22 @@ import { Card } from "@/components/ui/card"
 import { Sparkles } from "lucide-react"
 import { useRouter } from 'next/navigation'
 import { tools } from "@/data/tools";
+import { useAuth, useClerk } from '@clerk/nextjs';
 
 export default function ToolsSection() {
   const router = useRouter()
+  const { isSignedIn } = useAuth();
+  const { openSignUp } = useClerk();
+
+  const handleToolClick = (slug: string | undefined) => {
+    if (isSignedIn) {
+      if (slug) {
+        router.push(slug);
+      }
+    } else {
+      openSignUp();
+    }
+  }
 
   return (
     <section className="px-4 py-4">
@@ -25,7 +38,7 @@ export default function ToolsSection() {
             <Card
               key={tool.title}
               className={`group relative flex cursor-pointer flex-col bg-gray-800/50 p-6 text-white transition-all ${tool.slug ? 'hover:bg-gray-700/50' : 'opacity-75 cursor-not-allowed'}`}
-              onClick={() => tool.slug && router.push(tool.slug)}
+              onClick={() => handleToolClick(tool.slug)}
             >
               {tool.label && (
                 <div

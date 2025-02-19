@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { SignedOut, SignUpButton } from "@clerk/clerk-react"
 
 export default function Hero() {
   return (
@@ -10,9 +11,19 @@ export default function Hero() {
         <p className="mb-8 text-xl text-gray-300 sm:text-2xl">
           Use AI-powered interview prep and stand out—It&apos;s free.
         </p>
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-6 px-8">
-          Get Started for Free
-        </Button>
+        <SignedOut>
+          <SignUpButton mode="modal">
+            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-6 px-8">
+              Get Started for Free
+            </Button>
+          </SignUpButton>
+        </SignedOut>
+{/* For testing
+        <SignedIn>
+          <SignOutButton>
+          </SignOutButton>
+        </SignedIn>
+         */}
       </div>
     </section>
   )
