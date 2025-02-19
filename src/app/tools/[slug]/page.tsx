@@ -3,6 +3,7 @@
 import MarkdownRenderer from "@/components/markdown-renderer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tool, tools } from "@/data/tools";
 import { useMixpanel } from '@/hooks/use-mixpanel';
 import Cookies from "js-cookie";
 import Link from "next/link";
@@ -17,21 +18,20 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   const [profileId, setProfileId] = useState<String>()
   const [showInterviewerLIUrl, setShowInterviewerLIUrl] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
-  const [resumeFileName, setResumeFileName] = useState<String>()
+  const [resumeFileName, setResumeFileName] = useState<String>();
+  const [tool, setTool] = useState<Tool>();
 
   const { track } = useMixpanel();
   const { slug } = React.use(params);
+
+  const getToolBySlug = (slug: string) => {
+    return tools.find(tool => tool.slug === slug);
+  }
 
   const toolName = slug.split("-")
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-  const tool = {
-    name: toolName,
-    description: `${toolName} description`,
-    slug: slug,
-    imageUrl: null
-  }
 
   // e: FormEvent<HTMLFormElement>
   const handleRunTool = async(e: FormEvent<HTMLFormElement>) => {
@@ -48,7 +48,10 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   }
 
   useEffect(() => {
-    if (slug.includes("interviewer-scouting-report")) {
+    const tool = getToolBySlug(`/tools/${slug}`);
+    setTool(tool);
+
+    if (slug.includes("interviewer-scout")) {
       setShowInterviewerLIUrl(true)
     }
   }, [])
@@ -130,9 +133,9 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
 
   const getToolResults = async (interviewId: string) => {
     // Determine the API endpoint based on the slug
-    const apiEndpoint = slug.includes("company-scouting-report") ? "company-prep" :
-                        slug.includes("interviewer-scouting-report") ? "interviewer-prep" :
-                        slug.includes("question-scouting-report") ? "question-prep" : "";
+    const apiEndpoint = slug.includes("company-scout") ? "company-prep" :
+                        slug.includes("interviewer-scout") ? "interviewer-prep" :
+                        slug.includes("question-scout") ? "question-prep" : "";
 
     if (apiEndpoint) {
       fetch(`/api/${apiEndpoint}?profileId=${profileId}&interviewId=${interviewId}`)
@@ -197,9 +200,9 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     // constprofileId: string, interviewId: string
 
     // Determine the API endpoint based on the slug
-    const apiEndpoint = slug.includes("company-scouting-report") ? "generate-company-prep" :
-                        slug.includes("interviewer-scouting-report") ? "generate-interviewer-prep" :
-                        slug.includes("question-scouting-report") ? "generate-question-prep" : "";
+    const apiEndpoint = slug.includes("company-scout") ? "generate-company-prep" :
+                        slug.includes("interviewer-scout") ? "generate-interviewer-prep" :
+                        slug.includes("question-scout") ? "generate-question-prep" : "";
 
     const apiUrl = `/api/${apiEndpoint}`;
     try {
@@ -224,6 +227,10 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     }
   }
 
+  if (!tool) {
+    return null
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[#111827]">
       <div className="flex flex-col space-y-4 px-4 sm:px-6 lg:px-8 my-6">
@@ -231,21 +238,14 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         <div className="w-full max-w-full sm:px-8 sm:pb-8 space-y-6 sm:space-y-8 bg-[#1F2937] rounded-xl shadow-md">
           <div className="text-[#F9FAFB] p-4">
             <div className="max-w-3xl">
-              {tool.imageUrl && (
-              <div className="flex my-8">
-                <img
-                  src={tool.imageUrl}
-                  alt={tool.name}
-                  className="aspect-video rounded-xl"
-                  width="550"
-                  height="310"
-                />
+              <div className="flex items-center mb-4">
+                <div className="h-12 w-12 flex items-center justify-center rounded-lg bg-gray-700">
+                  {tool.icon}
+                </div>
+                <h1 className="text-4xl font-bold text-emerald-400 mb-2 ml-4">{tool.title}</h1>
               </div>
-              )}
-              <h1 className="text-4xl font-bold text-emerald-400 mb-2">{tool.name}</h1>
-
               <Link href="/tools" className="hover:underline">
-                ← Back to tools
+                ← Back
               </Link>
 
               <div className="prose prose-invert prose-emerald mt-8">
@@ -253,7 +253,6 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Input(s) */}

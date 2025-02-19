@@ -1,26 +1,14 @@
-'use client'
+"use client";
 
-import LandingPage from "@/components/landing-page"
-import { useUser } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import Hero from "@/components/hero"
+import ToolsSection from "@/components/tools-section"
 
-export default function Home() {
-  const router = useRouter()
-  const { isLoaded, isSignedIn } = useUser()
-
-  useEffect(() => {
-    // Don't do anything until Clerk is loaded
-    if (!isLoaded) return
-
-    if (isSignedIn) {
-      router.push('/dashboard')
-    // } else {
-    //   router.push('/start')
-    }
-  }, [isLoaded, isSignedIn, router])
-
+export default function Page() {
   return (
-    <LandingPage />
+    <main>
+      <Hero />
+      <ToolsSection />
+    </main>
   )
 }
+
