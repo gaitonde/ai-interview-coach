@@ -24,12 +24,12 @@ export default function Hero() {
           </SignUpButton>
         </SignedOut>
 {/* For testing */}
-
+{/*
         <SignedIn>
           <SignOutButton>
           </SignOutButton>
         </SignedIn>
-
+ */}
       </div>
     </section>
   )

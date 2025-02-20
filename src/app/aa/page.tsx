@@ -1,5 +1,6 @@
 "use client";
 
+import { useMixpanel } from "@/hooks/use-mixpanel";
 import { useAuth, useUser } from '@clerk/nextjs'
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -8,13 +9,14 @@ import { useEffect, useState } from "react";
 export default function AA() {
   const router = useRouter();
   const { user } = useUser();
+  const { track, identify } = useMixpanel();
 
   useEffect(() => {
     if (!user) return;
 
     const initializeUserAndProfile = async () => {
       try {
-        // Create user first
+        track('ClerkUserCreated')
         const userResponse = await fetch('/api/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -25,6 +27,8 @@ export default function AA() {
         if (!userData.id) {
           throw new Error('Failed to create user');
         }
+
+        track('TIPUserCreated', {id: userData.id, email: user.emailAddresses[0].emailAddress})
 
         // Create profile with the returned userId
         const profileResponse = await fetch('/api/profiles', {
@@ -41,7 +45,10 @@ export default function AA() {
           Cookies.set('profileId', profileData.id, {
             secure: true,
             sameSite: 'strict'
-          })
+          });
+
+          track('ProfileCreated', {id: profileData.id})
+          identify(profileData.id);
 
           router.push('/');
         }

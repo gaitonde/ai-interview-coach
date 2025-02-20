@@ -49,6 +49,8 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   useEffect(() => {
     const tool = getToolBySlug(`/tools/${slug}`);
     setTool(tool);
+    console.log('ViewedTool...')
+    track('ViewedTool', {tool: `/tools/${slug}`});
 
     if (slug.includes("interviewer-scout")) {
       setShowInterviewerLIUrl(true)
@@ -56,29 +58,26 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   }, [])
 
   const handleUploadResume = async () => {
-
-    console.log('1')
+    track('UploadResumeAttempt');
     uploadResume().then(uploaded => {
-      console.log('2')
-      if (uploaded) {
-        console.log('3. uploaded!')
-      }
+      console.log('resume uploaded: ', uploaded)
+      // if (uploaded) {
+      //   track('UploadResumeSuccess');
+      // } else {
+      //   track('UploadResumeFailed');
+      // }
     })
   }
 
   const uploadResume = async (): Promise<boolean> => {
-    console.log('in upload resume...')
     return new Promise((resolve) => {
-      console.log('in here...')
       const input = document.createElement('input')
       input.type = 'file'
       input.accept = 'application/pdf'
 
       input.onchange = async (e) => {
-        console.log('a')
         const file = (e.target as HTMLInputElement).files?.[0]
         if (!file) {
-          console.log('b')
           resolve(false)
           return
         }
@@ -86,7 +85,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         console.log('c')
         try {
           setIsUploading(true)
-          // track('SubmittedResumeUpload', { landingPageEmail: email })
+          track('SubmittedResumeUpload');
           const profileId = Cookies.get('profileId') as string
           setProfileId(profileId)
 
@@ -111,6 +110,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           // setProfileId(profileId)
           const resumeFileName = (file.name.length > 20) ? `${file.name.substring(0, 20)}...` : file.name;
           setResumeFileName(resumeFileName)
+          track('UploadResumeSuccess');
           // track('ProfileCreatedSuccess', {
           //   landingPageEmail: email,
           //   profileId
@@ -150,6 +150,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           })
           .then(data => {
             setContent(`# ${toolName}\n\n` + data.content)
+            track('ViewedToolContent', {tool: slug });
           })
           .catch(error => {
             console.error('Error fetching prep sheet response:', error)
@@ -177,7 +178,6 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           company_url: formData.get('company_url'),
           jd_url: formData.get('jd_url'),
           interviewer_linkedin_url: formData.get('interviewer_linkedin_url'),
-          // interview_date: formData.get('interview_date')
         }),
       });
 
@@ -209,6 +209,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
 
     const apiUrl = `/api/${apiEndpoint}`;
     try {
+      track('RunToolAttempt', {tool: slug});
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -218,15 +219,15 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
       });
 
       if (!response.ok) {
-        console.log(`error response for url: ${apiUrl}`, response)
-        return
+        console.log(`error response for url: ${apiUrl}`, response);
+        return;
       }
 
-      const result = await response.json()
-      return result.content
+      const result = await response.json();
+      return result.content;
     } catch (error) {
-      console.error('Error in generating response for tool:', error)
-      throw error
+      console.error('Error in generating response for tool:', error);
+      throw error;
     }
   }
 

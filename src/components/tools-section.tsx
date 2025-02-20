@@ -1,20 +1,23 @@
-import { Card } from "@/components/ui/card"
-import { Sparkles } from "lucide-react"
-import { useRouter } from 'next/navigation'
+import { Card } from "@/components/ui/card";
 import { tools } from "@/data/tools";
-import { useAuth, useClerk } from '@clerk/nextjs';
+import { useMixpanel } from "@/hooks/use-mixpanel";
+import { useAuth, useClerk } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function ToolsSection() {
-  const router = useRouter()
+  const router = useRouter();
+  const { track } = useMixpanel();
   const { isSignedIn } = useAuth();
   const { openSignUp } = useClerk();
 
   const handleToolClick = (slug: string | undefined) => {
+    track('ViewToolAttempt', {tool: slug});
     if (isSignedIn) {
       if (slug) {
         router.push(slug);
       }
     } else {
+      track('ViewSignup')
       openSignUp();
     }
   }
