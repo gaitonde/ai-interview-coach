@@ -186,8 +186,14 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         jdUrl = `https://${jdUrl}`;
       }
 
+      let interviewerLinkedinUrl = formData.get('interviewer_linkedin_url')?.toString();
+      if (interviewerLinkedinUrl && !interviewerLinkedinUrl.match(/^https?:\/\//)) {
+        interviewerLinkedinUrl = `https://${interviewerLinkedinUrl}`;
+      }
+
       console.log('companyUrl: ', companyUrl)
       console.log('jdUrl: ', jdUrl)
+      console.log('interviewerLinkedinUrl: ', interviewerLinkedinUrl)
 
       const response = await fetch(`/api/interviews`, {
         method: 'POST',
@@ -266,7 +272,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                 </div>
                 <h1 className="text-4xl font-bold text-emerald-400 mb-2 ml-4">{tool.title}</h1>
               </div>
-              <Link href="/tools" className="hover:underline">
+              <Link href="/" className="hover:underline">
                 ← Back
               </Link>
 
