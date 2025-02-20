@@ -72,7 +72,9 @@ export async function POST(request: Request) {
   const formattedInterviewDate = interview_date === '' ? null : interview_date;
 
   //TODO: do these url fetches async
+  console.log('fetching contents company_url: ', company_url)
   const company_md = await fetchUrlContents(company_url)
+  console.log('fetching contents for jd_url: ', jd_url)
   const jd_md = await fetchUrlContents(jd_url)
   const interviewer_linkedin_md = interviewer_linkedin_url ? await fetchUrlContents(interviewer_linkedin_url) : null
 
@@ -132,11 +134,29 @@ export async function POST(request: Request) {
 }
 
 async function fetchUrlContents(url: string): Promise<string> {
+  const AbortController = globalThis.AbortController || await import('abort-controller')
+  const controller = new AbortController();
+  let timeoutId: NodeJS.Timeout | undefined = undefined;
+
   try {
-    const response = await fetch(url)
+    // Set timeout and store the timeout ID
+    timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 10000);
+
+    console.log('1')
+    const response = await fetch(url, {
+      signal: controller.signal,
+      follow: 10
+    });
+    // const response = await fetch(url, {});
+    console.log('2')
     const html = await response.text()
+    console.log('3')
     const $ = cheerio.load(html)
+    console.log('4')
     $('script').remove()
+    console.log('5')
     $('[onload], [onclick], [onmouseover], [onfocus], [onsubmit], [oninput]').each((_, element) => {
       Object.keys(element.attribs).forEach(attr => {
         if (attr.startsWith('on')) {
@@ -144,13 +164,21 @@ async function fetchUrlContents(url: string): Promise<string> {
         }
       });
     });
+    console.log('6')
 
     // Get the cleaned HTML
     const cleanHtml = $('body').html()
+    console.log('7')
     const markdown = turndownService.turndown(cleanHtml || '')
+    console.log('8')
     return markdown
   } catch (error) {
     console.error('Error in fetchUrlContents:', error)
     throw error
+  } finally {
+    // Clear timeout using the stored ID
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
   }
 }

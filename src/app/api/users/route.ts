@@ -31,3 +31,18 @@ export async function GET(request: NextRequest) {
   const profileResult = await sql.query(query, [id])
   return NextResponse.json({ id, profile: profileResult?.rows[0] })
 }
+
+export async function POST(request: NextRequest) {
+  const { clerkId } = await request.json()
+  const table = getTable('users')
+
+  const query = `
+    INSERT INTO ${table}
+      (clerk_id)
+    VALUES
+      ($1)
+    RETURNING id
+  `
+  const result = await sql.query(query, [clerkId])
+  return NextResponse.json({ id: result.rows[0].id })
+}

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { sql } from '@vercel/postgres'
 import { getTable } from "@/lib/db"
 
@@ -52,46 +52,66 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
-  try {
-    const json = await request.json()
-    const { userId, school, major, concentration, graduation_year } = json
+// export async function POST_OLD(request: Request) {
+//   try {
+//     const json = await request.json()
+//     const { userId, school, major, concentration, graduation_year } = json
 
-    // Convert graduation_year String to a Date with Jan 1
-    const graduation_date = new Date(`1/1/${graduation_year}`)
-    const profileId = await createProfile(userId, school, major, concentration, graduation_date)
+//     // Convert graduation_year String to a Date with Jan 1
+//     const graduation_date = new Date(`1/1/${graduation_year}`)
+//     const profileId = await createProfile(userId, school, major, concentration, graduation_date)
 
-    return NextResponse.json({ success: true, profileId })
-  } catch (error) {
-    console.error('Error:', error)
-    return NextResponse.json({ content: "unable to add profile" }, { status: 500 })
+//     return NextResponse.json({ success: true, profileId })
+//   } catch (error) {
+//     console.error('Error:', error)
+//     return NextResponse.json({ content: "unable to add profile" }, { status: 500 })
+//   }
+// }
+
+// async function createProfile(
+//   userId: number,
+//   school: string,
+//   major: string,
+//   concentration: string,
+//   graduation_date: Date
+// ): Promise<number> {
+//   try {
+//     // ON CONFLICT ON CONSTRAINT unique_user_id
+//     const result = await sql.query(`
+//       INSERT INTO ${PROFILES_TABLE} (user_id, school, major, concentration, graduation_date)
+//       VALUES (${userId}, '${school}', '${major}', '${concentration}', '${graduation_date.toISOString()}')
+//       ON CONFLICT (user_id)
+//       DO UPDATE SET
+//         school = EXCLUDED.school,
+//         major = EXCLUDED.major,
+//         concentration = EXCLUDED.concentration,
+//         graduation_date = EXCLUDED.graduation_date,
+//         last_updated_at = CURRENT_TIMESTAMP
+//       RETURNING id
+//     `)
+//     return result.rows[0].id
+//   } catch (error) {
+//     console.error('Error creating profiles:', error)
+//     throw error
+//   }
+// }
+
+export async function POST(request: NextRequest) {
+  const { email, userId } = await request.json()
+
+  if (!email || !userId) {
+    return NextResponse.json({ error: 'email and userId are required' }, { status: 400 })
   }
-}
 
-async function createProfile(
-  userId: number,
-  school: string,
-  major: string,
-  concentration: string,
-  graduation_date: Date
-): Promise<number> {
-  try {
-    // ON CONFLICT ON CONSTRAINT unique_user_id
-    const result = await sql.query(`
-      INSERT INTO ${PROFILES_TABLE} (user_id, school, major, concentration, graduation_date)
-      VALUES (${userId}, '${school}', '${major}', '${concentration}', '${graduation_date.toISOString()}')
-      ON CONFLICT (user_id)
-      DO UPDATE SET
-        school = EXCLUDED.school,
-        major = EXCLUDED.major,
-        concentration = EXCLUDED.concentration,
-        graduation_date = EXCLUDED.graduation_date,
-        last_updated_at = CURRENT_TIMESTAMP
-      RETURNING id
-    `)
-    return result.rows[0].id
-  } catch (error) {
-    console.error('Error creating profiles:', error)
-    throw error
-  }
+  const table = getTable('profiles')
+
+  const query = `
+    INSERT INTO ${table}
+      (email, user_id)
+    VALUES
+      ($1, $2)
+    RETURNING id
+  `
+  const result = await sql.query(query, [email, userId])
+  return NextResponse.json({ id: result.rows[0].id })
 }

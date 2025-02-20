@@ -37,16 +37,22 @@ export async function POST(request: Request) {
     const resumeUrl = await uploadResume(resume)
     const resumeText = await extractText(resume)
     const parsedResume = await parseResume(resumeText)
-    const profile = await insertProfile(parsedResume)
-    const profileId = profile.id
+    let profileId = formData.get('profileId') as string;
+    let profile;
+    if (profileId) {
+      profile = await updateProfile(profileId, parsedResume)
+    } else {
+      profile = await insertProfile(parsedResume)
+      profileId = profile.id
+    }
     await insertResumeRecord(profileId, filename, resumeUrl, parsedResume)
 
     if (profile.email && profile.id) {
       await updateEmailRecord(userEnteredEmail, profile.id)
     }
 
-    const data = await sendEmail(resumeUrl, filename, profile)
-    console.log('email sent:', data)
+    // const data = await sendEmail(resumeUrl, filename, profile)
+    // console.log('email sent:', data)
 
     return NextResponse.json({ success: true, profileId })
   } catch (error) {
@@ -196,6 +202,50 @@ async function insertProfile(resumeJson: string): Promise<Profile> {
     linkedInURL
   ])
 
+  return result.rows[0]
+}
+
+async function updateProfile(profileId: string, resumeJson: string): Promise<Profile> {
+  console.log('in update profile: ', profileId)
+  const parsed = JSON.parse(resumeJson)
+
+  // Convert "Not Specified" to null for each field
+  const {
+    firstName,
+    lastName,
+    school,
+    major,
+    concentration,
+    graduationYear,
+    email,
+    phone,
+    linkedInURL
+  } = Object.fromEntries(
+    Object.entries(parsed).map(([key, value]) =>
+      [key, value === "Not Specified" ? null : value]
+    )
+  )
+
+  const graduation_date = graduationYear ? new Date(`6/1/${graduationYear}`) : null
+  const table = getTable('profiles')
+
+  const query = `
+    UPDATE ${table}
+    SET
+      first_name = $1,
+      last_name = $2,
+      school = $3,
+      major = $4,
+      concentration = $5,
+      graduation_date = $6,
+      email = $7,
+      phone = $8,
+      linkedin_url = $9
+    WHERE id = $10
+    RETURNING *
+    `
+  console.log("QUERY: ", query)
+  const result = await sql.query(query, [firstName, lastName, school, major, concentration, graduation_date, email, phone, linkedInURL, profileId])
   return result.rows[0]
 }
 
