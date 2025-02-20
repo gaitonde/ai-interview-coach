@@ -82,7 +82,6 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           return
         }
 
-        console.log('c')
         try {
           setIsUploading(true)
           track('SubmittedResumeUpload');
@@ -96,7 +95,6 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           formData.append('resume', file)
           formData.append('filename', file.name)
 
-          console.log('d')
 
           const response = await fetch('/api/resume', {
             method: 'POST',
@@ -167,7 +165,11 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
 
   const saveInterview = async (formData: FormData) => {
     try {
-      // track('AttemptedAddInterview', { profileId })
+      let companyUrl = formData.get('company_url')?.toString();
+      if (companyUrl && !companyUrl.match(/^https?:\/\//)) {
+        companyUrl = `https://${companyUrl}`;
+      }
+
       const response = await fetch(`/api/interviews`, {
         method: 'POST',
         headers: {
@@ -175,7 +177,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         },
         body: JSON.stringify({
           profileId,
-          company_url: formData.get('company_url'),
+          company_url: companyUrl,
           jd_url: formData.get('jd_url'),
           interviewer_linkedin_url: formData.get('interviewer_linkedin_url'),
         }),
@@ -330,8 +332,12 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
               <Button
                 type="submit"
                 className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
-                // className="w-full bg-[#F9FAFB] text-gray-800 hover:bg-[#E5E7EB] py-2 px-4 rounded-md transition-colors"
-                disabled={isSubmitting}
+                disabled={
+                  isSubmitting ||
+                  !resumeFileName ||
+                  !formRef.current?.company_url.value ||
+                  !formRef.current?.jd_url.value
+                }
               >
                 Go
               </Button>

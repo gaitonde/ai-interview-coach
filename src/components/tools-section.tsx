@@ -18,7 +18,7 @@ export default function ToolsSection() {
       }
     } else {
       track('ViewSignup')
-      openSignUp();
+      openSignUp({forceRedirectUrl: slug});
     }
   }
 
