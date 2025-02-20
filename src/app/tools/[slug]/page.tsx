@@ -32,7 +32,6 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-
   // e: FormEvent<HTMLFormElement>
   const handleRunTool = async(e: FormEvent<HTMLFormElement>) => {
     console.log('in handleRunTool')
@@ -88,9 +87,13 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         try {
           setIsUploading(true)
           // track('SubmittedResumeUpload', { landingPageEmail: email })
+          const profileId = Cookies.get('profileId') as string
+          setProfileId(profileId)
+
           const formData = new FormData()
           const email = 'fix@me.com';
           formData.append('email', email)
+          formData.append('profileId', profileId)
           formData.append('resume', file)
           formData.append('filename', file.name)
 
@@ -104,8 +107,8 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           if (!response.ok) throw new Error('Upload failed')
 
           const result = await response.json()
-          const profileId = result.profileId
-          setProfileId(profileId)
+          // const profileId = result.profileId
+          // setProfileId(profileId)
           const resumeFileName = (file.name.length > 20) ? `${file.name.substring(0, 20)}...` : file.name;
           setResumeFileName(resumeFileName)
           // track('ProfileCreatedSuccess', {

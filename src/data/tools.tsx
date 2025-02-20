@@ -65,10 +65,10 @@ export const tools: Tool[] = [
   //   description: "Get personalized coaching on tackling any interview question—boost your confidence.",
   //   label: "Coming Soon",
   // },
-  {
-    icon: <Star className="h-8 w-8 text-emerald-400" />,
-    title: "STAR Story Creator",
-    description: "Build a arsenal of impactful STAR stories to showcase your skills and experiences.",
-    label: "Coming Soon",
-  },
+  // {
+  //   icon: <Star className="h-8 w-8 text-emerald-400" />,
+  //   title: "STAR Story Creator",
+  //   description: "Build a arsenal of impactful STAR stories to showcase your skills and experiences.",
+  //   label: "Coming Soon",
+  // },
 ]

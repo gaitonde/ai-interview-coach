@@ -22,6 +22,7 @@ export default function ToolsSection() {
   return (
     <section className="px-4 py-4">
       <div className="mx-auto max-w-7xl">
+{/*
         <div className="mb-12 text-center">
           <h2 className="mb-2 flex items-center justify-center gap-2 text-4xl font-bold text-emerald-400">
             <Sparkles className="h-8 w-8 text-emerald-400" />
@@ -33,7 +34,8 @@ export default function ToolsSection() {
             <span className="text-emerald-400">100% Free!</span>
           </p>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+ */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
           {tools.map((tool) => (
             <Card
               key={tool.title}

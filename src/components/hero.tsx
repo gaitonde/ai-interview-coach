@@ -1,29 +1,35 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { SignedOut, SignUpButton } from "@clerk/clerk-react"
+import { SignedIn, SignedOut, SignOutButton, SignUpButton } from "@clerk/clerk-react"
+import { Sparkles } from "lucide-react"
 
 export default function Hero() {
   return (
     <section className="flex h-auto flex-col items-center justify-center px-4 py-12 text-center">
       <div className="max-w-4xl">
-        <h1 className="mb-6 text-4xl font-bold text-emerald-400 sm:text-6xl">Master Your Interview Game</h1>
+        <h1  className="mb-2 flex items-center justify-center gap-2 text-4xl font-bold text-emerald-400">
+          {/* <Sparkles className="h-8 w-8 text-emerald-400" /> */}
+          Master Your Interview Game
+          {/* <Sparkles className="h-8 w-8 text-emerald-400" /> */}
+        </h1>
         <p className="mb-8 text-xl text-gray-300 sm:text-2xl">
-          Use AI-powered interview prep and stand out—It&apos;s free.
+          Crush your interviews with personalized AI powered prep and stand out — <span className="text-emerald-400">It's free.</span>
         </p>
         <SignedOut>
-          <SignUpButton mode="modal">
+          <SignUpButton mode="modal" forceRedirectUrl="/aa">
             <Button className="bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-6 px-8">
               Get Started for Free
             </Button>
           </SignUpButton>
         </SignedOut>
-{/* For testing
+{/* For testing */}
+
         <SignedIn>
           <SignOutButton>
           </SignOutButton>
         </SignedIn>
-         */}
+
       </div>
     </section>
   )
