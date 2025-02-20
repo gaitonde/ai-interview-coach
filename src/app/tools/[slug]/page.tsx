@@ -220,9 +220,6 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   };
 
   const generateResults = async (interviewId: string) => {
-
-    // constprofileId: string, interviewId: string
-
     // Determine the API endpoint based on the slug
     const apiEndpoint = slug.includes("company-scout") ? "generate-company-prep" :
                         slug.includes("interviewer-scout") ? "generate-interviewer-prep" :
@@ -358,7 +355,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                   !formRef.current?.jd_url.value
                 }
               >
-                {isSubmitting ? statusMessage : showOutput ? 'Run Again' : 'Run'}
+                {isSubmitting ? statusMessage : showOutput ? 'Run Again' : `Run ${toolName}`}
               </Button>
               <p className="text-sm mt-1 text-center">
                 {isSubmitting && (

@@ -70,8 +70,8 @@ export default function ToolsSection() {
                   ⭐⭐⭐⭐⭐ Popular
                 </div>
               )} */}
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gray-700">{tool.icon}</div>
-              <h3 className="mb-2 text-xl font-semibold text-emerald-400">{tool.title}</h3>
+              <div className="absolute left-2 top-2 ml-4 mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gray-700">{tool.icon}</div>
+              <h3 className="mt-12 mb-2 text-xl font-semibold text-emerald-400">{tool.title}</h3>
               <p className="mb-4 flex-grow text-gray-300">{tool.description}</p>
               {/* Hide button if no slug */}
               {tool.slug && (
