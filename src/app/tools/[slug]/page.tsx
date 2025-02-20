@@ -349,10 +349,10 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                 type="submit"
                 className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
                 disabled={
-                  isSubmitting ||
-                  !resumeFileName ||
-                  !formRef.current?.company_url.value ||
-                  !formRef.current?.jd_url.value
+                  isSubmitting
+                  // !resumeFileName ||
+                  // !formRef.current?.company_url.value ||
+                  // !formRef.current?.jd_url.value
                 }
               >
                 {isSubmitting ? statusMessage : showOutput ? 'Run Again' : `Run ${toolName}`}
