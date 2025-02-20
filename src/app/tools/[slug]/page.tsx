@@ -10,14 +10,14 @@ import Link from "next/link";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 
 export default function ToolDetails({ params }: { params: Promise<{ slug: string }> }) {
-  const [showOutput, setShowOutput] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
-  const [content, setContent] = useState('')
-  const [error, setError] = useState('')
-  const [profileId, setProfileId] = useState<String>()
-  const [showInterviewerLIUrl, setShowInterviewerLIUrl] = useState(false)
-  const formRef = useRef<HTMLFormElement>(null)
+  const [showOutput, setShowOutput] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [content, setContent] = useState('');
+  const [error, setError] = useState('');
+  const [profileId, setProfileId] = useState<String>();
+  const [showInterviewerLIUrl, setShowInterviewerLIUrl] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
   const [resumeFileName, setResumeFileName] = useState<String>();
   const [tool, setTool] = useState<Tool>();
   const [statusMessage, setStatusMessage] = useState('Thinking...');
@@ -35,13 +35,10 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
 
   // e: FormEvent<HTMLFormElement>
   const handleRunTool = async(e: FormEvent<HTMLFormElement>) => {
-    console.log('in handleRunTool')
     e.preventDefault();
-
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
-
     const interviewId = await saveInterview(formData)
     await generateResults(interviewId)
     await getToolResults(interviewId)
