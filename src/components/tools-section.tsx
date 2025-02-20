@@ -42,8 +42,12 @@ export default function ToolsSection() {
           {tools.map((tool) => (
             <Card
               key={tool.title}
-              className={`group relative flex cursor-pointer flex-col bg-gray-800/50 p-6 text-white transition-all ${tool.slug ? 'hover:bg-gray-700/50' : 'opacity-75 cursor-not-allowed'}`}
-              onClick={() => handleToolClick(tool.slug)}
+              className={`group relative flex flex-col bg-gray-800/50 p-6 text-white transition-all ${
+                tool.disabled ? 'opacity-75 cursor-not-allowed' :
+                tool.slug ? 'cursor-pointer hover:bg-gray-700/50' :
+                'opacity-75 cursor-not-allowed'
+              }`}
+              onClick={() => !tool.disabled && handleToolClick(tool.slug)}
             >
               {tool.label && (
                 <div
@@ -75,7 +79,9 @@ export default function ToolsSection() {
               <p className="mb-4 flex-grow text-gray-300">{tool.description}</p>
               {/* Hide button if no slug */}
               {tool.slug && (
-                <div className="w-full rounded-md bg-emerald-500 py-2 text-center text-white transition-colors group-hover:bg-emerald-600">
+                <div className={`w-full rounded-md py-2 text-center text-white transition-colors ${
+                  tool.disabled ? 'bg-gray-500 cursor-not-allowed' : 'bg-emerald-500 group-hover:bg-emerald-600'
+                }`}>
                   Try {tool.title}
                 </div>
               )}
