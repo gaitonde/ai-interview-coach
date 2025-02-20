@@ -20,6 +20,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   const formRef = useRef<HTMLFormElement>(null)
   const [resumeFileName, setResumeFileName] = useState<String>();
   const [tool, setTool] = useState<Tool>();
+  const [statusMessage, setStatusMessage] = useState('Thinking...');
 
   const { track } = useMixpanel();
   const { slug } = React.use(params);
@@ -56,6 +57,20 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
       setShowInterviewerLIUrl(true)
     }
   }, [])
+
+  useEffect(() => {
+    if (!isSubmitting) return
+
+    const messages = ['Thinking...', 'Researching...', 'Analyzing...', 'Generating...']
+    let currentIndex = 0
+
+    const interval = setInterval(() => {
+      currentIndex = (currentIndex + 1) % messages.length
+      setStatusMessage(messages[currentIndex])
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [isSubmitting])
 
   const handleUploadResume = async () => {
     track('UploadResumeAttempt');
@@ -169,6 +184,13 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
       if (companyUrl && !companyUrl.match(/^https?:\/\//)) {
         companyUrl = `https://${companyUrl}`;
       }
+      let jdUrl = formData.get('jd_url')?.toString();
+      if (jdUrl && !jdUrl.match(/^https?:\/\//)) {
+        jdUrl = `https://${jdUrl}`;
+      }
+
+      console.log('companyUrl: ', companyUrl)
+      console.log('jdUrl: ', jdUrl)
 
       const response = await fetch(`/api/interviews`, {
         method: 'POST',
@@ -178,7 +200,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         body: JSON.stringify({
           profileId,
           company_url: companyUrl,
-          jd_url: formData.get('jd_url'),
+          jd_url: jdUrl,
           interviewer_linkedin_url: formData.get('interviewer_linkedin_url'),
         }),
       });
@@ -339,7 +361,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                   !formRef.current?.jd_url.value
                 }
               >
-                Go
+                {isSubmitting ? statusMessage : showOutput ? 'Run Again' : 'Run'}
               </Button>
               <p className="text-sm mt-1 text-center">
                 {isSubmitting && (
@@ -352,7 +374,6 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           </div>
         </div>
 
-        {/* Output */}
         {showOutput && (
           <div>
             <MarkdownRenderer content={content} />
