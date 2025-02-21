@@ -48,7 +48,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     const tool = getToolBySlug(`/tools/${slug}`);
     setTool(tool);
     console.log('ViewedTool...')
-    track('ViewedTool', {tool: `/tools/${slug}`});
+    track('ViewedTool', {tool: slug});
 
     if (slug.includes("interviewer-scout")) {
       setShowInterviewerLIUrl(true)

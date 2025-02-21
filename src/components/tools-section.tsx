@@ -11,7 +11,8 @@ export default function ToolsSection() {
   const { openSignUp } = useClerk();
 
   const handleToolClick = (slug: string | undefined) => {
-    track('ViewToolAttempt', {tool: slug});
+    const tool = slug?.replace('/tools/', '');
+    track('ViewToolAttempt', { tool });
     if (isSignedIn) {
       if (slug) {
         router.push(slug);
