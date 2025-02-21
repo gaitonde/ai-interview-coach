@@ -204,7 +204,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           profileId,
           company_url: companyUrl,
           jd_url: jdUrl,
-          interviewer_linkedin_url: formData.get('interviewer_linkedin_url'),
+          interviewer_linkedin_url: interviewerLinkedinUrl,
         }),
       });
 
