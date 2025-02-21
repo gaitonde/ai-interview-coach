@@ -303,3 +303,5 @@ CREATE TABLE aic_production_emails (
 
 ALTER TABLE aic_production_profiles ADD COLUMN is_test BOOLEAN DEFAULT FALSE;
 ALTER TABLE aic_production_emails ADD COLUMN is_test BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE aic_production_airesponses ADD COLUMN generated_interview_question_predictor TEXT;

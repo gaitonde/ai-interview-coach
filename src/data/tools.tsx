@@ -70,8 +70,7 @@ export const tools: Tool[] = [
     icon: <MessageSquare className="h-8 w-8 text-emerald-400" />,
     title: "Interview Question Predictor",
     description: "Get tailored questions based on the role, company, and industry—be one step ahead.",
-    slug: "/tools/interview-questions-predictor",
-    label: "Coming Soon",
-    disabled: true
+    slug: "/tools/interview-question-predictor",
+    label: "New",
   },
 ]

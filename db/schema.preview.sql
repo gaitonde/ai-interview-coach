@@ -292,3 +292,5 @@ CREATE TABLE aic_preview_emails (
 
 ALTER TABLE aic_preview_profiles ADD COLUMN is_test BOOLEAN DEFAULT FALSE;
 ALTER TABLE aic_preview_emails ADD COLUMN is_test BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE aic_preview_airesponses ADD COLUMN generated_interview_question_predictor TEXT;

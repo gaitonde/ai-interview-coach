@@ -148,10 +148,11 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     // Determine the API endpoint based on the slug
     const apiEndpoint = slug.includes("company-scout") ? "company-prep" :
                         slug.includes("interviewer-scout") ? "interviewer-prep" :
-                        slug.includes("question-scout") ? "question-prep" : "";
+                        slug.includes("question-scout") ? "question-prep" :
+                        slug.includes("interview-question-predictor") ? "tools" : "" ;
 
     if (apiEndpoint) {
-      fetch(`/api/${apiEndpoint}?profileId=${profileId}&interviewId=${interviewId}`)
+      fetch(`/api/${apiEndpoint}?profileId=${profileId}&interviewId=${interviewId}&slug=${slug}`)
         .then(response => {
             if (!response.ok) {
               throw new Error('Failed to fetch generated questions response')
@@ -229,7 +230,8 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     // Determine the API endpoint based on the slug
     const apiEndpoint = slug.includes("company-scout") ? "generate-company-prep" :
                         slug.includes("interviewer-scout") ? "generate-interviewer-prep" :
-                        slug.includes("question-scout") ? "generate-question-prep" : "";
+                        slug.includes("question-scout") ? "generate-question-prep" :
+                        slug.includes("interview-question-predictor") ? "tools" : "" ;
 
     const apiUrl = `/api/${apiEndpoint}`;
     try {
@@ -239,7 +241,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profileId, interviewId }),
+        body: JSON.stringify({ profileId, interviewId, slug }),
       });
 
       if (!response.ok) {
