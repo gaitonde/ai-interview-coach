@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     try {
       const table = getTable('airesponses');
       const result = await client.query(`
-        SELECT generated_company_prep
+        SELECT generated_company_scout
         FROM ${table}
         WHERE profile_id = $1
         AND interview_id = $2
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'No company info found' }, { status: 404 });
       }
 
-      return NextResponse.json({ content: result.rows[0].generated_company_prep });
+      return NextResponse.json({ content: result.rows[0].generated_company_scout });
     } finally {
       client.release();
     }

@@ -145,35 +145,25 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   }
 
   const getToolResults = async (interviewId: string) => {
-    // Determine the API endpoint based on the slug
-    const apiEndpoint = slug.includes("company-scout") ? "company-prep" :
-                        slug.includes("interviewer-scout") ? "interviewer-prep" :
-                        slug.includes("question-scout") ? "question-prep" :
-                        slug.includes("interview-question-predictor") ? "tools" : "" ;
-
-    if (apiEndpoint) {
-      fetch(`/api/${apiEndpoint}?profileId=${profileId}&interviewId=${interviewId}&slug=${slug}`)
-        .then(response => {
-            if (!response.ok) {
-              throw new Error('Failed to fetch generated questions response')
-            }
-            return response.json()
-          })
-          .then(data => {
-            setContent(`# ${toolName}\n\n` + data.content)
-            track('ViewedToolContent', {tool: slug });
-          })
-          .catch(error => {
-            console.error('Error fetching prep sheet response:', error)
-            setContent('Error loading content. Please try again later.')
-          })
-          .finally(() => {
-            setShowOutput(true);
-            setIsSubmitting(false);
-          })
-    } else {
-      console.error('Invalid slug for API endpoint');
-    }
+    fetch(`/api/tools?profileId=${profileId}&interviewId=${interviewId}&slug=${slug}`)
+      .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to fetch generated questions response')
+          }
+          return response.json()
+        })
+        .then(data => {
+          setContent(`# ${toolName}\n\n` + data.content)
+          track('ViewedToolContent', {tool: slug });
+        })
+        .catch(error => {
+          console.error('Error fetching prep sheet response:', error)
+          setContent('Error loading content. Please try again later.')
+        })
+        .finally(() => {
+          setShowOutput(true);
+          setIsSubmitting(false);
+        })
   }
 
   const saveInterview = async (formData: FormData) => {

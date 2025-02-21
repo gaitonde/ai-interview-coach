@@ -6,7 +6,7 @@ import { Sparkles } from "lucide-react"
 
 export default function Hero() {
   return (
-    <section className="flex h-auto flex-col items-center justify-center px-4 py-12 text-center">
+    <section className="flex h-auto flex-col items-center justify-center px-4 text-center">
       <div className="max-w-4xl">
         <h1  className="mb-2 flex items-center justify-center gap-2 text-4xl font-bold text-emerald-400">
           {/* <Sparkles className="h-8 w-8 text-emerald-400" /> */}

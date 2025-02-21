@@ -294,3 +294,7 @@ ALTER TABLE aic_preview_profiles ADD COLUMN is_test BOOLEAN DEFAULT FALSE;
 ALTER TABLE aic_preview_emails ADD COLUMN is_test BOOLEAN DEFAULT FALSE;
 
 ALTER TABLE aic_preview_airesponses ADD COLUMN generated_interview_question_predictor TEXT;
+
+ALTER TABLE aic_preview_airesponses RENAME COLUMN generated_company_prep TO generated_company_scout;
+ALTER TABLE aic_preview_airesponses RENAME COLUMN generated_interviewer_prep TO generated_interviewer_scout;
+ALTER TABLE aic_preview_airesponses RENAME COLUMN generated_question_prep TO generated_question_scout;

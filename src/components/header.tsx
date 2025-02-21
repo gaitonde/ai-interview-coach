@@ -10,7 +10,7 @@ export function Header() {
   return (
     <div className="flex flex-col">
       <div className="flex justify-center">
-        <div className="w-full max-w-4xl overflow-hidden">
+        <div className="w-full overflow-hidden">
           <header className="p-8 md:py-8">
             <div className={`container max-w-7xl mx-auto flex justify-between items-center`}>
               <Link href="/">

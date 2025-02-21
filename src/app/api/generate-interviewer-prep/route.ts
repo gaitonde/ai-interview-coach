@@ -32,11 +32,11 @@ export async function POST(request: Request) {
     const query = `
       WITH upsert AS (
         UPDATE ${table}
-        SET generated_interviewer_prep = $3
+        SET generated_interviewer_scout = $3
         WHERE profile_id = $1 AND interview_id = $2
         RETURNING *
       )
-      INSERT INTO ${table} (profile_id, interview_id, generated_interviewer_prep)
+      INSERT INTO ${table} (profile_id, interview_id, generated_interviewer_scout)
       SELECT $1, $2, $3
       WHERE NOT EXISTS (
         SELECT * FROM upsert
