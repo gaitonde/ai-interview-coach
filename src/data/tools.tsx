@@ -6,7 +6,7 @@ export type Tool = {
   title: string;
   description: string;
   slug?: string;
-  label: string;
+  label?: string;
   disabled?: boolean;
 };
 
@@ -16,14 +16,14 @@ export const tools: Tool[] = [
     title: "Interviewer Scout",
     description: "Know your interviewer's background in seconds—before you step into the call.",
     slug: "/tools/interviewer-scout",
-    label: "New",
+    // label: "New",
   },
   {
     icon: <Building2 className="h-8 w-8 text-emerald-400" />,
     title: "Company Scout",
     description: "Research the company in minutes so you can interview with confidence.",
     slug: "/tools/company-scout",
-    label: "New",
+    // label: "New",
     // users: "1890 users",
     // popular: true,
   },
@@ -32,7 +32,7 @@ export const tools: Tool[] = [
     title: "Question Scout",
     description: "See the types and styles of questions you will get asked for this role at this company.",
     slug: "/tools/question-scout",
-    label: "New",
+    // label: "New",
     // users: "2100 users",
     // trending: true,
   },
@@ -70,8 +70,7 @@ export const tools: Tool[] = [
     icon: <MessageSquare className="h-8 w-8 text-emerald-400" />,
     title: "Interview Question Predictor",
     description: "Get tailored questions based on the role, company, and industry—be one step ahead.",
-    slug: "/tools/interview-questions-predictor",
-    label: "Coming Soon",
-    disabled: true
+    slug: "/tools/interview-question-predictor",
+    label: "New",
   },
 ]

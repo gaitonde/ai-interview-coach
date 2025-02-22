@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
     const table = getTable('airesponses')
     const result = await sql.query(`
-      SELECT generated_interviewer_prep
+      SELECT generated_interviewer_scout
       FROM ${table}
       WHERE profile_id = $1
       AND interview_id = $2
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'No questions found' }, { status: 404 });
     }
 
-    return NextResponse.json({ content: result.rows[0].generated_interviewer_prep });
+    return NextResponse.json({ content: result.rows[0].generated_interviewer_scout });
   } catch (error) {
     console.error('Error fetching prep sheet response:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

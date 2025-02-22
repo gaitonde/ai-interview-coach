@@ -15,10 +15,10 @@ export async function POST(request: Request) {
     const { content, usage } = await generateCompletion(profileId, 'prompt-company-prep', interviewId)
     const aiResponsesTable = getTable('airesponses')
     const query = `
-      INSERT INTO ${aiResponsesTable} (profile_id, interview_id, generated_company_prep, usage)
+      INSERT INTO ${aiResponsesTable} (profile_id, interview_id, generated_company_scout, usage)
       VALUES ($1, $2, $3, $4)
       ON CONFLICT (profile_id, interview_id)
-      DO UPDATE SET generated_company_prep = EXCLUDED.generated_company_prep, usage = EXCLUDED.usage;
+      DO UPDATE SET generated_company_scout = EXCLUDED.generated_company_scout, usage = EXCLUDED.usage;
     `;
 
     await sql.query(query, [profileId, interviewId, content, usage]);

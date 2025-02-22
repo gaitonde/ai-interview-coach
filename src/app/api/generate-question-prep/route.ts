@@ -42,11 +42,11 @@ async function generateQuestionPrep(profileId: string, interviewId: string): Pro
     const query = `
       WITH upsert AS (
         UPDATE ${table}
-        SET generated_question_prep = $3
+        SET generated_question_scout = $3
         WHERE profile_id = $1 AND interview_id = $2
         RETURNING *
       )
-      INSERT INTO ${table} (profile_id, interview_id, generated_question_prep)
+      INSERT INTO ${table} (profile_id, interview_id, generated_question_scout)
       SELECT $1, $2, $3
       WHERE NOT EXISTS (
         SELECT * FROM upsert
