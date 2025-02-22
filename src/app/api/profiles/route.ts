@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     } else if (userId) {
       const usersTable = getTable('users')
       query = `
-        SELECT * FROM ${PROFILES_TABLE}, ${usersTable}
+        SELECT ${PROFILES_TABLE}.* FROM ${PROFILES_TABLE}, ${usersTable}
         WHERE ${PROFILES_TABLE}.user_id = ${usersTable}.id
         AND ${usersTable}.clerk_id = '${userId}'
       `

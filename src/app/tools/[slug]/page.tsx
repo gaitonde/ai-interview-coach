@@ -41,8 +41,11 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
 
     const formData = new FormData(e.currentTarget);
     const interviewId = await saveInterview(formData)
-    await generateResults(interviewId)
-    await getToolResults(interviewId)
+    const content = await generateResults(interviewId)
+    setContent(`# ${toolName}\n\n` + content)
+    setShowOutput(true);
+    setIsSubmitting(false);
+    // await getToolResults(interviewId)
   }
 
   useEffect(() => {
@@ -131,27 +134,27 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     })
   }
 
-  const getToolResults = async (interviewId: string) => {
-    fetch(`/api/tools?profileId=${profileId}&interviewId=${interviewId}&slug=${slug}`)
-      .then(response => {
-          if (!response.ok) {
-            throw new Error('Failed to fetch generated questions response')
-          }
-          return response.json()
-        })
-        .then(data => {
-          setContent(`# ${toolName}\n\n` + data.content)
-          track('ViewedToolContent', {tool: slug });
-        })
-        .catch(error => {
-          console.error('Error fetching prep sheet response:', error)
-          setContent('Error loading content. Please try again later.')
-        })
-        .finally(() => {
-          setShowOutput(true);
-          setIsSubmitting(false);
-        })
-  }
+  // const getToolResults = async (interviewId: string) => {
+  //   fetch(`/api/tools?profileId=${profileId}&interviewId=${interviewId}&slug=${slug}`)
+  //     .then(response => {
+  //         if (!response.ok) {
+  //           throw new Error('Failed to fetch generated questions response')
+  //         }
+  //         return response.json()
+  //       })
+  //       .then(data => {
+  //         setContent(`# ${toolName}\n\n` + data.content)
+  //         track('ViewedToolContent', {tool: slug });
+  //       })
+  //       .catch(error => {
+  //         console.error('Error fetching prep sheet response:', error)
+  //         setContent('Error loading content. Please try again later.')
+  //       })
+  //       .finally(() => {
+  //         setShowOutput(true);
+  //         setIsSubmitting(false);
+  //       })
+  // }
 
   const saveInterview = async (formData: FormData) => {
     try {
@@ -169,9 +172,9 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         interviewerLinkedinUrl = `https://${interviewerLinkedinUrl}`;
       }
 
-      console.log('companyUrl: ', companyUrl)
-      console.log('jdUrl: ', jdUrl)
-      console.log('interviewerLinkedinUrl: ', interviewerLinkedinUrl)
+      console.debug('companyUrl: ', companyUrl)
+      console.debug('jdUrl: ', jdUrl)
+      console.debug('interviewerLinkedinUrl: ', interviewerLinkedinUrl)
 
       const response = await fetch(`/api/interviews`, {
         method: 'POST',
