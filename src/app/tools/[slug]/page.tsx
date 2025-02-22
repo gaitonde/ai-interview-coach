@@ -21,6 +21,8 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   const [resumeFileName, setResumeFileName] = useState<String>();
   const [tool, setTool] = useState<Tool>();
   const [statusMessage, setStatusMessage] = useState('Thinking...');
+  const [isResumeUploaded, setIsResumeUploaded] = useState(false);
+  const [, forceUpdate] = useState({});
 
   const { track } = useMixpanel();
   const { slug } = React.use(params);
@@ -33,7 +35,6 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-  // e: FormEvent<HTMLFormElement>
   const handleRunTool = async(e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -47,14 +48,14 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   useEffect(() => {
     const tool = getToolBySlug(`/tools/${slug}`);
     setTool(tool);
-    console.log('ViewedTool...')
     track('ViewedTool', {tool: slug});
 
     if (slug.includes("interviewer-scout")) {
-      setShowInterviewerLIUrl(true)
+      setShowInterviewerLIUrl(true);
     }
   }, [])
 
+  //Go button text updating
   useEffect(() => {
     if (!isSubmitting) return
 
@@ -101,36 +102,22 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           setProfileId(profileId)
 
           const formData = new FormData()
-          const email = 'fix@me.com';
-          formData.append('email', email)
           formData.append('profileId', profileId)
           formData.append('resume', file)
           formData.append('filename', file.name)
 
-
           const response = await fetch('/api/resume', {
             method: 'POST',
             body: formData,
-          })
+          });
 
-          if (!response.ok) throw new Error('Upload failed')
+          if (!response.ok) throw new Error('Upload failed');
 
-          const result = await response.json()
-          // const profileId = result.profileId
-          // setProfileId(profileId)
+          await response.json();
+          setIsResumeUploaded(true);
           const resumeFileName = (file.name.length > 20) ? `${file.name.substring(0, 20)}...` : file.name;
-          setResumeFileName(resumeFileName)
+          setResumeFileName(resumeFileName);
           track('UploadResumeSuccess');
-          // track('ProfileCreatedSuccess', {
-          //   landingPageEmail: email,
-          //   profileId
-          // })
-
-          Cookies.set('profileId', profileId, {
-            secure: true,
-            sameSite: 'strict'
-          })
-
           resolve(true)
         } catch (error) {
           console.error('Upload error:', error)
@@ -312,6 +299,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                     placeholder="https://acme.com"
                     // defaultValue="http://www.apple.com/careers/us/"
                     className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                    onChange={() => forceUpdate({})}
                   />
                 </div>
                 <div className="w-full">
@@ -325,6 +313,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                     placeholder="https://careers.example.com/job-description"
                     // defaultValue="https://jobs.apple.com/en-us/details/200554357/business-marketing-and-g-a-internships?team=STDNT"
                     className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                    onChange={() => forceUpdate({})}
                   />
                 </div>
                 {showInterviewerLIUrl && (
@@ -339,6 +328,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                     placeholder="eg. https://www.linkedin.com/in/johndoe"
                     // defaultValue="https://www.linkedin.com/in/ellendalen/"
                     className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                    onChange={() => forceUpdate({})}
                   />
                 </div>
                 )}
@@ -347,11 +337,14 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                 type="submit"
                 className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
                 disabled={
-                  isSubmitting
-                  // !resumeFileName ||
-                  // !formRef.current?.company_url.value ||
-                  // !formRef.current?.jd_url.value
+                  isSubmitting ||
+                  !isResumeUploaded ||
+                  !formRef.current?.company_url.value ||
+                  !formRef.current?.jd_url.value ||
+                  (showInterviewerLIUrl && !formRef.current?.interviewer_linkedin_url.value)
                 }
+                onBlur={() => forceUpdate({})}
+
               >
                 {isSubmitting ? statusMessage : showOutput ? 'Run Again' : `Run ${toolName}`}
               </Button>

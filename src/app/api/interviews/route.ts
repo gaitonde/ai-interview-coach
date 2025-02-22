@@ -144,19 +144,17 @@ async function fetchUrlContents(url: string): Promise<string> {
       controller.abort();
     }, 10000);
 
-    console.log('1')
+    console.log('loading url: ', url)
     const response = await fetch(url, {
       signal: controller.signal,
       follow: 10
     });
-    // const response = await fetch(url, {});
-    console.log('2')
+
+    console.log('loaded response without timeout: ', url)
     const html = await response.text()
-    console.log('3')
     const $ = cheerio.load(html)
-    console.log('4')
+    console.log('cheerio loaded html')
     $('script').remove()
-    console.log('5')
     $('[onload], [onclick], [onmouseover], [onfocus], [onsubmit], [oninput]').each((_, element) => {
       Object.keys(element.attribs).forEach(attr => {
         if (attr.startsWith('on')) {
@@ -168,9 +166,7 @@ async function fetchUrlContents(url: string): Promise<string> {
 
     // Get the cleaned HTML
     const cleanHtml = $('body').html()
-    console.log('7')
     const markdown = turndownService.turndown(cleanHtml || '')
-    console.log('8')
     return markdown
   } catch (error) {
     console.error('Error in fetchUrlContents:', error)

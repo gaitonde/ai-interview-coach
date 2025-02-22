@@ -15,9 +15,9 @@ export const useMixpanel = () => {
   }
 
   const identify = (profileId: string) => {
-    // if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       mixpanel.identify(profileId)
-    // }
+    }
   }
 
   return { track, identify }

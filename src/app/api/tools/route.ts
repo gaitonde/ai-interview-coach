@@ -45,13 +45,10 @@ export async function GET(request: NextRequest) {
 
 
 export async function POST(request: Request) {
-  console.log('in new POST')
   const body = await request.json();
   const { profileId, interviewId, slug } = body;
   console.log('in new POST slug:', slug)
 
-  //prompt-tools-interview-questions-predictor
-  //prompt-tools-interview-question-predictor
   const promptKey = `prompt-tools-${slug}`;
   try {
     const promptData: PromptData = await fetchPrompt(profileId, promptKey, interviewId)
