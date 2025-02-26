@@ -11,15 +11,15 @@ export default function ToolsSection() {
   const { openSignUp } = useClerk();
 
   const handleToolClick = (slug: string | undefined) => {
-    const tool = slug?.replace('/tools/', '');
-    track('ViewToolAttempt', { tool });
+    const path = `/tools/${slug}`;
+    track('ViewToolAttempt', { slug });
     if (isSignedIn) {
       if (slug) {
-        router.push(slug);
+        router.push(path);
       }
     } else {
       track('ViewSignup')
-      openSignUp({forceRedirectUrl: slug});
+      openSignUp({forceRedirectUrl: path});
     }
   }
 

@@ -1,93 +1,95 @@
-import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
-import { sql } from '@vercel/postgres'
-import { fetchPrompt, PromptData } from '../utils/fetchPrompt'
-import { getTable } from '@/lib/db'
+import { runPostProcess as runToolCompanyScout } from '@/app/actions/run-tool-company-scout';
+import { ToolInput } from '@/app/actions/tool-input';
+import { getTable } from '@/lib/db';
+import { sql } from '@vercel/postgres';
+import { NextRequest, NextResponse } from 'next/server';
+import { runAI } from '../utils/openAiCompletion';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Define a type for post-processor functions
+type PostProcessor = (input: ToolInput, content: string) => Promise<void>;
 
-export async function GET(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams
-    const { profileId, interviewId, slug } = Object.fromEntries(searchParams.entries())
+// Create a registry of post-processors
+const postProcessors: Record<string, PostProcessor> = {
+  'company-scout': runToolCompanyScout,
+  // Add more processors as needed:
+  // 'y': runToolY,
+  // 'z': runToolZ,
+};
 
-    if (!profileId || !interviewId || !slug) {
-      return NextResponse.json({ error: 'Profile ID and Interview ID AND slug are required' }, { status: 400 });
-    }
+// export async function GET(request: NextRequest) {
+//   try {
+//     const searchParams = request.nextUrl.searchParams
+//     const { profileId, interviewId, tool } = Object.fromEntries(searchParams.entries())
 
-    const table = getTable('airesponses');
+//     if (!profileId || !tool) {
+//       return NextResponse.json({ error: 'Profile ID and Interview ID AND slug are required' }, { status: 400 });
+//     }
 
-    const underscore_slug = slug.replace(/-/g, '_');
-    const column = `generated_${underscore_slug}`;
+//     const table = getTable('tool_responses');
 
-    const query = `
-      SELECT ${column} as content
-      FROM ${table}
-      WHERE profile_id = $1
-      AND interview_id = $2
-      ORDER BY created_at DESC
-      LIMIT 1
-    `;
+//     const underscore_slug = tool.replace(/-/g, '_');
+//     // const column = `generated_${underscore_slug}`;
 
-    const result = await sql.query(query, [profileId, interviewId])
-    if (result.rows.length === 0) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    } else {
-      return NextResponse.json({ content: result.rows[0].content })
-    }
-  } catch (error) {
-    console.error('Error fetching prep sheet response:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
-}
+//     const query = `
+//       SELECT content
+//       FROM ${table}
+//       WHERE profile_id = $1
+//       ORDER BY created_at DESC
+//       LIMIT 1
+//     `;
 
+//     const result = await sql.query(query, [profileId, interviewId])
+//     if (result.rows.length === 0) {
+//       return NextResponse.json({ error: 'Not found' }, { status: 404 });
+//     } else {
+//       return NextResponse.json({ content: result.rows[0].content })
+//     }
+//   } catch (error) {
+//     console.error('Error fetching prep sheet response:', error);
+//     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+//   }
+// }
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { profileId, interviewId, slug } = body;
-  console.log('in new POST slug:', slug)
+  const { toolName, profileId, interviewId } = body;
 
-  const promptKey = `prompt-tools-${slug}`;
-  try {
-    const promptData: PromptData = await fetchPrompt(profileId, promptKey, interviewId)
-
-    const completion = await openai.chat.completions.create({
-      model: promptData.model,
-      messages: [
-        { role: "system", content: promptData.systemPrompt },
-        { role: "user", content: promptData.userPrompt }
-      ],
-      max_completion_tokens: promptData.maxCompletionTokens,
-      temperature: promptData.temperature,
-    })
-
-    const generatedContent = completion.choices[0]?.message?.content
-
-    const underscore_slug = slug.replace(/-/g, '_');
-    const column = `generated_${underscore_slug}`;
-
-    // Modified upsert operation
-    const table = getTable('airesponses')
-    const query = `
-      WITH upsert AS (
-        UPDATE ${table}
-        SET ${column} = $3
-        WHERE profile_id = $1 AND interview_id = $2
-        RETURNING *
-      )
-      INSERT INTO ${table} (profile_id, interview_id, ${column})
-      SELECT $1, $2, $3
-      WHERE NOT EXISTS (
-        SELECT * FROM upsert
-      )
-    `
-    await sql.query(query, [profileId, interviewId, generatedContent])
-
-    return NextResponse.json({ content: generatedContent })
-  } catch (error) {
-    console.error('Error:', error)
-    return NextResponse.json({ content: "unable to get content" }, { status: 500 })
+  if (!toolName || !profileId) {
+    return NextResponse.json({ error: 'toolName, profileId are required' }, { status: 400 });
   }
+
+  const content = await runAIAndStoreResults(toolName, profileId, interviewId);
+
+  if (!content) {
+    return NextResponse.json({ error: 'Sorry, there was an issue. Not able to run this tool at this time.' }, { status: 400 });
+  }
+
+  // Run post-processor if one exists for this tool
+  const postProcessor = postProcessors[toolName];
+  if (postProcessor && content) {
+    await postProcessor({ profileId, interviewId }, content);
+  }
+
+  return NextResponse.json({ content })
+}
+
+async function runAIAndStoreResults(toolName: string, profileId: string, interviewId?: string) {
+  console.log('in new POST tool:', toolName)
+
+  const promptKey = `prompt-tools-${toolName}`;
+  try {
+    const { content, usage } = await runAI(promptKey, profileId, interviewId)
+    const table = getTable('tool_responses')
+    const query = `
+      INSERT INTO ${table} (profile_id, tool_name, content, usage)
+      VALUES ($1, $2, $3, $4)
+    `
+
+    await sql.query(query, [profileId, toolName, content, usage])
+    return content;
+  } catch (error) {
+    console.error('Error:', error);
+    return null;
+  }
+
 }

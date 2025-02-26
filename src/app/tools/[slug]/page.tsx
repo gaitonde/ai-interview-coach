@@ -8,6 +8,7 @@ import { useMixpanel } from '@/hooks/use-mixpanel';
 import Cookies from "js-cookie";
 import Link from "next/link";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
+import { HtmlOutput, MarkdownOutput, ToolOutput } from "@/components/tool-output";
 
 export default function ToolDetails({ params }: { params: Promise<{ slug: string }> }) {
   const [showOutput, setShowOutput] = useState(false);
@@ -16,13 +17,17 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const [profileId, setProfileId] = useState<String>();
-  const [showInterviewerLIUrl, setShowInterviewerLIUrl] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const [resumeFileName, setResumeFileName] = useState<String>();
   const [tool, setTool] = useState<Tool>();
   const [statusMessage, setStatusMessage] = useState('Thinking...');
   const [isResumeUploaded, setIsResumeUploaded] = useState(false);
   const [, forceUpdate] = useState({});
+
+  const [showResumeInput, setShowResumeInput] = useState(false);
+  const [showCompanyUrlInput, setShowCompanyUrlInput] = useState(false);
+  const [showJdUrlInput, setShowJdUrlInput] = useState(false);
+  const [showInterviewerLIUrlInput, setShowInterviewerLIUrlInput] = useState(false);
 
   const { track } = useMixpanel();
   const { slug } = React.use(params);
@@ -40,21 +45,42 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
-    const interviewId = await saveInterview(formData)
+    let interviewId;
+    //fix this to be more robust
+    if (formData.get('company_url')) {
+      interviewId = await saveInterview(formData)
+    }
     const content = await generateResults(interviewId)
     setContent(`# ${toolName}\n\n` + content)
     setShowOutput(true);
     setIsSubmitting(false);
-    // await getToolResults(interviewId)
   }
 
+  //setup tool and inputs
   useEffect(() => {
-    const tool = getToolBySlug(`/tools/${slug}`);
+    const tool = getToolBySlug(slug);
     setTool(tool);
     track('ViewedTool', {tool: slug});
 
+
+    tool?.inputTypes.map((inputType) => {
+      console.log('XXX inputType: ', inputType)
+      if (inputType === 'Resume') {
+        setShowResumeInput(true)
+      }
+      if (inputType === 'CompanyUrl') {
+        setShowCompanyUrlInput(true)
+      }
+      if (inputType === 'JdUrl') {
+        setShowJdUrlInput(true)
+      }
+      if (inputType === 'InterviewerLIURL') {
+        setShowInterviewerLIUrlInput(true)
+      }
+    })
+    //fix setting of fields
     if (slug.includes("interviewer-scout")) {
-      setShowInterviewerLIUrl(true);
+      setShowInterviewerLIUrlInput(true);
     }
   }, [])
 
@@ -77,11 +103,11 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     track('UploadResumeAttempt');
     uploadResume().then(uploaded => {
       console.log('resume uploaded: ', uploaded)
-      // if (uploaded) {
-      //   track('UploadResumeSuccess');
-      // } else {
-      //   track('UploadResumeFailed');
-      // }
+      if (uploaded) {
+        track('UploadResumeSuccess');
+      } else {
+        track('UploadResumeFailed');
+      }
     })
   }
 
@@ -206,22 +232,23 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     }
   };
 
-  const generateResults = async (interviewId: string) => {
+  const generateResults = async (interviewId?: string) => {
     // Determine the API endpoint based on the slug
-    const apiEndpoint = slug.includes("company-scout") ? "generate-company-prep" :
-                        slug.includes("interviewer-scout") ? "generate-interviewer-prep" :
-                        slug.includes("question-scout") ? "generate-question-prep" :
-                        slug.includes("interview-question-predictor") ? "tools" : "" ;
+    const apiEndpoint = slug.includes("company-scout") ? "generate-company-prep" : "tools";
+                        // slug.includes("interviewer-scout") ? "generate-interviewer-prep" :
+                        // slug.includes("question-scout") ? "generate-question-prep" :
+                        // slug.includes("interview-question-predictor") ? "tools" : "" ;
 
     const apiUrl = `/api/${apiEndpoint}`;
+    const toolName = slug;
     try {
-      track('RunToolAttempt', {tool: slug});
+      track('RunToolAttempt', { tool: toolName });
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profileId, interviewId, slug }),
+        body: JSON.stringify({ profileId, toolName, interviewId }),
       });
 
       if (!response.ok) {
@@ -269,28 +296,30 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         <div className="w-full max-w-full sm:px-8 sm:pb-8 space-y-6 sm:space-y-8 bg-[#1F2937] rounded-xl shadow-md">
           <div className="text-[#F9FAFB] p-4">
             <h2 className="mt-2 text-3xl font-bold text-white">Inputs</h2>
+            {showResumeInput && (
             <div className="w-full mt-8">
-                    <label htmlFor="interviewer_role" className="block text-sm font-medium text-white">
-                      Resume
-                    </label>
-                    <Button
-                      size="lg"
-                      className="text-sm w-full bg-[#F9FAFB] hover:bg-[#E5E7EB] text-gray-800"
-                      onClick={handleUploadResume}
-                      disabled={isUploading}
-                    >
-                      <span className="min-w-[200px]">
-                        {isUploading ? "Uploading..." : (resumeFileName) ? `Selected Resume: ${resumeFileName}` : "Choose Resume"}
-                      </span>
-                    </Button>
-                  </div>
+              <label htmlFor="interviewer_role" className="block text-sm font-medium text-white">
+                Resume
+              </label>
+              <Button
+                size="lg"
+                className="text-sm w-full bg-[#F9FAFB] hover:bg-[#E5E7EB] text-gray-800"
+                onClick={handleUploadResume}
+                disabled={isUploading}
+              >
+                <span className="min-w-[200px]">
+                  {isUploading ? "Uploading..." : (resumeFileName) ? `Selected Resume: ${resumeFileName}` : "Choose Resume"}
+                </span>
+              </Button>
+            </div>
+            )}
             <form
               ref={formRef}
               className="mt-4 space-y-6 w-full"
               onSubmit={handleRunTool}
             >
               <div className="space-y-4">
-
+                {showCompanyUrlInput && (
                 <div className="w-full">
                   <label htmlFor="company_url" className="block text-sm font-medium text-white">
                     Company URL
@@ -305,6 +334,8 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                     onChange={() => forceUpdate({})}
                   />
                 </div>
+                )}
+                {showJdUrlInput && (
                 <div className="w-full">
                   <label htmlFor="jd_url" className="block text-sm font-medium text-white">
                     Job Description URL
@@ -319,7 +350,8 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                     onChange={() => forceUpdate({})}
                   />
                 </div>
-                {showInterviewerLIUrl && (
+                )}
+                {showInterviewerLIUrlInput && (
                 <div className="w-full">
                   <label htmlFor="interviewer_linkedin_url" className="block text-sm font-medium text-white">
                     Interviewer LinkedIn URL
@@ -342,9 +374,9 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                 disabled={
                   isSubmitting ||
                   !isResumeUploaded ||
-                  !formRef.current?.company_url.value ||
-                  !formRef.current?.jd_url.value ||
-                  (showInterviewerLIUrl && !formRef.current?.interviewer_linkedin_url.value)
+                  (formRef.current?.company_url && !formRef.current?.company_url.value) ||
+                  (formRef.current?.jd_url && !formRef.current?.jd_url.value) ||
+                  (showInterviewerLIUrlInput && !formRef.current?.interviewer_linkedin_url?.value)
                 }
                 onBlur={() => forceUpdate({})}
 
@@ -363,9 +395,11 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         </div>
 
         {showOutput && (
-          <div>
-            <MarkdownRenderer content={content} />
-          </div>
+          <ToolOutput content={content}>
+            {tool?.outputType === 'HTML'
+              ? <HtmlOutput content={content} />
+              : <MarkdownOutput content={content} />}
+          </ToolOutput>
         )}
       </div>
     </div>
