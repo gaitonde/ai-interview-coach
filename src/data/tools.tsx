@@ -13,7 +13,7 @@ export type Tool = {
 };
 
 export type InputType = 'Resume' | 'CompanyUrl' | 'JdUrl' | 'InterviewerLIURL';
-export type OutputType = 'Markdown' | 'HTML';
+export type OutputType = 'Markdown' | 'HTML' | 'Custom';
 
 export const tools: Tool[] = [
   {

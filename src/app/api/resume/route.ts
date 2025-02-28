@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       profile = await insertProfile(parsedResume)
       profileId = profile.id
     }
-    await insertResumeRecord(profileId, filename, resumeUrl, parsedResume)
+    await insertResumeRecord(profileId, filename, resumeUrl, resumeText)
 
     // if (profile.email && profile.id) {
     //   await updateEmailRecord(userEnteredEmail, profile.id)
