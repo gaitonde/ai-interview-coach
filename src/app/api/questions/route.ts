@@ -98,3 +98,21 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(result.rows)
 }
 
+export async function POST(request: NextRequest) {
+  const body = await request.json()
+  const {
+    profileId,
+    interviewId,
+    question,
+  } = body
+
+  const table = getTable('questions')
+  const query = `
+    INSERT INTO ${table}
+      (profile_id, interview_id, question)
+    VALUES
+      ($1, $2, $3)
+  `
+  await sql.query(query, [profileId, interviewId, question])
+
+}

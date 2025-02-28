@@ -7,6 +7,7 @@ interface ProfileData {
   companyWebsiteText: string
   jobDescriptionURL: string
   jobDescription: string
+  roleName: string
   resumeUrl?: string
   resume?: string
   schoolName?: string
@@ -58,7 +59,7 @@ async function fetchProfileData(profileId: string, interviewId?: string, questio
       FROM "${PROFILES_TABLE}"
       WHERE id = $1`;
 
-  const INTERVIEW_QUERY = `SELECT company_url, company_text, jd_url, jd_text, interviewer_name, interviewer_role, interviewer_linkedin_url, interviewer_linkedin_text
+  const INTERVIEW_QUERY = `SELECT company_url, company_text, jd_url, jd_text, role_name, interviewer_name, interviewer_role, interviewer_linkedin_url, interviewer_linkedin_text
       FROM "${INTERVIEWS_TABLE}"
       WHERE profile_id = $1
       AND id = $2
@@ -94,11 +95,12 @@ async function fetchProfileData(profileId: string, interviewId?: string, questio
   if (answerId && answerDetails.rows.length === 0) throw new Error("Answers not found")
 
   const { school: schoolName, major: schoolMajor, concentration: schoolConcentration, graduation_date: graduationDate } = profileDetails.rows[0]
-  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, interviewer_name: interviewerName, interviewer_role: interviewerRole, interviewer_linkedin_url: interviewerLinkedInUrl, interviewer_linkedin_text: interviewerLinkedInText } = interviewDetails.rows[0] || {
+  const { company_url: companyWebsiteUrl, company_text: companyWebsiteText, jd_url: jobDescriptionURL, jd_text: jobDescription, role_name: roleName, interviewer_name: interviewerName, interviewer_role: interviewerRole, interviewer_linkedin_url: interviewerLinkedInUrl, interviewer_linkedin_text: interviewerLinkedInText } = interviewDetails.rows[0] || {
     company_url: null,
     company_text: null,
     jd_url: null,
     jd_text: null,
+    role_name: null,
     interviewer_name: null,
     interviewer_role: null,
     interviewer_linkedin_url: null,
@@ -117,6 +119,7 @@ async function fetchProfileData(profileId: string, interviewId?: string, questio
     companyWebsiteText,
     jobDescriptionURL,
     jobDescription,
+    roleName,
     resumeUrl,
     resume,
     schoolName,
@@ -159,6 +162,7 @@ async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: strin
 function applyVariables(prompt: string, data: ProfileData, content?: string): string {
   return prompt
     .replace('${jobDescription}', data.jobDescription)
+    .replace('${roleName}', data.roleName)
     .replace('${companyWebsiteText}', data.companyWebsiteText)
     .replace('${resume}', data.resume || '')
     .replace('${gradYear}', data.gradYear.toString())

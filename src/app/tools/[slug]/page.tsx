@@ -9,6 +9,7 @@ import Cookies from "js-cookie";
 import Link from "next/link";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { HtmlOutput, MarkdownOutput, ToolOutput } from "@/components/tool-output";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function ToolDetails({ params }: { params: Promise<{ slug: string }> }) {
   const [showOutput, setShowOutput] = useState(false);
@@ -28,6 +29,8 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   const [showCompanyUrlInput, setShowCompanyUrlInput] = useState(false);
   const [showJdUrlInput, setShowJdUrlInput] = useState(false);
   const [showInterviewerLIUrlInput, setShowInterviewerLIUrlInput] = useState(false);
+  const [showRoleNameInput, setShowRoleNameInput] = useState(false);
+  const [showQuestionInput, setShowQuestionInput] = useState(false);
 
   const { track } = useMixpanel();
   const { slug } = React.use(params);
@@ -36,9 +39,9 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     return tools.find(tool => tool.slug === slug);
   }
 
-  const toolName = slug.split("-")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  // const toolName = slug.split("-")
+  //   .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  //   .join(" ");
 
   const handleRunTool = async(e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,9 +52,12 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     //fix this to be more robust
     if (formData.get('company_url')) {
       interviewId = await saveInterview(formData)
+    } else if (tool?.title.toLowerCase() === 'byoq') {
+      formData.append('jd_url', 'https://theinterviewplaybook.com/')
+      interviewId = await saveInterview(formData)
     }
     const content = await generateResults(interviewId)
-    setContent(`# ${toolName}\n\n` + content)
+    setContent(`# ${tool?.title}\n\n` + content)
     setShowOutput(true);
     setIsSubmitting(false);
   }
@@ -77,11 +83,19 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
       if (inputType === 'InterviewerLIURL') {
         setShowInterviewerLIUrlInput(true)
       }
+      if (inputType === 'RoleName') {
+        setShowRoleNameInput(true)
+      }
+      if (inputType === 'Question') {
+        setShowQuestionInput(true)
+      }
+
     })
+
     //fix setting of fields
-    if (slug.includes("interviewer-scout")) {
-      setShowInterviewerLIUrlInput(true);
-    }
+    // if (slug.includes("interviewer-scout")) {
+    //   setShowInterviewerLIUrlInput(true);
+    // }
   }, [])
 
   //Go button text updating
@@ -184,6 +198,10 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
 
   const saveInterview = async (formData: FormData) => {
     try {
+
+      const profileId = Cookies.get('profileId') as string
+      setProfileId(profileId)
+
       let companyUrl = formData.get('company_url')?.toString();
       if (companyUrl && !companyUrl.match(/^https?:\/\//)) {
         companyUrl = `https://${companyUrl}`;
@@ -212,6 +230,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
           company_url: companyUrl,
           jd_url: jdUrl,
           interviewer_linkedin_url: interviewerLinkedinUrl,
+          role_name: formData.get('role_name')?.toString()
         }),
       });
 
@@ -241,6 +260,13 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
 
     const apiUrl = `/api/${apiEndpoint}`;
     const toolName = slug;
+
+    const profileId = Cookies.get('profileId') as string
+    setProfileId(profileId)
+
+    console.log('tool params toolName: ', toolName)
+    console.log('tool params profileId: ', profileId)
+    console.log('tool params interviewId: ', interviewId)
     try {
       track('RunToolAttempt', { tool: toolName });
       const response = await fetch(apiUrl, {
@@ -261,6 +287,22 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     } catch (error) {
       console.error('Error in generating response for tool:', error);
       throw error;
+    }
+  }
+
+  const isFormDisabled = () => {
+    if (tool?.title.endsWith('BYOQ')) {
+      return (
+        (showRoleNameInput && !formRef.current?.role_name?.value) ||
+        (showQuestionInput && !formRef.current?.question?.value)
+      )
+    } else {
+      return (
+        isSubmitting ||
+        (formRef.current?.company_url && !formRef.current?.company_url.value) ||
+        (formRef.current?.jd_url && !formRef.current?.jd_url.value) ||
+        (showInterviewerLIUrlInput && !formRef.current?.interviewer_linkedin_url?.value)
+      )
     }
   }
 
@@ -367,21 +409,49 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                   />
                 </div>
                 )}
+
+                {showRoleNameInput && (
+                <div className="w-full">
+                  <label htmlFor="role_name" className="block text-sm font-medium text-white">
+                    Role or Job Title
+                  </label>
+                  <Input
+                    id="role_name"
+                    name="role_name"
+                    type="text"
+                    placeholder="eg. Product Manager"
+                    defaultValue="Product Manager"
+                    className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                    onChange={() => forceUpdate({})}
+                  />
+                </div>
+                )}
+
+                {showQuestionInput && (
+                <div className="w-full">
+                  <label htmlFor="question" className="block text-sm font-medium text-white">
+                    Question
+                  </label>
+                  <Textarea
+                    id="question"
+                    name="question"
+                    rows={5}
+                    placeholder="eg. What strategies would you implement to enhance customer engagement for Acme's products?"
+                    defaultValue="What strategies would you implement to enhance customer engagement for Acme's products?"
+                    className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                    onChange={() => forceUpdate({})}
+                  />
+                </div>
+                )}
+
               </div>
               <Button
                 type="submit"
                 className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
-                disabled={
-                  isSubmitting ||
-                  !isResumeUploaded ||
-                  (formRef.current?.company_url && !formRef.current?.company_url.value) ||
-                  (formRef.current?.jd_url && !formRef.current?.jd_url.value) ||
-                  (showInterviewerLIUrlInput && !formRef.current?.interviewer_linkedin_url?.value)
-                }
+                disabled={isFormDisabled()}
                 onBlur={() => forceUpdate({})}
-
               >
-                {isSubmitting ? statusMessage : showOutput ? 'Run Again' : `Run ${toolName}`}
+                {isSubmitting ? statusMessage : showOutput ? 'Run Again' : `Run ${tool.title}`}
               </Button>
               <p className="text-sm mt-1 text-center">
                 {isSubmitting && (

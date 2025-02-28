@@ -1,5 +1,5 @@
 import { PersonIcon } from "@radix-ui/react-icons"
-import { Building2, HelpCircle, MessageSquare, Music, Mic2, Lightbulb, Star } from "lucide-react"
+import { Building2, HelpCircle, MessageSquare, Music, Mic2, Lightbulb, Star, MessageCircleQuestion } from "lucide-react"
 
 export type Tool = {
   icon: JSX.Element;
@@ -12,7 +12,15 @@ export type Tool = {
   outputType: OutputType;
 };
 
-export type InputType = 'Resume' | 'CompanyUrl' | 'JdUrl' | 'InterviewerLIURL';
+export type InputType =
+  'Resume'
+  | 'CompanyUrl'
+  | 'JdUrl'
+  | 'InterviewerLIURL'
+  | 'RoleName'
+  | 'Question'
+;
+
 export type OutputType = 'Markdown' | 'HTML' | 'Custom';
 
 export const tools: Tool[] = [
@@ -54,8 +62,8 @@ export const tools: Tool[] = [
   },
   {
     icon: <Mic2 className="h-8 w-8 text-emerald-400" />,
-    title: "Tool 5",
-    description: "Tool 5 desc",
+    title: "Know Your Resume",
+    description: "Master the tough resume questions—before your interviewer asks them.desc",
     slug: "tool-5",
     inputTypes: ['Resume'],
     outputType: 'Markdown',
@@ -67,6 +75,15 @@ export const tools: Tool[] = [
     description: "Build a arsenal of impactful STAR stories to showcase your skills and experiences.",
     slug: "star-stories-creator",
     inputTypes: ['Resume'],
+    outputType: 'Markdown',
+    label: "New",
+  },
+  {
+    icon: <MessageCircleQuestion className="h-8 w-8 text-emerald-400" />,
+    title: "BYOQuestion",
+    description: "Get advice on how to approach YOUR interview question.",
+    slug: "byoq",
+    inputTypes: ['RoleName', 'Question'],
     outputType: 'Markdown',
     label: "New",
   },

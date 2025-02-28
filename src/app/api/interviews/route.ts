@@ -58,7 +58,8 @@ export async function POST(request: Request) {
     jd_url,
     interviewer_linkedin_url,
     interviewer_role,
-    interview_date
+    interview_date,
+    role_name
   } = body
 
   //TODO: how to properly handle the initial free interview case
@@ -72,11 +73,9 @@ export async function POST(request: Request) {
   const formattedInterviewDate = interview_date === '' ? null : interview_date;
 
   //TODO: do these url fetches async
-  console.log('fetching contents company_url: ', company_url)
-  const company_md = await fetchUrlContents(company_url)
-  console.log('fetching contents for jd_url: ', jd_url)
-  const jd_md = await fetchUrlContents(jd_url)
-  const interviewer_linkedin_md = interviewer_linkedin_url ? await fetchUrlContents(interviewer_linkedin_url) : null
+  const company_md = company_url ? await fetchUrlContents(company_url) : null;
+  const jd_md = jd_url ? await fetchUrlContents(jd_url) : null;
+  const interviewer_linkedin_md = interviewer_linkedin_url ? await fetchUrlContents(interviewer_linkedin_url) : null;
 
   const query = `
     INSERT INTO "${INTERVIEWS}" (
@@ -88,9 +87,10 @@ export async function POST(request: Request) {
       interviewer_linkedin_url,
       interviewer_linkedin_text,
       interviewer_role,
-      interview_date
+      interview_date,
+      role_name
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING id
   `;
 
@@ -103,7 +103,8 @@ export async function POST(request: Request) {
     interviewer_linkedin_url,
     interviewer_linkedin_md,
     interviewer_role,
-    formattedInterviewDate
+    formattedInterviewDate,
+    role_name
   ];
 
   const interviews = await sql.query(query, values)
