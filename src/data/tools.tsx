@@ -1,5 +1,5 @@
 import { PersonIcon } from "@radix-ui/react-icons"
-import { Building2, HelpCircle, MessageSquare, Music, Mic2, Lightbulb, Star, MessageCircleQuestion } from "lucide-react"
+import { Building2, HelpCircle, MessageSquare, Music, Mic2, Lightbulb, Star, MessageCircleQuestion, FileText } from "lucide-react"
 
 export type Tool = {
   icon: JSX.Element;
@@ -61,7 +61,7 @@ export const tools: Tool[] = [
     label: "New",
   },
   {
-    icon: <Mic2 className="h-8 w-8 text-emerald-400" />,
+    icon: <FileText className="h-8 w-8 text-emerald-400" />,
     title: "Know Your Resume",
     description: "Master the tough resume questions—before your interviewer asks them.",
     slug: "tool-5",
