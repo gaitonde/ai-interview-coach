@@ -63,7 +63,7 @@ export const tools: Tool[] = [
   {
     icon: <Mic2 className="h-8 w-8 text-emerald-400" />,
     title: "Know Your Resume",
-    description: "Master the tough resume questions—before your interviewer asks them.desc",
+    description: "Master the tough resume questions—before your interviewer asks them.",
     slug: "tool-5",
     inputTypes: ['Resume'],
     outputType: 'Markdown',
