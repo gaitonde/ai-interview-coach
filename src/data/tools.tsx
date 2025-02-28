@@ -61,6 +61,16 @@ export const tools: Tool[] = [
     outputType: 'Markdown',
     label: "New",
   },
+  {
+    icon: <Star className="h-8 w-8 text-emerald-400" />,
+    title: "STAR Stories Creator",
+    description: "Build a arsenal of impactful STAR stories to showcase your skills and experiences.",
+    slug: "star-stories-creator",
+    inputTypes: ['Resume'],
+    outputType: 'Markdown',
+    label: "New",
+  },
+
   // {
   //   icon: <Lightbulb className="h-8 w-8 text-emerald-400" />,
   //   title: "Questions To Ask the Interviewer",
