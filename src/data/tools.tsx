@@ -10,6 +10,7 @@ export type Tool = {
   disabled?: boolean;
   inputTypes: InputType[];
   outputType: OutputType;
+  trending?: boolean;
 };
 
 export type InputType =
@@ -24,6 +25,15 @@ export type InputType =
 export type OutputType = 'Markdown' | 'HTML' | 'Custom';
 
 export const tools: Tool[] = [
+  {
+    icon: <FileText className="h-8 w-8 text-emerald-400" />,
+    title: "Know Your Resume",
+    description: "Master the tough resume questions—before your interviewer asks them.",
+    slug: "tool-5",
+    inputTypes: ['Resume'],
+    outputType: 'Markdown',
+    trending: true
+  },
   {
     icon: <PersonIcon className="h-8 w-8 text-emerald-400" />,
     title: "Interviewer Scout",
@@ -57,15 +67,6 @@ export const tools: Tool[] = [
     description: "Get tailored questions based on the role, company, and industry—be one step ahead.",
     slug: "interview-question-predictor",
     inputTypes: ['Resume', 'CompanyUrl', 'JdUrl'],
-    outputType: 'Markdown',
-    label: "New",
-  },
-  {
-    icon: <FileText className="h-8 w-8 text-emerald-400" />,
-    title: "Know Your Resume",
-    description: "Master the tough resume questions—before your interviewer asks them.",
-    slug: "tool-5",
-    inputTypes: ['Resume'],
     outputType: 'Markdown',
     label: "New",
   },

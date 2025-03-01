@@ -53,7 +53,7 @@ export default function ToolsSection() {
               {tool.label && (
                 <div
                   className={`absolute right-2 top-2 rounded-full px-3 py-1 text-sm text-white font-semibold ${
-                    tool.label === "New" ? "bg-emerald-600" : "bg-purple-500"
+                    tool.label === "New" ? "bg-blue-500" : "bg-purple-500"
                   }`}
                 >
                   {tool.label}
@@ -65,11 +65,13 @@ export default function ToolsSection() {
                   {tool.users}
                 </div>
               )}
+                */}
               {tool.trending && (
-                <div className="absolute right-2 top-10 rounded-full bg-amber-500 px-2 py-1 text-xs font-semibold text-white">
+                <div className="absolute top-2 right-2 rounded-full bg-purple-500 px-3 py-1 text-sm font-semibold text-white">
                   🔥 Trending
                 </div>
               )}
+              {/*}
               {tool.popular && (
                 <div className="absolute right-2 top-10 rounded-full bg-blue-500 px-2 py-1 text-xs font-semibold text-white">
                   ⭐⭐⭐⭐⭐ Popular

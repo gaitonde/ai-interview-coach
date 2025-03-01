@@ -420,7 +420,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                     name="role_name"
                     type="text"
                     placeholder="eg. Product Manager"
-                    defaultValue="Product Manager"
+                    // defaultValue="Product Manager"
                     className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                     onChange={() => forceUpdate({})}
                   />
@@ -437,7 +437,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
                     name="question"
                     rows={5}
                     placeholder="eg. What strategies would you implement to enhance customer engagement for Acme's products?"
-                    defaultValue="What strategies would you implement to enhance customer engagement for Acme's products?"
+                    // defaultValue="What strategies would you implement to enhance customer engagement for Acme's products?"
                     className="bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
                     onChange={() => forceUpdate({})}
                   />
