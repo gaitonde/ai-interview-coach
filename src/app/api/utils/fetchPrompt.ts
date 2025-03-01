@@ -33,6 +33,7 @@ export interface PromptData {
 }
 
 export async function fetchPrompt(profileId: string, promptKey: string, interviewId?: string, questionId?: string, answerId?: string, content?: string): Promise<PromptData> {
+  console.log("QQQ: 1: ", questionId)
   const profileData = await fetchProfileData(profileId, interviewId, questionId, answerId)
   const rawPromptData = await fetchRawPrompt(promptKey)
 
@@ -46,6 +47,7 @@ export async function fetchPrompt(profileId: string, promptKey: string, intervie
 }
 
 async function fetchProfileData(profileId: string, interviewId?: string, questionId?: string, answerId?: string): Promise<ProfileData> {
+  console.log("QQQ: 2: ", questionId)
   const todayDate = new Date();
   const todayDateFormatted = todayDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
@@ -87,6 +89,7 @@ async function fetchProfileData(profileId: string, interviewId?: string, questio
   console.log('Profile rows:', profileDetails.rows.length);
   console.log('Interview rows:', interviewDetails.rows.length);
   console.log('Resume rows:', resumeDetails.rows.length);
+  console.log('Question rows:', questionDetails.rows.length);
 
   if (profileDetails.rows.length === 0) throw new Error(`Profile not found for ID: ${profileId}`)
   if (interviewId && interviewDetails.rows.length === 0) throw new Error(`Interview not found for profile ID: ${profileId}`)

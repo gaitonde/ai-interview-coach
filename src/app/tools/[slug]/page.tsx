@@ -48,15 +48,17 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     setIsSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
-    let interviewId;
+    let interviewId, questionId;
     //fix this to be more robust
     if (formData.get('company_url')) {
-      interviewId = await saveInterview(formData)
-    } else if (tool?.title.toLowerCase() === 'byoq') {
+      interviewId = await saveInterview(formData);
+      questionId = null;
+    } else if (tool?.title.toLowerCase().startsWith('byoq')) {
       formData.append('jd_url', 'https://theinterviewplaybook.com/')
       interviewId = await saveInterview(formData)
+      questionId = await saveQuestion(interviewId, formData)
     }
-    const content = await generateResults(interviewId)
+    const content = await generateResults(interviewId, questionId)
     setContent(`# ${tool?.title}\n\n` + content)
     setShowOutput(true);
     setIsSubmitting(false);
@@ -196,9 +198,39 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   //       })
   // }
 
+  const saveQuestion = async (interviewId: string, formData: FormData) => {
+    try {
+      const profileId = Cookies.get('profileId') as string
+      setProfileId(profileId)
+
+      const response = await fetch(`/api/questions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          profileId,
+          interviewId: interviewId,
+          question: formData.get('question')?.toString()
+        }),
+      });
+
+      if (!response.ok) {
+        const result = await response.json()
+        setError(result.message)
+        return
+      }
+      const result = await response.json();
+      const questionId = result.id;
+      return questionId;
+    } catch (error) {
+      throw error
+    }
+
+  }
+
   const saveInterview = async (formData: FormData) => {
     try {
-
       const profileId = Cookies.get('profileId') as string
       setProfileId(profileId)
 
@@ -251,7 +283,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
     }
   };
 
-  const generateResults = async (interviewId?: string) => {
+  const generateResults = async (interviewId?: string, questionId?: string) => {
     // Determine the API endpoint based on the slug
     const apiEndpoint = slug.includes("company-scout") ? "generate-company-prep" : "tools";
                         // slug.includes("interviewer-scout") ? "generate-interviewer-prep" :
@@ -274,7 +306,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ profileId, toolName, interviewId }),
+        body: JSON.stringify({ profileId, toolName, interviewId, questionId }),
       });
 
       if (!response.ok) {
