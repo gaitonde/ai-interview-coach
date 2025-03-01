@@ -106,13 +106,20 @@ export async function POST(request: NextRequest) {
     question,
   } = body
 
+
+  console.log('server profileId:', profileId)
+  console.log('server interviewId:', interviewId)
+  console.log('server question:', question)
+
   const table = getTable('questions')
   const query = `
     INSERT INTO ${table}
       (profile_id, interview_id, question)
     VALUES
       ($1, $2, $3)
+    RETURNING id
   `
-  await sql.query(query, [profileId, interviewId, question])
+  const result = await sql.query(query, [profileId, interviewId, question])
 
+  return NextResponse.json({ id: result.rows[0].id });
 }

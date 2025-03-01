@@ -18,13 +18,13 @@ const postProcessors: Record<string, PostProcessor> = {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { toolName, profileId, interviewId } = body;
+  const { toolName, profileId, interviewId, questionId } = body;
 
   if (!toolName || !profileId) {
     return NextResponse.json({ error: 'toolName, profileId are required' }, { status: 400 });
   }
 
-  const content = await runAIAndStoreResults(toolName, profileId, interviewId);
+  const content = await runAIAndStoreResults(toolName, profileId, interviewId, questionId);
 
   if (!content) {
     return NextResponse.json({ error: 'Sorry, there was an issue. Not able to run this tool at this time.' }, { status: 400 });
@@ -36,15 +36,18 @@ export async function POST(request: Request) {
     await postProcessor({ profileId, interviewId }, content);
   }
 
+  console.log('tool output: ', content)
+
   return NextResponse.json({ content })
 }
 
-async function runAIAndStoreResults(toolName: string, profileId: string, interviewId?: string) {
-  console.log('in new POST tool:', toolName)
+async function runAIAndStoreResults(toolName: string, profileId: string, interviewId?: string, questionId?: string) {
+  console.log('in new POST tool:', toolName, questionId)
+
 
   const promptKey = `prompt-tools-${toolName}`;
   try {
-    const { content, usage } = await runAI(promptKey, profileId, interviewId)
+    const { content, usage } = await runAI(promptKey, profileId, interviewId, questionId)
     const table = getTable('tool_responses')
     const query = `
       INSERT INTO ${table} (profile_id, tool_name, content, usage)
