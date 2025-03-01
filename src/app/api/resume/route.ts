@@ -31,7 +31,7 @@ export interface Profile {
 export async function POST(request: Request) {
   try {
     const formData = await request.formData()
-    const userEnteredEmail = formData.get('email') as string
+    // const userEnteredEmail = formData.get('email') as string
     const resume = formData.get('resume') as File
     const filename = formData.get('filename') as string
     const resumeUrl = await uploadResume(resume)
@@ -45,11 +45,11 @@ export async function POST(request: Request) {
       profile = await insertProfile(parsedResume)
       profileId = profile.id
     }
-    await insertResumeRecord(profileId, filename, resumeUrl, parsedResume)
+    await insertResumeRecord(profileId, filename, resumeUrl, resumeText)
 
-    if (profile.email && profile.id) {
-      await updateEmailRecord(userEnteredEmail, profile.id)
-    }
+    // if (profile.email && profile.id) {
+    //   await updateEmailRecord(userEnteredEmail, profile.id)
+    // }
 
     // const data = await sendEmail(resumeUrl, filename, profile)
     // console.log('email sent:', data)
@@ -244,7 +244,6 @@ async function updateProfile(profileId: string, resumeJson: string): Promise<Pro
     WHERE id = $10
     RETURNING *
     `
-  console.log("QUERY: ", query)
   const result = await sql.query(query, [firstName, lastName, school, major, concentration, graduation_date, email, phone, linkedInURL, profileId])
   return result.rows[0]
 }

@@ -38,3 +38,22 @@ export async function generateCompletion(profileId: string, promptKey: string, i
     usage: JSON.stringify(completion.usage)
   };
 }
+
+export async function runAI(promptKey: string, profileId: string, interviewId?: string) {
+  const promptData: PromptData = await fetchPrompt(profileId, promptKey, interviewId, undefined, undefined, undefined);
+
+  const completion = await openai.chat.completions.create({
+    model: promptData.model,
+    messages: [
+      { role: "system", content: promptData.systemPrompt },
+      { role: "user", content: promptData.userPrompt }
+    ],
+    max_completion_tokens: promptData.maxCompletionTokens,
+    temperature: promptData.temperature,
+  });
+
+  return {
+    content: completion.choices[0]?.message?.content,
+    usage: JSON.stringify(completion.usage)
+  };
+}

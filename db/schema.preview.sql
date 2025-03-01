@@ -298,3 +298,18 @@ ALTER TABLE aic_preview_airesponses ADD COLUMN generated_interview_question_pred
 ALTER TABLE aic_preview_airesponses RENAME COLUMN generated_company_prep TO generated_company_scout;
 ALTER TABLE aic_preview_airesponses RENAME COLUMN generated_interviewer_prep TO generated_interviewer_scout;
 ALTER TABLE aic_preview_airesponses RENAME COLUMN generated_question_prep TO generated_question_scout;
+
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Tool Responses
+DROP TABLE IF EXISTS aic_preview_tool_responses CASCADE;
+CREATE TABLE aic_preview_tool_responses (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    profile_id INTEGER NOT NULL,
+    tool_name VARCHAR(255),
+    content TEXT,
+    usage JSON,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES aic_preview_profiles(id) ON DELETE CASCADE
+);
