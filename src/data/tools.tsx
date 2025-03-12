@@ -404,27 +404,49 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
         break
 
       case 'file':
-        console.log('fix file validation')
-        fieldSchema = z.custom<File>()
-        // fieldSchema = z.custom<File>()
-        //   .refine((file) => file instanceof File, {
-        //     message: "Please select a filex"
+        console.log('validating file')
+        fieldSchema = z.custom<object>()
+        .refine((file: any) => {
+          console.log('validating file: ', file)
+          console.log('validating file name:', file?.name)
+          return file?.name; //file instanceof File;
+        }, {
+            message: "Please select a resume"
+        })
+        .refine((file: any) => {
+          console.log('validating file: ', file)
+          console.log('validating file isFileUploaded:', file?.isFileUploaded)
+          return file?.isFileUploaded; //file instanceof File;
+        }, {
+            message: "Please wait for the resume to upload"
+        })
+        // fieldSchema = z.custom<FileList>()
+        //   .refine((fileList) => {
+        //     console.log('in here fileList: ', fileList);
+        //     return fileList?.length > 0
+        //   }
+        //   ,{
+        //     message: "Please select a resume"
         //   })
-        if (validation.validation?.maxSize) {
-          fieldSchema = fieldSchema.refine(
-            (file) => file.size <= validation.validation!.maxSize!,
-            { message: `File size must be less than ${validation.validation.maxSize / (1024 * 1024)}MB` }
-          )
-        }
-        if (validation.validation?.allowedTypes) {
-          fieldSchema = fieldSchema.refine(
-            (file) => {
-              const extension = file.name?.split('.').pop()?.toLowerCase()
-              return extension ? validation.validation!.allowedTypes!.includes(extension) : false
-            },
-            { message: `File must be: ${validation.validation.allowedTypes.join(', ')}` }
-          )
-        }
+
+        // //   // .refine((file) => file instanceof File, {
+        //   //   message: "Please select a file"
+        //   // })
+        // // if (validation.validation?.maxSize) {
+        // //   fieldSchema = fieldSchema.refine(
+        // //     (file) => file?.size <= validation.validation!.maxSize!,
+        // //     { message: `File size must be less than ${validation.validation.maxSize / (1024 * 1024)}MB` }
+        // //   )
+        // // }
+        // // if (validation.validation?.allowedTypes) {
+        // //   fieldSchema = fieldSchema.refine(
+        // //     (file) => {
+        // //       const extension = file.name?.split('.').pop()?.toLowerCase()
+        // //       return extension ? validation.validation!.allowedTypes!.includes(extension) : false
+        // //     },
+        // //     { message: `File must be: ${validation.validation.allowedTypes.join(', ')}` }
+        // //   )
+        // // }
         break
 
         case 'email':
@@ -440,7 +462,7 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
       case 'dropdown':
         fieldSchema = z.custom<String>()
           .refine((selectedValue) => selectedValue.length > 0, {
-            message: "Please select a value"
+            message: 'Required'
           })
         break
 

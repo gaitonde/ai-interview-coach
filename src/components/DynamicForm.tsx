@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
+import FileUploadButton from "./FileUploadButton";
 
 type DynamicFormProps = {
   tool: Tool
@@ -20,12 +21,9 @@ export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
   const zodSchema = createZodSchema(tool.formData);
 
   const form = useForm({
-    resolver: zodResolver(zodSchema)
+    resolver: zodResolver(zodSchema),
+    mode: 'onChange'
   });
-
-  // function x() {
-  //   console.log('in x');
-  // }
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -62,14 +60,29 @@ export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
             />
           )}
 
-          {fieldConfig.type === 'file' && (
-            <FileUpload
-              register={form.register}
+          {fieldConfig.type === 'file' && fieldConfig?.validation?.allowedTypes && (
+            <>
+            <FileUploadButton
               fieldName={fieldName}
+              // onFileSelected={onFileSelected}
+              register={form.register}
+              setValue={form.setValue}
+              trigger={form.trigger}
+              allowedTypes={fieldConfig.validation.allowedTypes}
               toolSlug={tool.resumeUploadType}
-              allowedTypes={fieldConfig.validation?.allowedTypes}
               setToolRuns={setToolRuns}
             />
+{/*
+            <FileUpload
+              fieldName={fieldName}
+              register={form.register}
+              setValue={form.setValue}
+              trigger={form.trigger}
+              toolSlug={tool.resumeUploadType}
+              allowedTypes={fieldConfig.validation.allowedTypes}
+              setToolRuns={setToolRuns}
+            /> */}
+            </>
           )}
 
           {fieldConfig.type === 'dropdown' && (

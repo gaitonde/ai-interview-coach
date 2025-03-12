@@ -142,11 +142,10 @@ export const commonFields = {
   resumeFile: {
     type: 'file',
     label: 'Resume',
-    //TODO: fix resume validation
-    // validation: {
-    //   maxSize: 4 * 1024 * 1024, // 4MB
-    //   allowedTypes: ['pdf']
-    // }
+    validation: {
+      // maxSize: 4 * 1024 * 1024, // 4MB
+      allowedTypes: ['pdf']
+    }
   },
   resumeText: {
     type: 'text',
