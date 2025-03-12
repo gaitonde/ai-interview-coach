@@ -33,12 +33,12 @@ export function ToolForm({slug}: {slug: string}) {
   const generateResults = async (formData: FormData) => {
     if (!tool) return;
 
-    console.log('formData: ',  Array.from(formData.entries()));
+    // console.log('formData: ',  Array.from(formData.entries()));
 
     const profileId = Cookies.get('profileId') as string;
 
-    console.log('tool params toolName: ', tool.slug);
-    console.log('tool params profileId: ', profileId);
+    // console.log('tool params toolName: ', tool.slug);
+    // console.log('tool params profileId: ', profileId);
 
     try {
       // const formData = new FormData()
@@ -73,13 +73,8 @@ export function ToolForm({slug}: {slug: string}) {
     setIsSubmitting(true);
     setShowOutput(false);
 
-    console.log("D1: ", data)
     const formData = jsonToFormData(data);
-    console.log('tool:', tool)
-    console.log('formDataXXX:', Array.from(formData.entries()))
     const payload = await generateResults(formData);
-    console.log('payload: ', payload)
-    // console.log('results.final: ', payload.finalOutput.content);
 
     if (tool?.outputType === 'Json') {
       console.error(`TODO: implement json`);

@@ -2,7 +2,7 @@ import { FileUpload } from "@/components/FileUpload";
 import { createZodSchema } from "@/data/tools";
 import { Tool } from "@/types/tools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
 import FileUploadButton from "./FileUploadButton";
@@ -16,7 +16,7 @@ type DynamicFormProps = {
 export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
   const [, forceUpdate] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showOutput, setShowOutput] = useState(false);
+  const [ranOnce, setRanOnce] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Thinking...');
   const zodSchema = createZodSchema(tool.formData);
 
@@ -25,8 +25,33 @@ export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
     mode: 'onChange'
   });
 
+  //Go button text updating
+  useEffect(() => {
+    if (!isSubmitting) return
+
+    const messages = ['Thinking...', 'Researching...', 'Analyzing...', 'Generating...']
+    let currentIndex = 0
+
+    const interval = setInterval(() => {
+      currentIndex = (currentIndex + 1) % messages.length
+      setStatusMessage(messages[currentIndex])
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [isSubmitting])
+
+  const handleSubmit = async (data: any) => {
+    setIsSubmitting(true);
+    try {
+      await onSubmit(data);
+    } finally {
+      setIsSubmitting(false);
+      setRanOnce(true);
+    }
+  };
+
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
       {Object.entries(tool.formData).map(([fieldName, fieldConfig]) => (
         <div key={fieldName} className="space-y-2">
           <label htmlFor={fieldName} className="block text-sm font-medium">
@@ -130,7 +155,7 @@ export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
         className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
         onBlur={() => forceUpdate({})}
       >
-        {isSubmitting ? statusMessage : showOutput ? 'Run Again' : `Run ${tool.name}`}
+        {isSubmitting ? statusMessage : ranOnce ? `Run Again` : `Run ${tool.name}`}
       </Button>
     </form>
   )

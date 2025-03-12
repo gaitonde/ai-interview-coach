@@ -44,9 +44,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('here1')
     if (event.target.files && event.target.files.length > 0) {
-      console.log('here2.1')
       const file = event.target.files[0];
 
       const resumeFileName = (file.name.length > 20) ? `${file.name.substring(0, 20)}...` : file.name;

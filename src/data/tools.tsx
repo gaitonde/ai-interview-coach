@@ -404,18 +404,18 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
         break
 
       case 'file':
-        console.log('validating file')
+        // console.log('validating file')
         fieldSchema = z.custom<object>()
         .refine((file: any) => {
-          console.log('validating file: ', file)
-          console.log('validating file name:', file?.name)
-          return file?.name; //file instanceof File;
+          // console.log('validating file: ', file)
+          // console.log('validating file name:', file?.name)
+          return file?.name;
         }, {
             message: "Please select a resume"
         })
         .refine((file: any) => {
-          console.log('validating file: ', file)
-          console.log('validating file isFileUploaded:', file?.isFileUploaded)
+          // console.log('validating file: ', file)
+          // console.log('validating file isFileUploaded:', file?.isFileUploaded)
           return file?.isFileUploaded; //file instanceof File;
         }, {
             message: "Please wait for the resume to upload"
