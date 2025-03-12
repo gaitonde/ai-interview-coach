@@ -5,13 +5,10 @@ interface BaseOutputProps {
   content: string;
 }
 
-export function MarkdownOutput({ content }: BaseOutputProps) {
-  return <div><MarkdownRenderer content={content} /></div>;
-}
 
 // HtmlOutput.tsx
-export function HtmlOutput({ content }: BaseOutputProps) {
-  return <div dangerouslySetInnerHTML={{ __html: content }} />;
+export function JsonRenderer({ content }: BaseOutputProps) {
+  return <div>{JSON.stringify(content, null, 2)}</div>;
 }
 
 // ToolOutput.tsx as a wrapper

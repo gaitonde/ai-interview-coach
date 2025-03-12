@@ -320,6 +320,24 @@ CREATE TABLE aic_production_tool_responses (
     profile_id INTEGER NOT NULL,
     tool_name VARCHAR(255),
     content TEXT,
+    usage JSON,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (profile_id) REFERENCES aic_production_profiles(id) ON DELETE CASCADE
 );
+
+-- Tool Run Data
+DROP TABLE IF EXISTS aic_production_tool_runs CASCADE;
+CREATE TABLE aic_production_tool_runs (
+    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    profile_id INTEGER NOT NULL,
+    tool_id VARCHAR(255),
+    input JSON,
+    output JSON,
+    generated_content TEXT,
+    derived_content TEXT,
+    computed_content TEXT,
+    usage JSON,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES aic_production_profiles(id) ON DELETE CASCADE
+);
+

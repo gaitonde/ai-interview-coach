@@ -43,7 +43,6 @@ export async function GET() {
 
     //key	model	temperature	max_completion_tokens	system prompt	user prompt
     for(const row of rows) {
-      console.log('adding row', row.rowNumber);
       const promptData = {
         id: row.rowNumber - 1,
         key: row.get('key'),
@@ -53,10 +52,14 @@ export async function GET() {
         system_prompt: row.get('system prompt'),
         user_prompt: row.get('user prompt')
       };
-      await insertPrompt(promptData);
-      prompts.push(promptData);
+      //skip if
+      console.log('prompt key: ', promptData.key);
+      if (promptData.key) {
+        console.log('adding row', row.rowNumber);
+        await insertPrompt(promptData);
+        prompts.push(promptData);
+      }
     }
-    //  insertPrompts(prompts);
 
     return NextResponse.json({
       success: true,
@@ -101,55 +104,55 @@ async function insertPrompt(prompt: any) {
   await sql.query(query, values);
 }
 
-async function insertPrompts(prompts: any[]) {
-  console.log('inserting prompts.length: ', prompts.length);
-
-  if (prompts.length === 0) {
-    console.log('No prompts to insert');
-    return;
-  }
-
-  const values = prompts.map((_, index) =>
-    `($${index * 7 + 1}, $${index * 7 + 2}, $${index * 7 + 3}, $${index * 7 + 4}, $${index * 7 + 5}, $${index * 7 + 6}, $${index * 7 + 7})`
-  ).join(', ');
-
-  console.debug('values: ', values);
-
-  const flattenedValues = prompts.flatMap(prompt => [
-    prompt.id,
-    prompt.key,
-    prompt.model,
-    prompt.temperature,
-    prompt.max_completion_tokens,
-    prompt.system_prompt,
-    prompt.user_prompt
-  ]);
-
-  console.debug('flattenedValues: ', flattenedValues);
-
-  const TABLE = getTable('prompts');
-
-  const query = `
-    INSERT INTO ${TABLE} (
-      id,
-      key,
-      model,
-      temperature,
-      max_completion_tokens,
-      system_prompt,
-      user_prompt
-    ) VALUES ${values}
-  `;
-
-  console.debug('query: ', query);
-
-  try {
-    const result = await sql.query(query, flattenedValues);
-    console.log(`Successfully inserted ${result.rowCount} prompts`);
-  } catch (error) {
-    console.error('Error inserting prompts:', error);
-    console.error('Query:', query);
-    console.error('Values:', flattenedValues);
-    throw error;
-  }
-}
+// async function insertPrompts(prompts: any[]) {
+//   console.log('inserting prompts.length: ', prompts.length);
+//
+//   if (prompts.length === 0) {
+//     console.log('No prompts to insert');
+//     return;
+//   }
+//
+//   const values = prompts.map((_, index) =>
+//     `($${index * 7 + 1}, $${index * 7 + 2}, $${index * 7 + 3}, $${index * 7 + 4}, $${index * 7 + 5}, $${index * 7 + 6}, $${index * 7 + 7})`
+//   ).join(', ');
+//
+//   console.debug('values: ', values);
+//
+//   const flattenedValues = prompts.flatMap(prompt => [
+//     prompt.id,
+//     prompt.key,
+//     prompt.model,
+//     prompt.temperature,
+//     prompt.max_completion_tokens,
+//     prompt.system_prompt,
+//     prompt.user_prompt
+//   ]);
+//
+//   console.debug('flattenedValues: ', flattenedValues);
+//
+//   const TABLE = getTable('prompts');
+//
+//   const query = `
+//     INSERT INTO ${TABLE} (
+//       id,
+//       key,
+//       model,
+//       temperature,
+//       max_completion_tokens,
+//       system_prompt,
+//       user_prompt
+//     ) VALUES ${values}
+//   `;
+//
+//   console.debug('query: ', query);
+//
+//   try {
+//     const result = await sql.query(query, flattenedValues);
+//     console.log(`Successfully inserted ${result.rowCount} prompts`);
+//   } catch (error) {
+//     console.error('Error inserting prompts:', error);
+//     console.error('Query:', query);
+//     console.error('Values:', flattenedValues);
+//     throw error;
+//   }
+// }
