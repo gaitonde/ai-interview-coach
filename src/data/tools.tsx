@@ -255,7 +255,7 @@ export const tools: Tool[] = [
     name: 'Tell Me About Yourself Creator',
     slug: 'tell-me-about-yourself',
     promptKey: 'prompt-tools-tell-me-about-yourself',
-    description: 'See a personalized Tell Me About Yourself answer tailored to the role.',
+    description: 'Craft a compelling personal pitch that captures attention and sets you apart.',
     icon: <User className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'companyWebsiteUrl']),
     resumeUploadType: 'parse-resume',
@@ -268,7 +268,7 @@ export const tools: Tool[] = [
     name: 'Questions To Ask The Interviewer',
     slug: 'questions-to-ask-interviewer',
     promptKey: 'prompt-tools-questions-to-ask-interviewer',
-    description: 'See insightful questions to ask the interviewer.',
+    description: 'Impress interviewers with thought-provoking questions that showcase your expertise.',
     icon: <MessageCircleQuestion className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'jobDescriptionUrl', 'interviewerRole']),
     resumeUploadType: 'parse-resume',
@@ -314,7 +314,7 @@ export const tools: Tool[] = [
     actions: ['run-gen-ai'],
     // disabled: true,
   },
-  //✅ What Can I Do With My Major?
+  // ✅ What Can I Do With My Major?
   //broken - asking for __MAJOR__: ${schoolMajor} w/o resume
   {
     id: '571ef333-f0d2-45af-aea8-8beb1ec4786e',
