@@ -10,7 +10,8 @@ export default function ToolsSection() {
   const { isSignedIn } = useAuth();
   const { openSignUp } = useClerk();
 
-  const isProd = process.env.NODE_ENV === 'production';
+
+  const isProd = typeof window !== 'undefined' && window.location.hostname.split('.')[0] === 'www';
 
   const handleToolClick = (slug: string | undefined) => {
     const path = `/tools/${slug}`;
@@ -46,9 +47,8 @@ export default function ToolsSection() {
             <Card
               key={tool.slug}
               className={`group relative flex flex-col bg-gray-800/50 p-6 text-white transition-all ${
-                tool.disabled && isProd ? 'opacity-75 cursor-not-allowed' :
-                tool.slug ? 'cursor-pointer hover:bg-gray-700/50' :
-                'opacity-75 cursor-not-allowed'
+                ((!tool.disabled || !isProd) && tool.slug)? 'cursor-pointer hover:bg-gray-700/50' :
+                  'opacity-75 cursor-not-allowed'
               }`}
               onClick={() => (!isProd || !tool.disabled) && handleToolClick(tool.slug)}
             >
@@ -107,6 +107,13 @@ export default function ToolsSection() {
               )}
             </Card>
           ))}
+        </div>
+      </div>
+      <div>
+        Debug: env: {process.env.NODE_ENV} ({isProd})
+        <div>
+          Debug: hostname: {window?.location?.hostname})
+          Debug: host[0]: {window.location.hostname.split('.')[0]}
         </div>
       </div>
     </section>
