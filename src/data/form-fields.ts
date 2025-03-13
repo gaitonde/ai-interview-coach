@@ -17,6 +17,7 @@ export const commonFields = {
   },
   schoolMajor: {
     type: 'text',
+    placeholderText: 'eg. Sports Analytics',
     label: 'School Major',
     validation: {
       minLength: 1,
@@ -31,7 +32,8 @@ export const commonFields = {
   },
   intervieweeRole: {
     type: 'text',
-    label: 'Interviewee Role',
+    label: 'Target Role',
+    placeholderText: 'eg. Financial Analyst Intern or Product Manager at TikTok',
     validation: {
       minLength: 1,
       maxLength: 100
@@ -40,6 +42,7 @@ export const commonFields = {
   interviewerRole: {
     type: 'text',
     label: 'Interviewer Role',
+    placeholderText: 'eg. Director of Product Management',
     validation: {
       minLength: 1,
       maxLength: 100
@@ -55,6 +58,7 @@ export const commonFields = {
   question: {
     type: 'textarea',
     label: 'Question',
+    placeholderText: "Type or paste your question here. eg. What strategies would you implement to enhance customer engagement for Acme's products?",
     validation: {
       minLength: 1,
       maxLength: 5000
@@ -84,6 +88,7 @@ export const commonFields = {
   companyWebsiteUrl: {
     type: 'url',
     label: 'Company Website URL',
+    placeholderText: 'https://acme.com',
     validation: {
       protocols: ['http', 'https'],
     }
@@ -98,6 +103,7 @@ export const commonFields = {
   jobDescriptionUrl: {
     type: 'url',
     label: 'Job Description URL',
+    placeholderText: 'https://careers.example.com/job-description',
     validation: {
       protocols: ['http', 'https'] as const,
     }
@@ -112,6 +118,7 @@ export const commonFields = {
   intervieweeLinkedInProfileUrl: {
     type: 'url',
     label: 'Interviewee Linkedin URL',
+    placeholderText: 'eg. https://www.linkedin.com/in/johndoe',
     validation: {
       protocols: ['https'],
       allowedDomains: ['linkedin.com']
@@ -119,7 +126,7 @@ export const commonFields = {
   },
   intervieweeLinkedInProfileText: {
     type: 'text',
-    label: 'interviewee LinkedIn Profile Text',
+    label: 'Interviewee LinkedIn Profile Text',
     validation: {
       minLength: 1,
     }
@@ -127,6 +134,7 @@ export const commonFields = {
   interviewerLinkedInProfileUrl: {
     type: 'url',
     label: 'Interviewer LinkedIn URL',
+    placeholderText: 'eg. https://www.linkedin.com/in/johndoe',
     validation: {
       protocols: ['https'] as const,
       allowedDomains: ['linkedin.com']
@@ -134,7 +142,7 @@ export const commonFields = {
   },
   interviewerLinkedInProfileText: {
     type: 'text',
-    label: 'interviewer LinkedIn Profile Text',
+    label: 'Interviewer LinkedIn Profile Text',
     validation: {
       minLength: 1,
     }
@@ -172,7 +180,7 @@ export const commonFields = {
         'Risk & Crisis Management',
       ]
     }
-  }
+  },
 } as const satisfies Record<string, FormFieldValidation>
 
 // Helper function to pick specific fields

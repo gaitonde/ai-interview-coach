@@ -10,14 +10,21 @@ export type Tool = {
   labels?: Label[];
   hidden?: boolean;
   disabled?: boolean;
-  formData: {
-    [key: string]: FormFieldValidation;
-  };
   actions?: string[];
   outputType?: OutputType;
   resumeUploadType?: string;
+  formData: {
+    [key: string]: FormFieldValidation;
+  };
 };
 
+// type DisplayableTool = Tool & {
+
+// }
+
+// type InternalTool = Tool & {
+
+// }
 
 export type ToolRun = {
   tool: Tool

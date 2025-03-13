@@ -1,11 +1,13 @@
-import { FileUpload } from "@/components/FileUpload";
 import { createZodSchema } from "@/data/tools";
 import { Tool } from "@/types/tools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "./ui/button";
 import FileUploadButton from "./FileUploadButton";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select";
+import { Textarea } from "./ui/textarea";
 
 type DynamicFormProps = {
   tool: Tool
@@ -19,6 +21,7 @@ export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
   const [ranOnce, setRanOnce] = useState(false);
   const [statusMessage, setStatusMessage] = useState('Thinking...');
   const zodSchema = createZodSchema(tool.formData);
+  const [value, setValue] = useState("");
 
   const form = useForm({
     resolver: zodResolver(zodSchema),
@@ -60,28 +63,31 @@ export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
           </label>
 
           {fieldConfig.type === 'text' && (
-            <input
+            <Input
               type="text"
               id={fieldName}
+              placeholder={fieldConfig.placeholderText}
               {...form.register(fieldName)}
-              className="block w-full rounded-md border text-black"
+              className="block bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
             />
           )}
 
           {fieldConfig.type === 'textarea' && (
-            <textarea
+            <Textarea
               id={fieldName}
+              placeholder={fieldConfig.placeholderText}
               {...form.register(fieldName)}
-              className="block w-full rounded-md border text-black"
+              className="block w-full rounded-md border bg-white text-black"
             />
           )}
 
           {fieldConfig.type === 'url' && (
-            <input
+            <Input
               type="url"
               id={fieldName}
+              placeholder={fieldConfig.placeholderText}
               {...form.register(fieldName)}
-              className="block w-full rounded-md border text-black"
+              className="block bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
             />
           )}
 
@@ -111,18 +117,39 @@ export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
           )}
 
           {fieldConfig.type === 'dropdown' && (
+            <>
+            <div className="w-full space-y-2">
+              <Select value={value} onValueChange={(val) => setValue(val)}>
+                <SelectTrigger id="do-i-need-this-academic-year" className="w-full bg-white text-black">
+                  <SelectValue placeholder="Select an option" />
+                </SelectTrigger>
+                <SelectContent className="bg-white text-black">
+                  <SelectGroup>
+                    <SelectLabel>Case Study</SelectLabel>
+                    {fieldConfig.validation?.allowedValues.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+{/*
             <select
-              id={fieldName}
-              {...form.register(fieldName)}
-              className="block w-full rounded-md border text-black"
-            >
-              <option value="">Select an option</option>
-              {fieldConfig.validation?.allowedValues?.map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
+                id={fieldName}
+                {...form.register(fieldName)}
+                className="block w-full rounded-md border text-black"
+              >
+                <option value="">Select an option</option>
+                {fieldConfig.validation?.allowedValues?.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+               */}
+            </>
           )}
 
 {/*

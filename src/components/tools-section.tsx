@@ -10,6 +10,8 @@ export default function ToolsSection() {
   const { isSignedIn } = useAuth();
   const { openSignUp } = useClerk();
 
+  const isProd = process.env.NODE_ENV === 'production';
+
   const handleToolClick = (slug: string | undefined) => {
     const path = `/tools/${slug}`;
     track('ViewToolAttempt', { slug });
@@ -44,11 +46,11 @@ export default function ToolsSection() {
             <Card
               key={tool.slug}
               className={`group relative flex flex-col bg-gray-800/50 p-6 text-white transition-all ${
-                tool.disabled ? 'opacity-75 cursor-not-allowed' :
+                tool.disabled && isProd ? 'opacity-75 cursor-not-allowed' :
                 tool.slug ? 'cursor-pointer hover:bg-gray-700/50' :
                 'opacity-75 cursor-not-allowed'
               }`}
-              onClick={() => !tool.disabled && handleToolClick(tool.slug)}
+              onClick={() => (!isProd || !tool.disabled) && handleToolClick(tool.slug)}
             >
               {tool.labels?.includes('New') && (
                 <div
@@ -98,9 +100,9 @@ export default function ToolsSection() {
               {/* Hide button if no slug */}
               {tool.slug && (
                 <div className={`w-full rounded-md py-2 text-center text-white transition-colors ${
-                  tool.disabled ? 'bg-orange-500 cursor-not-allowed' : 'bg-emerald-500 group-hover:bg-emerald-600'
+                  (isProd && tool.disabled) ? 'bg-orange-500 cursor-not-allowed' : 'bg-emerald-500 group-hover:bg-emerald-600'
                 }`}>
-                  {tool.disabled ? 'Coming soon' : `Try ${tool.name}`}
+                  {(isProd && tool.disabled) ? 'Coming soon' : `Try ${tool.name}`}
                 </div>
               )}
             </Card>

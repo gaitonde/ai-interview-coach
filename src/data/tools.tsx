@@ -9,8 +9,8 @@ import {
   User
 } from 'lucide-react';
 import { z } from 'zod';
-import { pickFormFields } from "./form-fields";
-import { Tool } from "@/types/tools";
+import { pickFormFields } from './form-fields';
+import { Tool } from '@/types/tools';
 
 type BaseValidation = {
   label: string;
@@ -19,6 +19,7 @@ type BaseValidation = {
 
 export type TextValidation = BaseValidation & {
   type: 'text';
+  placeholderText?: string;
   validation?: {
     minLength?: number;
     maxLength?: number;
@@ -28,6 +29,7 @@ export type TextValidation = BaseValidation & {
 
 export type TextAreaValidation = BaseValidation & {
   type: 'textarea';
+  placeholderText?: string;
   validation?: {
     minLength?: number;
     maxLength?: number;
@@ -37,6 +39,7 @@ export type TextAreaValidation = BaseValidation & {
 
 type UrlValidation = BaseValidation & {
   type: 'url';
+  placeholderText?: string;
   validation?: {
     protocols?: ('http' | 'https')[];
     allowedDomains?: string[];
@@ -310,12 +313,10 @@ export const tools: Tool[] = [
     description: 'Test your Case Study skills tailored to your target role.',
     icon: <MessageCircleQuestion className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['intervieweeRole', 'caseStudy']),
-    labels: ['Coming Soon'],
+    labels: ['New'],
     actions: ['run-gen-ai'],
-    // disabled: true,
   },
   // ✅ What Can I Do With My Major?
-  //broken - asking for __MAJOR__: ${schoolMajor} w/o resume
   {
     id: '571ef333-f0d2-45af-aea8-8beb1ec4786e',
     name: 'What Can I Do With My Major?',
@@ -323,10 +324,10 @@ export const tools: Tool[] = [
     promptKey: 'prompt-tools-what-can-i-do-with-my-major',
     description: 'Get a personalized roadmap for careers based on your major.',
     icon: <User className='h-8 w-8 text-emerald-400' />,
-    formData: pickFormFields(['intervieweeRole']),
+    formData: pickFormFields(['schoolMajor']),
     labels: ['Coming Soon'],
     actions: ['run-gen-ai'],
-    // disabled: true,
+    disabled: true,
   },
   // ✅ Resume Checker
   {
@@ -338,9 +339,8 @@ export const tools: Tool[] = [
     icon: <FileText className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile']),
     resumeUploadType: 'upload-resume',
-    labels: ['Coming Soon'],
+    labels: ['New'],
     actions: ['run-gen-ai'],
-    // disabled: true,
   },
 
 ]
@@ -382,7 +382,7 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
             } catch {
               return false
             }
-          }, { message: 'Please enter a valid URL' })
+          }, { message: 'Please enter a valid URL that starts with http:// or https://' })
           .refine((url) => {
             try {
               const urlObj = new URL(url)
@@ -411,14 +411,14 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
           // console.log('validating file name:', file?.name)
           return file?.name;
         }, {
-            message: "Please select a resume"
+            message: 'Please select a resume'
         })
         .refine((file: any) => {
           // console.log('validating file: ', file)
           // console.log('validating file isFileUploaded:', file?.isFileUploaded)
           return file?.isFileUploaded; //file instanceof File;
         }, {
-            message: "Please wait for the resume to upload"
+            message: 'Please wait for the resume to upload'
         })
         // fieldSchema = z.custom<FileList>()
         //   .refine((fileList) => {
@@ -426,11 +426,11 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
         //     return fileList?.length > 0
         //   }
         //   ,{
-        //     message: "Please select a resume"
+        //     message: 'Please select a resume'
         //   })
 
         // //   // .refine((file) => file instanceof File, {
-        //   //   message: "Please select a file"
+        //   //   message: 'Please select a file'
         //   // })
         // // if (validation.validation?.maxSize) {
         // //   fieldSchema = fieldSchema.refine(
@@ -469,7 +469,7 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
       case 'year':
         fieldSchema = z.number()
           .refine((val) => !isNaN(Number(val)), {
-            message: "Please enter a valid year"
+            message: 'Please enter a valid year'
           })
           // .refine((val) => {
           //   const year = Number(val)
@@ -497,9 +497,9 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
           //       return `Year must be before ${validation.validation.maxYear}`
           //     }
           //     if (validation.validation?.allowFuture === false && year > currentYear) {
-          //       return "Future years are not allowed"
+          //       return 'Future years are not allowed'
           //     }
-          //     return "Invalid year"
+          //     return 'Invalid year'
           //   }
           // })
         break
