@@ -109,7 +109,7 @@ export default function ToolsSection() {
           ))}
         </div>
       </div>
-      <div>
+      <div className="text-[#1a1f2b]">
         Debug: env: {process.env.NODE_ENV} ({isProd})
         <div>
           Debug: hostname: {window?.location?.hostname})
