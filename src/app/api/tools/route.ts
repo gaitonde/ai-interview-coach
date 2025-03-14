@@ -1,9 +1,9 @@
 import { runPostProcess as runToolCompanyScout } from '@/app/actions/run-tool-company-scout';
 import { ToolInput } from '@/app/actions/tool-input';
+import { runAI } from '@/app/api/utils/openAiCompletion';
 import { getTable } from '@/lib/db';
 import { sql } from '@vercel/postgres';
-import { NextRequest, NextResponse } from 'next/server';
-import { runAI } from '../utils/openAiCompletion';
+import { NextResponse } from 'next/server';
 
 // Define a type for post-processor functions
 type PostProcessor = (input: ToolInput, content: string) => Promise<void>;
@@ -43,7 +43,6 @@ export async function POST(request: Request) {
 
 async function runAIAndStoreResults(toolName: string, profileId: string, interviewId?: string, questionId?: string) {
   console.log('in new POST tool:', toolName, questionId)
-
 
   const promptKey = `prompt-tools-${toolName}`;
   try {

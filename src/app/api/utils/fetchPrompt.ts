@@ -153,7 +153,7 @@ export function fetchGradeClass(graduationYear: number, currentDate: Date): stri
   return 'Freshman';
 }
 
-async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: string; user_prompt: string; model: string; temperature: number; max_completion_tokens: number }> {
+export async function fetchRawPrompt(promptKey: string): Promise<{ system_prompt: string; user_prompt: string; model: string; temperature: number; max_completion_tokens: number }> {
   const protocol = process.env.NEXT_PUBLIC_VERCEL_URL?.startsWith('localhost') ? 'http' : 'https'
   const promptUrl = `${protocol}://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prompts?key=${promptKey}`
   const promptResponse = await fetch(promptUrl)
