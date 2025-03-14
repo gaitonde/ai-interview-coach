@@ -2,10 +2,12 @@
 
 import { ToolForm } from "@/components/ToolForm";
 import { tools } from "@/data/tools";
+import { useMixpanel } from "@/hooks/use-mixpanel";
 import { Tool } from "@/types/tools";
 import React, { useEffect, useState } from "react";
 
 export default function ToolDetails({ params }: { params: Promise<{ slug: string }> }) {
+  const { track } = useMixpanel();
   const [tool, setTool] = useState<Tool>();
   const { slug } = React.use(params);
 
@@ -17,7 +19,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   useEffect(() => {
     const tool = getToolBySlug(slug);
     setTool(tool);
-    // track('ViewedTool', {tool: slug});
+    track('ViewedTool', {tool: slug});
   }, []);
 
   return tool ?

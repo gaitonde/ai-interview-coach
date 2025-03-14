@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { UseFormRegister, UseFormSetValue, UseFormTrigger } from "react-hook-form";
 import { Button } from "./ui/button";
 import Cookies from "js-cookie";
+import { useMixpanel } from "@/hooks/use-mixpanel";
 
 interface FileUploadButtonProps {
   fieldName: string;
@@ -24,6 +25,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
   toolSlug,
   setToolRuns,
 }) => {
+  const { track } = useMixpanel();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [fileName, setFileName] = useState<string>();
@@ -58,7 +60,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
 
       try {
         setIsUploading(true);
-        // track('SubmittedResumeUpload');
+        track('SubmittedResumeUpload');
 
         const profileId = Cookies.get('profileId') as string;
         const formData = new FormData();
