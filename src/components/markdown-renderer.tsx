@@ -7,8 +7,6 @@ interface MarkdownRendererProps {
   content: string;
 }
 
-
-
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <div className="flex flex-col min-h-screen bg-[#111827]">

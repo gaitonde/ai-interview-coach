@@ -109,6 +109,7 @@ export default function ToolsSection() {
           ))}
         </div>
       </div>
+      {/* TODO: remove debug */}
       <div className="text-[#1a1f2b]">
         Debug: env: {process.env.NODE_ENV} ({isProd})
         <div>
