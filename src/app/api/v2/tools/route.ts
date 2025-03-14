@@ -75,18 +75,13 @@ export async function POST(request: NextRequest) {
         // Process each URL entry
         for (const [key, value] of urlEntries) {
           const url = value as string;
-          console.log('XXXX fetching url: ', url)
+          console.log('fetching tool url: ', url)
           // Create the corresponding Text key (e.g., companyUrl -> companyText)
           const textKey = key.slice(0, -3) + 'Text'; // Replace 'Url' with 'Text'
           const toolRun = await handleFetch(profileId, textKey, url, toolRuns);
-          // console.log('XXXX toolRun: ', toolRun.output[textKey])
           formData.append(textKey, toolRun.output[textKey]);
         }
       } else if (toolAction == 'run-gen-ai') {
-        // console.log('formData: ', formData);
-        // if (formData) {
-        //   return NextResponse.json({ error: formData }, { status: 400 });
-        // }
         await handleGenAI(profileId, tool, formData, toolRuns);
       } else {
         console.error(`Unsupported toolAction: ${toolAction}`);
@@ -289,7 +284,7 @@ async function handleGenAI(profileId: string, tool: Tool, formData: FormData, to
   const prevToolRuns = prevToolRunsStr ? JSON.parse(prevToolRunsStr) : [];
 
   for (const toolRun of prevToolRuns) {
-    console.log('PPP toolRun ids: ', toolRun.id, toolRun.tool_id)
+    console.log('toolRun ids: ', toolRun.id, toolRun.tool_id)
     constructuredUserPrompt = replacePathVars(constructuredUserPrompt, toolRun);
   }
 

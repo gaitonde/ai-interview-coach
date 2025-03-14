@@ -1,6 +1,6 @@
 import type { FormFieldValidation } from './tools'
 
-export const commonFields = {
+const commonFields = {
   gradYear: {
     type: 'year',
     label: 'Graduation Year',
@@ -192,3 +192,5 @@ export function pickFormFields<T extends keyof typeof commonFields>(
     return acc
   }, {} as any)
 }
+
+export { commonFields };

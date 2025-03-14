@@ -16,6 +16,15 @@ type BaseValidation = {
   label: string;
   optional?: boolean;
 }
+// export type UrlOrTextValidation = BaseValidation & {
+//   type: 'urlOrText';
+//   textField: string;
+//   urlField: string;
+//   validation?: {
+//     protocols?: ('http' | 'https')[];
+//   //   allowedDomains?: string[];
+//   };
+// }
 
 export type TextValidation = BaseValidation & {
   type: 'text';
@@ -100,6 +109,7 @@ export type FormFieldValidation = TextValidation
   | EmailValidation
   | YearValidation
   | GradeClassValidation
+  // | UrlOrTextValidation
 ;
 
 export type OutputType = 'Markdown' | 'Json' | 'None';
@@ -449,7 +459,7 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
         // // }
         break
 
-        case 'email':
+      case 'email':
           fieldSchema = z.string().email();
           if (validation.validation?.allowedDomains) {
             fieldSchema = fieldSchema.refine(
@@ -460,10 +470,14 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
           break
 
       case 'dropdown':
-        fieldSchema = z.custom<String>()
-          .refine((selectedValue) => selectedValue.length > 0, {
+        console.log('in DD validation')
+        fieldSchema = z.string()
+          .min(1, { message: 'Please select an option' })
+          .refine((selectedValue) => {
+            return selectedValue && selectedValue.length > 0;
+          }, {
             message: 'Required'
-          })
+          });
         break
 
       case 'year':

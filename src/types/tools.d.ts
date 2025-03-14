@@ -16,15 +16,10 @@ export type Tool = {
   formData: {
     [key: string]: FormFieldValidation;
   };
+  formDataForOr?: {
+    [key: string]: FormFieldValidation;
+  };
 };
-
-// type DisplayableTool = Tool & {
-
-// }
-
-// type InternalTool = Tool & {
-
-// }
 
 export type ToolRun = {
   tool: Tool
