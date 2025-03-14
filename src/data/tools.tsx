@@ -236,7 +236,6 @@ export const tools: Tool[] = [
     icon: <MessageSquare className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'companyWebsiteUrl', 'jobDescriptionUrl']),
     resumeUploadType: 'parse-resume',
-    labels: ['New'],
     actions: ['fetch', 'run-gen-ai'],
   },
   // ✅ STAR Stories Creator
@@ -262,7 +261,7 @@ export const tools: Tool[] = [
     formData: pickFormFields(['intervieweeRole', 'question']),
     actions: ['run-gen-ai'],
   },
-  // ✅ Tell Me About Yourself Creator
+  // ✅ Tell Me About Yourself Creator - begin new tools as of 3/14/2025
   {
     id: '42bf7564-653f-4cc5-9201-794165de7101',
     name: 'Tell Me About Yourself Creator',
