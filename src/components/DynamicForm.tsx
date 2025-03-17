@@ -10,14 +10,16 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { LinkIcon, FileText } from "lucide-react"
+import CopyToClipboardButton from "@/components/copy-to-clipboard-button";
 
 type DynamicFormProps = {
   tool: Tool
   onSubmit: (data: any) => void
   setToolRuns: (data: any) => void
+  content?: string
 }
 
-export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
+function DynamicForm({ tool, onSubmit, setToolRuns, content }: DynamicFormProps) {
   const [, forceUpdate] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ranOnce, setRanOnce] = useState(false);
@@ -178,7 +180,6 @@ export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
   // // console.log('finally have it... ', textFieldKey, urlFieldKey);
 
   return (
-
     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
       {Object.entries(tool.formData).map(([fieldName, fieldConfig]) => (
         <div key={fieldName} className="space-y-2">
@@ -363,13 +364,30 @@ export function DynamicForm({ tool, onSubmit, setToolRuns }: DynamicFormProps) {
         </div>
       ))}
 
-      <Button
-        type="submit"
-        className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
-        onBlur={() => forceUpdate({})}
-      >
-        {isSubmitting ? statusMessage : ranOnce ? `Run Again` : `Run ${tool.name}`}
-      </Button>
+      <div className="space-y-4 w-full">
+        {content && (
+          <div className="mt-8">
+            <CopyToClipboardButton
+              content={content}
+              tool={tool.slug}
+              btnText = "Click to copy results below"
+            />
+            <div className="flex justify-center mt-4">
+              or
+            </div>
+          </div>
+        )}
+
+        <Button
+          type="submit"
+          className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"
+          onBlur={() => forceUpdate({})}
+        >
+          {isSubmitting ? statusMessage : ranOnce ? `Run Again` : `Run ${tool.name}`}
+        </Button>
+      </div>
     </form>
   )
 }
+
+export default DynamicForm;

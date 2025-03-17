@@ -1,8 +1,8 @@
 "use client";
 
 import { Header } from "@/components/header";
-import Hero from "@/components/hero"
-import ToolsSection from "@/components/tools-section"
+import Hero from "@/components/hero";
+import ToolsSection from "@/components/tools-section";
 import { useUser } from "@clerk/nextjs";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
