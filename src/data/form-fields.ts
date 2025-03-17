@@ -94,7 +94,7 @@ const commonFields = {
     }
   },
   companyWebsiteText: {
-    type: 'text',
+    type: 'textarea',
     label: 'Company Website Text',
     validation: {
       minLength: 1,
@@ -109,8 +109,9 @@ const commonFields = {
     }
   },
   jobDescriptionText: {
-    type: 'text',
+    type: 'textarea',
     label: 'Job Description Text',
+    placeholderText: 'Copy and paste job description here...',
     validation: {
       minLength: 1,
     }

@@ -1,4 +1,4 @@
-import { FormFieldValidation, Label, OutputType } from "@/data/tools";
+import { FormFieldValidation, Label, OutputType, PairedFields } from "@/data/tools";
 
 export type Tool = {
   id: string;
@@ -19,6 +19,7 @@ export type Tool = {
   formDataForOr?: {
     [key: string]: FormFieldValidation;
   };
+  pairedFields?: PairedFields;
 };
 
 export type ToolRun = {

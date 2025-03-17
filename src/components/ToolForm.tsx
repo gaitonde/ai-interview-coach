@@ -78,7 +78,6 @@ export function ToolForm({slug}: {slug: string}) {
       console.error(`TODO: implement json`);
     } else {
       renderMarkdown(payload);
-      // setContent(`# ${tool?.name}\n\n Stuff`);
     }
     setShowOutput(true);
     setIsSubmitting(false);
