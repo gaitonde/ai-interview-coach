@@ -1,15 +1,24 @@
 import { Card } from "@/components/ui/card";
 import { displayableTools } from "@/data/tools";
 import { useMixpanel } from "@/hooks/use-mixpanel";
-import { useAuth, useClerk } from "@clerk/nextjs";
+import { useAuth, useClerk, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function ToolsSection() {
   const router = useRouter();
   const { track } = useMixpanel();
   const { isSignedIn } = useAuth();
   const { openSignUp } = useClerk();
+  const { user } = useUser();
 
+  useEffect(() => {
+    if (user && isSignedIn) {
+      track('ViewedToolsHomeSignedIn', {id: user.id});
+    } else {
+      track('ViewedToolsHomeAnonymous');
+    }
+  }, [isSignedIn, track])
 
   const isProd = typeof window !== 'undefined' && window.location.hostname.split('.')[0] === 'www';
 
