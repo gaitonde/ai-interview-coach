@@ -2,9 +2,11 @@
 
 import { Button } from "@/components/ui/button"
 import { SignedOut, SignUpButton } from "@clerk/clerk-react"
-import { track } from "@vercel/analytics/react"
+import { useMixpanel } from "@/hooks/use-mixpanel";
 
 export default function Hero() {
+  const { track } = useMixpanel();
+
   return (
     <section className="flex h-auto flex-col items-center justify-center px-4 text-center">
       <div className="max-w-4xl">
@@ -21,6 +23,7 @@ export default function Hero() {
             <Button
               className="bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-6 px-8"
               onClick={() => {
+                console.log('vs')
                 track('v2.ViewSignup');
               }}
             >
