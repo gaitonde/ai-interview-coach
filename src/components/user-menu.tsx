@@ -6,6 +6,7 @@ import { User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSetAtom } from 'jotai'
 import { userIdAtom } from '@/stores/profileAtoms'
+import Cookies from 'js-cookie';
 
 export function UserMenu() {
   const router = useRouter()
@@ -38,7 +39,10 @@ export function UserMenu() {
              */}
             <SignOutButton redirectUrl="/">
               <DropdownMenuItem
-                onClick={() => setUserId(null)}
+                onClick={() => {
+                  Cookies.remove('profileId');
+                  setUserId(null);
+                }}
                 className="cursor-pointer hover:bg-[#374151]"
               >
                 Sign out

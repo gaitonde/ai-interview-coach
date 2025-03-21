@@ -13,9 +13,10 @@ export default function Tools() {
 
   useEffect(() => {
     if (user && isSignedIn) {
-      track('ViewedToolsHomeSignedIn', {id: user.id});
+      //TODO: get profileId from Cookies.get('profileId)
+      track('v2.ViewedToolsHomeSignedIn', {clerkUserId: user.id });
     } else {
-      track('ViewedToolsHomeAnonymous');
+      track('v2.ViewedToolsHomeAnonymous');
     }
   }, [isSignedIn, track])
 

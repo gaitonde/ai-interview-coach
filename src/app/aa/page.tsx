@@ -16,7 +16,7 @@ export default function AA() {
 
     const initializeUserAndProfile = async () => {
       try {
-        track('ClerkUserCreated')
+        track('v2.ClerkUserCreated', { clerkUserId: user.id })
         const userResponse = await fetch('/api/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -28,7 +28,7 @@ export default function AA() {
           throw new Error('Failed to create user');
         }
 
-        track('TIPUserCreated', {id: userData.id, email: user.emailAddresses[0].emailAddress})
+        track('v2.TIPUserCreated', { clerkUserId: userData.id, email: user.emailAddresses[0].emailAddress })
 
         // Create profile with the returned userId
         const profileResponse = await fetch('/api/profiles', {
@@ -47,7 +47,7 @@ export default function AA() {
             sameSite: 'strict'
           });
 
-          track('ProfileCreated', {id: profileData.id})
+          track('v2.ProfileCreated', { profileId: profileData.id })
           identify(profileData.id);
 
           router.push('/');

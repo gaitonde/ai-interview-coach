@@ -1,15 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { sql } from '@vercel/postgres'
-import { getTable } from "@/lib/db"
+import { NextRequest, NextResponse } from 'next/server';
+import { sql } from '@vercel/postgres';
+import { getTable } from "@/lib/db";
+import { NewUserEmailTemplate } from '@/components/components/new-user-template';
+import { CreateEmailResponseSuccess, Resend } from 'resend';
 
-const PROFILES_TABLE = getTable('profiles')
+const resend = new Resend(process.env.RESEND_API_KEY);
+const PROFILES_TABLE = getTable('profiles');
 
 export async function GET(request: Request) {
   try {
-    const params = Object.fromEntries(new URL(request.url).searchParams)
-    const { profileId, userId, isDemo } = params
+    const params = Object.fromEntries(new URL(request.url).searchParams);
+    const { profileId, userId, isDemo } = params;
 
-    let query
+    let query;
 
     if (isDemo) {
       if (profileId) {
@@ -17,39 +20,91 @@ export async function GET(request: Request) {
           SELECT * FROM ${PROFILES_TABLE}
           WHERE id = ${profileId}
           AND is_demo = true
-        `
+        `;
       } else {
         query = `
           SELECT * FROM ${PROFILES_TABLE}
           WHERE is_demo = true
           ORDER BY created_at DESC
-        `
+        `;
       }
 
     } else if (userId) {
-      const usersTable = getTable('users')
+      const usersTable = getTable('users');
       query = `
         SELECT ${PROFILES_TABLE}.* FROM ${PROFILES_TABLE}, ${usersTable}
         WHERE ${PROFILES_TABLE}.user_id = ${usersTable}.id
         AND ${usersTable}.clerk_id = '${userId}'
-      `
-      const profileRows = await sql.query(query)
-      const profile = profileRows.rows.length > 0 ? profileRows.rows[0] : null
-      return NextResponse.json({ profile })
+      `;
+      const profileRows = await sql.query(query);
+      const profile = profileRows.rows.length > 0 ? profileRows.rows[0] : null;
+      return NextResponse.json({ profile });
     } else {
       query = `
         SELECT * FROM ${PROFILES_TABLE}
         WHERE id = ${profileId}
-      `
+      `;
     }
 
-    const profile = await sql.query(query)
+    const profile = await sql.query(query);
 
-    return NextResponse.json({ profiles: profile.rows })
+    return NextResponse.json({ profiles: profile.rows });
   } catch (error) {
-    console.error('Error:', error)
-    return NextResponse.json({ content: "unable to get profile" }, { status: 500 })
+    console.error('Error:', error);
+    return NextResponse.json({ content: "unable to get profile" }, { status: 500 });
   }
+}
+
+export async function POST(request: NextRequest) {
+  const { email, userId } = await request.json();
+
+  if (!email || !userId) {
+    return NextResponse.json({ error: 'email and userId are required' }, { status: 400 });
+  }
+
+  const table = getTable('profiles');
+
+  const query = `
+    INSERT INTO ${table}
+      (email, user_id)
+    VALUES
+      ($1, $2)
+    RETURNING id
+  `;
+  const result = await sql.query(query, [email, userId]);
+  const id = result.rows[0].id;
+
+  sendEmail(email, userId, id);
+
+  return NextResponse.json({ id });
+}
+
+async function sendEmail(email: string, clerkId: string, profileId: string): Promise<CreateEmailResponseSuccess | null> {
+  try {
+    const env = process.env.VERCEL_ENV || 'Unknown'
+    console.log('env: ', env)
+    const toList = (env.toLowerCase() === 'production') ? ['dayal@greenpenailabs.com', 'shaan@greenpenailabs.com'] : ['dayal@greenpenailabs.com']
+
+    const { data, error } = await resend.emails.send({
+      from: 'TIP <internal@theinterviewplaybook.com>',
+      to: toList,
+      subject: `New Landing Page Email - ${email}]`,
+      react: NewUserEmailTemplate({ email, env: env || '', clerkId, profileId }),
+    })
+
+    if (error) {
+      console.warn('New user and profile created, but unable to send internal notification email');
+    }
+
+    if (data) {
+      return data;
+    }
+
+  } catch (error) {
+    console.warn('New email entered on landing page, but unable to send internal notification email');
+
+  }
+  return null;
 }
 
 // export async function POST_OLD(request: Request) {
@@ -95,23 +150,3 @@ export async function GET(request: Request) {
 //     throw error
 //   }
 // }
-
-export async function POST(request: NextRequest) {
-  const { email, userId } = await request.json()
-
-  if (!email || !userId) {
-    return NextResponse.json({ error: 'email and userId are required' }, { status: 400 })
-  }
-
-  const table = getTable('profiles')
-
-  const query = `
-    INSERT INTO ${table}
-      (email, user_id)
-    VALUES
-      ($1, $2)
-    RETURNING id
-  `
-  const result = await sql.query(query, [email, userId])
-  return NextResponse.json({ id: result.rows[0].id })
-}

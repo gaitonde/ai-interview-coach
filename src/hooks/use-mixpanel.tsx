@@ -9,9 +9,9 @@ export const useMixpanel = () => {
   }, [])
 
   const track = (event: string, properties?: Record<string, any>) => {
-    // if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       mixpanel.track(event, properties)
-    // }
+    }
   }
 
   const identify = (profileId: string) => {

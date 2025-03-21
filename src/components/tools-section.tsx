@@ -12,25 +12,17 @@ export default function ToolsSection() {
   const { openSignUp } = useClerk();
   const { user } = useUser();
 
-  useEffect(() => {
-    if (user && isSignedIn) {
-      track('ViewedToolsHomeSignedIn', {id: user.id});
-    } else {
-      track('ViewedToolsHomeAnonymous');
-    }
-  }, [isSignedIn, track])
-
   const isProd = typeof window !== 'undefined' && window.location.hostname.split('.')[0] === 'www';
 
   const handleToolClick = (slug: string | undefined) => {
     const path = `/tools/${slug}`;
-    track('ViewToolAttempt', { slug });
+    track('v2.ViewToolAttempt', { slug });
     if (isSignedIn) {
       if (slug) {
         router.push(path);
       }
     } else {
-      track('ViewSignup')
+      track('v2.ViewSignup')
       openSignUp({forceRedirectUrl: path});
     }
   }
