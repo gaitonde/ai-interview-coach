@@ -14,6 +14,19 @@ export default function ToolsSection() {
 
   const isProd = typeof window !== 'undefined' && window.location.hostname.split('.')[0] === 'www';
 
+
+  useEffect(() => {
+    console.log('on th')
+    if (user && isSignedIn) {
+      console.log('vthsi')
+      //TODO: get profileId from Cookies.get('profileId)
+      track('v2.ViewedToolsHomeSignedIn', {clerkUserId: user.id });
+    } else {
+      console.log('vtha')
+      track('v2.ViewedToolsHomeAnonymous');
+    }
+  }, [track])
+
   const handleToolClick = (slug: string | undefined) => {
     const path = `/tools/${slug}`;
     track('v2.ViewToolAttempt', { slug });
