@@ -1,8 +1,8 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { SignedIn, SignedOut, SignOutButton, SignUpButton } from "@clerk/clerk-react"
-import { Sparkles } from "lucide-react"
+import { SignedOut, SignUpButton } from "@clerk/clerk-react"
+import { track } from "@vercel/analytics/react"
 
 export default function Hero() {
   return (
@@ -18,7 +18,12 @@ export default function Hero() {
         </p>
         <SignedOut>
           <SignUpButton mode="modal" forceRedirectUrl="/aa">
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-6 px-8">
+            <Button
+              className="bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-6 px-8"
+              onClick={() => {
+                track('v2.ViewSignup');
+              }}
+            >
               Get Started for Free
             </Button>
           </SignUpButton>

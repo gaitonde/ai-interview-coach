@@ -19,7 +19,7 @@ export default function ToolDetails({ params }: { params: Promise<{ slug: string
   useEffect(() => {
     const tool = getToolBySlug(slug);
     setTool(tool);
-    track('ViewedTool', {tool: slug});
+    track('v2.ViewedTool', { slug });
   }, []);
 
   return tool ?
