@@ -56,7 +56,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: NextRequest) {
-  const { email, userId } = await request.json();
+  const { email, clerkUserId, userId } = await request.json();
 
   if (!email || !userId) {
     return NextResponse.json({ error: 'email and userId are required' }, { status: 400 });
@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
   const result = await sql.query(query, [email, userId]);
   const id = result.rows[0].id;
 
-  sendEmail(email, userId, id);
+  sendEmail(email, userId, id, clerkUserId);
 
   return NextResponse.json({ id });
 }
 
-async function sendEmail(email: string, clerkId: string, profileId: string): Promise<CreateEmailResponseSuccess | null> {
+async function sendEmail(email: string, userId: string, profileId: string, clerkId: string): Promise<CreateEmailResponseSuccess | null> {
   try {
     const env = process.env.VERCEL_ENV || 'Unknown'
     console.log('env: ', env)
@@ -88,8 +88,8 @@ async function sendEmail(email: string, clerkId: string, profileId: string): Pro
     const { data, error } = await resend.emails.send({
       from: 'TIP <internal@theinterviewplaybook.com>',
       to: toList,
-      subject: `New Landing Page Email - ${email}]`,
-      react: NewUserEmailTemplate({ email, env: env || '', clerkId, profileId }),
+      subject: `New User - ${email}]`,
+      react: NewUserEmailTemplate({ email, env: env || '', userId, profileId, clerkId }),
     })
 
     if (error) {

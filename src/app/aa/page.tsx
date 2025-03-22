@@ -30,7 +30,7 @@ export default function AA() {
           throw new Error('Failed to create user');
         }
 
-        track('v2.TIPUserCreated', { clerkUserId: userData.id, email: user.emailAddresses[0].emailAddress })
+        track('v2.TIPUserCreated', { clerkUserId: user.id, email: user.emailAddresses[0].emailAddress })
 
         // Create profile with the returned userId
         const profileResponse = await fetch('/api/profiles', {
@@ -38,6 +38,7 @@ export default function AA() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userId: userData.id,
+            clerkUserId: user.id,
             email: user.emailAddresses[0].emailAddress
           }),
         });
