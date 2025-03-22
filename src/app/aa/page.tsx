@@ -1,10 +1,10 @@
 "use client";
 
 import { useMixpanel } from "@/hooks/use-mixpanel";
-import { useAuth, useUser } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs'
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function AA() {
   const router = useRouter();
@@ -13,6 +13,8 @@ export default function AA() {
 
   useEffect(() => {
     if (!user) return;
+
+    console.log('u: ', user);
 
     const initializeUserAndProfile = async () => {
       try {
@@ -57,7 +59,26 @@ export default function AA() {
       }
     };
 
-    initializeUserAndProfile();
+    const getUserAndProfile = async () => {
+      const userResponse = await fetch(`/api/users?clerk_id=${user.id}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const userData = await userResponse.json();
+      console.log('ud: ', userData);
+
+      if (userData && userData.profile) {
+        Cookies.set('profileId', userData.profile.id, {
+          secure: true,
+          sameSite: 'strict'
+        });
+        track('v2.LoggedIn', { profileId: userData.profile.id })
+      } else {
+        initializeUserAndProfile();
+      }
+
+    }
+    getUserAndProfile();
   }, [user, router]);
 
   if (!user) return null;

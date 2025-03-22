@@ -61,7 +61,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
       try {
         setIsUploading(true);
         const profileId = Cookies.get('profileId') as string;
-        track('v2.SubmittedResumeUploadAttempt', { profileId });
+        track('v2.SubmittedResumeUploadAttempt', { profileId, slug: toolSlug });
 
         const formData = new FormData();
         formData.append('profileId', profileId);
@@ -75,7 +75,7 @@ export const FileUploadButton: React.FC<FileUploadButtonProps> = ({
 
         if (!response.ok) throw new Error('Upload failed');
 
-        track('v2.SubmittedResumeUploadSuccess', { profileId });
+        track('v2.SubmittedResumeUploadSuccess', { profileId, slug: toolSlug });
         const r2 = await response.json();
         console.log('payload: ', r2.payload);
         setToolRuns(r2.payload.toolRuns);

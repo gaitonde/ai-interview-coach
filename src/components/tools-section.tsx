@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { displayableTools } from "@/data/tools";
 import { useMixpanel } from "@/hooks/use-mixpanel";
 import { useAuth, useClerk, useUser } from "@clerk/nextjs";
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -16,13 +17,10 @@ export default function ToolsSection() {
 
 
   useEffect(() => {
-    console.log('on th')
     if (user && isSignedIn) {
-      console.log('vthsi')
-      //TODO: get profileId from Cookies.get('profileId)
-      track('v2.ViewedToolsHomeSignedIn', {clerkUserId: user.id });
+      const profileId = Cookies.get('profileId');
+      track('v2.ViewedToolsHomeSignedIn', { clerkUserId: user.id, profileId });
     } else {
-      console.log('vtha')
       track('v2.ViewedToolsHomeAnonymous');
     }
   }, [track])

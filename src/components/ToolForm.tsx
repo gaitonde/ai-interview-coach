@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import MarkdownRenderer from "./markdown-renderer";
 import { JsonRenderer, ToolOutput } from "./tool-output";
+import { useMixpanel } from "@/hooks/use-mixpanel";
 
 export function ToolForm({slug}: {slug: string}) {
   const [showOutput, setShowOutput] = useState(false);
@@ -14,6 +15,7 @@ export function ToolForm({slug}: {slug: string}) {
   const [error, setError] = useState('');
   const [tool, setTool] = useState<Tool>();
   const [toolRuns, setToolRuns] = useState([]);
+  const { track } = useMixpanel();
 
   const getToolBySlug = (slug: string) => {
     return tools.find(tool => tool.slug === slug);
@@ -55,6 +57,8 @@ export function ToolForm({slug}: {slug: string}) {
         console.log(`Unable to run tool: ${tool.slug}`, response);
         return;
       }
+
+      track('v2.ToolRunSuccess', { slug, profileId });
 
       const result = await response.json();
       return result.payload;
