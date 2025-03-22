@@ -43,6 +43,7 @@ export function ToolForm({slug}: {slug: string}) {
     // console.log('tool params profileId: ', profileId);
 
     try {
+      track('v2.ToolRunAttempt', { slug, profileId });
       // const formData = new FormData()
       formData.append('profileId', profileId);
       formData.append('toolSlug', tool.slug);
