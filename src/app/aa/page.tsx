@@ -73,6 +73,8 @@ export default function AA() {
           sameSite: 'strict'
         });
         track('v2.LoggedIn', { profileId: userData.profile.id })
+        identify(userData.profile.id);
+        router.push('/');
       } else {
         initializeUserAndProfile();
       }
