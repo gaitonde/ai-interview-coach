@@ -23,7 +23,6 @@ export default function Hero() {
             <Button
               className="bg-emerald-500 hover:bg-emerald-600 text-white text-lg py-6 px-8"
               onClick={() => {
-                console.log('vs')
                 track('v2.ViewSignup');
               }}
             >

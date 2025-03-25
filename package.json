@@ -76,7 +76,7 @@
     "lucide-react": "^0.441.0",
     "mixpanel": "^0.18.0",
     "mixpanel-browser": "^2.58.0",
-    "next": "^15.0.0",
+    "next": "^15.2.4",
     "next-sanity": "^9.8.47",
     "next-themes": "^0.3.0",
     "node-fetch": "^3.3.2",
