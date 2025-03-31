@@ -34,7 +34,7 @@ export default function ToolsSection() {
       }
     } else {
       track('v2.ViewSignup')
-      openSignUp({forceRedirectUrl: path});
+      openSignUp({forceRedirectUrl: '/aa'});
     }
   }
 
