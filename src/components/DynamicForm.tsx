@@ -26,7 +26,7 @@ function DynamicForm({ tool, onSubmit, setToolRuns, content }: DynamicFormProps)
   const [statusMessage, setStatusMessage] = useState('Thinking...');
   const [inputType, setInputType] = useState<"url" | "text">("url");
   const [zodSchema, setZodSchema] = useState(createZodSchema(tool.formData));
-
+  const [showCopyButton, setShowCopyButton] = useState(false);
   // Get the paired fields if they exist
   const pairedFields = tool.pairedFields;
   const pairedUrlField = pairedFields?.pair1.urlField;
@@ -334,7 +334,7 @@ function DynamicForm({ tool, onSubmit, setToolRuns, content }: DynamicFormProps)
       })}
 
       <div className="space-y-4 w-full">
-        {content && (
+        {showCopyButton && content && (
           <div className="mt-8">
             <CopyToClipboardButton
               content={content}
