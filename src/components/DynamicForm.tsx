@@ -104,235 +104,177 @@ function DynamicForm({ tool, onSubmit, setToolRuns, content }: DynamicFormProps)
 
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-      {pairedFields && pairedUrlField && pairedTextField && (
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-
-            <Label
-              // htmlFor={inputType === "url" ? pairUrlField['urlField'].type : pairTextField['textField'].type}
-              className="text-white"
-            >
-              {inputType === "url"
-                ? (pairedFields.pair1.urlField[Object.keys(pairedFields.pair1.urlField)[0]]).label
-                : (pairedFields.pair1.textField[Object.keys(pairedFields.pair1.textField)[0]]).label
-              }
-            </Label>
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={toggleInputType}
-              className="text-white hover:text-black flex items-center gap-1 hover:cursor-pointer"
-            >
-              {inputType === "url" ? (
-                <>
-                  <FileText className="h-4 w-4" />
-                  <span>Use Text Instead</span>
-                </>
-              ) : (
-                <>
-                  <LinkIcon className="h-4 w-4" />
-                  <span>Use URL Instead</span>
-                </>
+      {(() => {
+        let pairedBlockRendered = false;
+        return Object.entries(tool.formData).map(([fieldName, fieldConfig], idx, arr) => {
+          // Paired fields logic
+          const urlKey = pairedFields?.pair1.urlField ? Object.keys(pairedFields.pair1.urlField)[0] : '';
+          const textKey = pairedFields?.pair1.textField ? Object.keys(pairedFields?.pair1.textField)[0] : '';
+          // If this field is part of a paired group
+          if (pairedFields && (fieldName === urlKey || fieldName === textKey)) {
+            // Only render the paired block at the first occurrence in formData
+            if (!pairedBlockRendered) {
+              pairedBlockRendered = true;
+              return (
+                <div key={`paired-block-${urlKey}-${textKey}-${idx}`} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-white">
+                      {inputType === "url"
+                        ? (pairedFields.pair1.urlField[urlKey] as UrlValidation).label
+                        : (pairedFields.pair1.textField[textKey] as UrlValidation).label}
+                    </Label>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={toggleInputType}
+                      className="text-white hover:text-black flex items-center gap-1 hover:cursor-pointer"
+                    >
+                      {inputType === "url" ? (
+                        <>
+                          <FileText className="h-4 w-4" />
+                          <span>Use Text Instead</span>
+                        </>
+                      ) : (
+                        <>
+                          <LinkIcon className="h-4 w-4" />
+                          <span>Use URL Instead</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  {inputType === "url" ? (
+                    <>
+                      <Input
+                        type="url"
+                        id={urlKey}
+                        placeholder={pairedFields.pair1.urlField[urlKey] && (pairedFields.pair1.urlField[urlKey] as UrlValidation).placeholderText}
+                        {...form.register(urlKey, {
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            if (value) {
+                              const urlValue = value.startsWith('http://') || value.startsWith('https://')
+                                ? value
+                                : `https://${value}`;
+                              form.setValue(urlKey, urlValue);
+                            }
+                            form.trigger(urlKey);
+                          }
+                        })}
+                        className="block bg-white text-black border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                      />
+                      {form.formState.errors[urlKey] && (
+                        <p className="text-sm text-red-500">
+                          {form.formState.errors[urlKey]?.message as string}
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <Textarea
+                        id={textKey}
+                        placeholder={pairedFields.pair1.textField[textKey] && (pairedFields.pair1.textField[textKey] as UrlValidation).placeholderText}
+                        {...form.register(textKey, {
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            form.setValue(textKey, value);
+                            form.trigger(textKey);
+                          }
+                        })}
+                        className="block w-full rounded-md border bg-white text-black"
+                      />
+                      {form.formState.errors[textKey] && (
+                        <p className="text-sm text-red-500">
+                          {form.formState.errors[textKey]?.message as string}
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              );
+            } else {
+              // Skip the second paired field
+              return null;
+            }
+          }
+          // Render all other fields as usual
+          return (
+            <div key={fieldName} className="space-y-2">
+              <label htmlFor={fieldName} className="block text-sm font-medium">
+                {fieldConfig.label}
+                {fieldConfig.optional && <span> (Optional)</span>}
+              </label>
+              {fieldConfig.type === 'text' && (
+                <Input
+                  type="text"
+                  id={fieldName}
+                  placeholder={fieldConfig.placeholderText}
+                  {...form.register(fieldName)}
+                  className="block bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                />
               )}
-            </Button>
-          </div>
-
-          {inputType === "url" ? (
-            <>
-              <Input
-                type="url"
-                id={pairedUrlFieldKey}
-                placeholder={pairedFields.pair1.urlField[pairedUrlFieldKey] && (pairedFields.pair1.urlField[pairedUrlFieldKey] as UrlValidation).placeholderText}
-                {...form.register(pairedUrlFieldKey, {
-                  onChange: (e) => {
-                    const value = e.target.value;
-                    // Only modify the URL if there's a value
-                    if (value) {
-                      const urlValue = value.startsWith('http://') || value.startsWith('https://')
-                        ? value
-                        : `https://${value}`;
-                      form.setValue(pairedUrlFieldKey, urlValue);
-                    }
-                    form.trigger(pairedUrlFieldKey);
-                  }
-                })}
-                // {...form.register(pairedUrlFieldKey)}
-
-                // {...form.register(pairedUrlFieldKey, {
-                //   onChange: (e) => {
-                //     const value = e.target.value;
-                //     const urlValue = value.startsWith('http://') || value.startsWith('https://')
-                //       ? value
-                //       : `https://${value}`;
-                //     form.setValue(pairedUrlFieldKey, urlValue);
-                //     form.trigger(pairedUrlFieldKey);
-                //   }
-                // })}
-                className="block bg-white text-black border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-              />
-
-              {form.formState.errors[pairedUrlFieldKey!] && (
-                <>
-                  <p className="text-sm text-red-500">
-                    {form.formState.errors[pairedUrlFieldKey!]?.message as string}
-                  </p>
-                </>
+              {fieldConfig.type === 'textarea' && (
+                <Textarea
+                  id={fieldName}
+                  placeholder={fieldConfig.placeholderText}
+                  {...form.register(fieldName)}
+                  className="block w-full rounded-md border bg-white text-black"
+                />
               )}
-            </>
-          ) : (
-            <>
-              <Textarea
-                id={pairedTextFieldKey}
-                placeholder={pairedFields.pair1.textField[pairedTextFieldKey] && (pairedFields.pair1.textField[pairedTextFieldKey] as UrlValidation).placeholderText}
-                {...form.register(pairedTextFieldKey, {
-                  onChange: (e) => {
-                    const value = e.target.value;
-                    form.setValue(pairedTextFieldKey, value);
-                    form.trigger(pairedTextFieldKey);
-                  }
-                })}
-                // {...form.register(pairedTextFieldKey!)}
-                className="block w-full rounded-md border bg-white text-black"
-              />
-
-              {form.formState.errors[pairedTextFieldKey!] && (
-                <>
-                  <p className="text-sm text-red-500">
-                    {form.formState.errors[pairedTextFieldKey!]?.message as string}
-                  </p>
-                </>
+              {fieldConfig.type === 'url' && (
+                <Input
+                  type="url"
+                  id={fieldName}
+                  placeholder={fieldConfig.placeholderText}
+                  {...form.register(fieldName)}
+                  className="block bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
+                />
               )}
-
-            </>
-          )}
-        </div>
-      )}
-      {Object.entries(tool.formData).map(([fieldName, fieldConfig]) => {
-        const urlKey = pairedFields?.pair1.urlField ? Object.keys(pairedFields.pair1.urlField)[0] : '';
-        const textKey = pairedFields?.pair1.textField ? Object.keys(pairedFields.pair1.textField)[0] : '';
-        // Skip paired fields as they're handled separately
-        // console.log('urlKey aa: ', urlKey)
-        if (pairedFields && (fieldName === urlKey || fieldName === textKey)) {
-          // console.log('skipped: ', fieldName)
-          return null;
-        }
-
-        return (
-          <div key={fieldName} className="space-y-2">
-
-            <label htmlFor={fieldName} className="block text-sm font-medium">
-              {fieldConfig.label}
-              {fieldConfig.optional && <span> (Optional)</span>}
-            </label>
-
-            {fieldConfig.type === 'text' && (
-              <Input
-                type="text"
-                id={fieldName}
-                placeholder={fieldConfig.placeholderText}
-                {...form.register(fieldName)}
-                className="block bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-              />
-            )}
-
-            {fieldConfig.type === 'textarea' && (
-              <Textarea
-                id={fieldName}
-                placeholder={fieldConfig.placeholderText}
-                {...form.register(fieldName)}
-                className="block w-full rounded-md border bg-white text-black"
-              />
-            )}
-
-            {fieldConfig.type === 'url' && (
-              <Input
-                type="url"
-                id={fieldName}
-                placeholder={fieldConfig.placeholderText}
-                {...form.register(fieldName)}
-                className="block bg-white text-gray-700 placeholder-gray-400 border-gray-300 focus:border-blue-500 focus:ring-blue-500 mt-1 w-full rounded-md"
-              />
-            )}
-
-            {fieldConfig.type === 'file' && fieldConfig.validation?.allowedTypes && (
-              <>
-              <FileUploadButton
-                fieldName={fieldName}
-                // onFileSelected={onFileSelected}
-                register={form.register}
-                setValue={form.setValue}
-                trigger={form.trigger}
-                allowedTypes={fieldConfig.validation.allowedTypes}
-                toolSlug={tool.resumeUploadType}
-                setToolRuns={setToolRuns}
-              />
-{/*
-              <FileUpload
-                fieldName={fieldName}
-                register={form.register}
-                setValue={form.setValue}
-                trigger={form.trigger}
-                toolSlug={tool.resumeUploadType}
-                allowedTypes={fieldConfig.validation.allowedTypes}
-                setToolRuns={setToolRuns}
-              /> */}
-              </>
-            )}
-
-            {fieldConfig.type === 'dropdown' && (
-              <div className="w-full space-y-2">
-                <Select
-                  onValueChange={(val) => {
-                    form.setValue(fieldName, val);
-                    form.trigger(fieldName);
-                  }}
-                  defaultValue={form.getValues(fieldName)}
-                >
-                  <SelectTrigger id={fieldName} className="w-full bg-white text-black">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white text-black">
-                    <SelectGroup>
-                      <SelectLabel>Select an option</SelectLabel>
-                      {fieldConfig.validation?.allowedValues?.map((value) => (
-                        <SelectItem key={value} value={value}>
-                          {value}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-{/*
-            {fieldConfig.type === 'gradeClass' && (
-              <select
-                id={fieldName}
-                {...form.register(fieldName)}
-                className="block w-full rounded-md border"
-              >
-                <option value="">Select Grade Level</option>
-                {(fieldConfig.validation?.gradeClass || Object.values(GradeClass)).map((grade) => (
-                  <option key={grade} value={grade}>
-                    {grade}
-                  </option>
-                ))}
-              </select>
-            )}
-             */}
-
-            {form.formState.errors[fieldName] && (
-              <p className="text-sm text-red-500">
-                {form.formState.errors[fieldName]?.message as string}
-              </p>
-            )}
-          </div>
-        );
-      })}
-
+              {fieldConfig.type === 'file' && fieldConfig.validation?.allowedTypes && (
+                <FileUploadButton
+                  fieldName={fieldName}
+                  register={form.register}
+                  setValue={form.setValue}
+                  trigger={form.trigger}
+                  allowedTypes={fieldConfig.validation.allowedTypes}
+                  toolSlug={tool.resumeUploadType}
+                  setToolRuns={setToolRuns}
+                />
+              )}
+              {fieldConfig.type === 'dropdown' && (
+                <div className="w-full space-y-2">
+                  <Select
+                    onValueChange={(val) => {
+                      form.setValue(fieldName, val);
+                      form.trigger(fieldName);
+                    }}
+                    defaultValue={form.getValues(fieldName)}
+                  >
+                    <SelectTrigger id={fieldName} className="w-full bg-white text-black">
+                      <SelectValue placeholder="Select an option" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white text-black">
+                      <SelectGroup>
+                        <SelectLabel>Select an option</SelectLabel>
+                        {fieldConfig.validation?.allowedValues?.map((value) => (
+                          <SelectItem key={value} value={value}>
+                            {value}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {form.formState.errors[fieldName] && (
+                <p className="text-sm text-red-500">
+                  {form.formState.errors[fieldName]?.message as string}
+                </p>
+              )}
+            </div>
+          );
+        });
+      })()}
       <div className="space-y-4 w-full">
         {showCopyButton && content && (
           <div className="mt-8">
@@ -346,7 +288,6 @@ function DynamicForm({ tool, onSubmit, setToolRuns, content }: DynamicFormProps)
             </div>
           </div>
         )}
-
         <Button
           type="submit"
           className="w-full bg-[#10B981] text-white hover:bg-[#059669] py-2 px-4 rounded-md transition-colors"

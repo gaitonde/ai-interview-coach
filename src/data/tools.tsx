@@ -222,15 +222,15 @@ export const tools: Tool[] = [
     promptKey: 'prompt-tools-company-scout',
     description: 'Research the company in minutes so you can interview with confidence.',
     icon: <Building2 className='h-8 w-8 text-emerald-400' />,
-    // formData: pickFormFields(['companyWebsiteUrl']),
-    formData: pickFormFields(['companyWebsiteUrl', 'companyWebsiteText']),
-    pairedFields: {
-      pair1: {
-        // label: 'Company',
-        urlField: pickFormFields(['companyWebsiteUrl']),
-        textField: pickFormFields(['companyWebsiteText']),
-      }
-    },
+    formData: pickFormFields(['companyWebsiteUrl']),
+    // formData: pickFormFields(['companyWebsiteUrl', 'companyWebsiteText']),
+    // pairedFields: {
+    //   pair1: {
+    //     // label: 'Company',
+    //     urlField: pickFormFields(['companyWebsiteUrl']),
+    //     textField: pickFormFields(['companyWebsiteText']),
+    //   }
+    // },
 
     actions: ['fetch', 'run-gen-ai']
   },
@@ -243,6 +243,14 @@ export const tools: Tool[] = [
     description: 'See the types and styles of questions you will get asked for this role at this company.',
     icon: <HelpCircle className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'companyWebsiteUrl', 'jobDescriptionUrl']),
+    // formData: pickFormFields(['resumeFile', 'companyWebsiteUrl', 'jobDescriptionUrl', 'jobDescriptionText']),
+    pairedFields: {
+      pair1: {
+        // label: 'Job Description',
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     actions: ['fetch', 'run-gen-ai'],
   },
