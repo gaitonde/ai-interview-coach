@@ -125,10 +125,10 @@ function DynamicForm({ tool, onSubmit, setToolRuns, content }: DynamicFormProps)
                     </Label>
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={toggleInputType}
-                      className="text-white hover:text-black flex items-center gap-1 hover:cursor-pointer"
+                      className="text-black flex items-center gap-1 hover:cursor-pointer bg-gray-200"
                     >
                       {inputType === "url" ? (
                         <>

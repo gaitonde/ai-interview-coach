@@ -111,7 +111,7 @@ const commonFields = {
   jobDescriptionText: {
     type: 'textarea',
     label: 'Job Description Text',
-    placeholderText: 'Copy and paste job description here...',
+    placeholderText: 'Copy and paste the job description here...',
     validation: {
       minLength: 1,
     }
@@ -143,7 +143,8 @@ const commonFields = {
   },
   interviewerLinkedInProfileText: {
     type: 'text',
-    label: 'Interviewer LinkedIn Profile Text',
+    label: 'Interviewer LinkedIn Text',
+    placeholderText: 'Copy and paste the interviewer LinkedIn profile here...',
     validation: {
       minLength: 1,
     }

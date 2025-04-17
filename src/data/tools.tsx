@@ -176,14 +176,14 @@ export const tools: Tool[] = [
     description: 'Sample desc',
     icon: <FileText className='h-8 w-8 text-emerald-400' />,
     // formData: pickFormFields(['url']),
-    formData: pickFormFields(['jobDescriptionUrl', 'jobDescriptionText']),
-    pairedFields: {
-      pair1: {
-        // label: 'Job Description',
-        urlField: pickFormFields(['jobDescriptionUrl']),
-        textField: pickFormFields(['jobDescriptionText']),
-      }
-    },
+    formData: pickFormFields(['jobDescriptionUrl']),
+    // pairedFields: {
+    //   pair1: {
+    //     // label: 'Job Description',
+    //     urlField: pickFormFields(['jobDescriptionUrl']),
+    //     textField: pickFormFields(['jobDescriptionText']),
+    //   }
+    // },
     outputType: 'None',
     labels: ['Trending'],
     actions: ['run-gen-ai'],
@@ -211,6 +211,12 @@ export const tools: Tool[] = [
     description: "Know your interviewer's background in seconds—before you step into the call.",
     icon: <User className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields([ 'resumeFile', 'interviewerLinkedInProfileUrl']),
+    pairedFields: {
+      pair1: {
+        urlField: pickFormFields(['interviewerLinkedInProfileUrl']),
+        textField: pickFormFields(['interviewerLinkedInProfileText']),
+      }
+    },
     resumeUploadType: 'upload-resume',
     actions: ['fetch', 'run-gen-ai'],
   },
@@ -263,6 +269,13 @@ export const tools: Tool[] = [
     description: 'Get tailored questions based on the role, company, and industry—be one step ahead.',
     icon: <MessageSquare className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'companyWebsiteUrl', 'jobDescriptionUrl']),
+    pairedFields: {
+      pair1: {
+        // label: 'Job Description',
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     actions: ['fetch', 'run-gen-ai'],
   },
@@ -311,6 +324,12 @@ export const tools: Tool[] = [
     description: 'Impress interviewers with thought-provoking questions that showcase your expertise.',
     icon: <MessageCircleQuestion className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'jobDescriptionUrl', 'interviewerRole']),
+    pairedFields: {
+      pair1: {
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     labels: ['New'],
     actions: ['fetch', 'run-gen-ai'],
@@ -324,6 +343,12 @@ export const tools: Tool[] = [
     description: 'See how well you fit the job description. Find out what you may need to work on.',
     icon: <Dumbbell className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'jobDescriptionUrl']),
+    pairedFields: {
+      pair1: {
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     labels: ['New'],
     actions: ['fetch', 'run-gen-ai'],
@@ -337,6 +362,12 @@ export const tools: Tool[] = [
     description: 'Tailor your cover to your job role and your background in seconds.',
     icon: <FileText className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'jobDescriptionUrl']),
+    pairedFields: {
+      pair1: {
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     labels: ['New'],
     actions: ['fetch', 'run-gen-ai'],
