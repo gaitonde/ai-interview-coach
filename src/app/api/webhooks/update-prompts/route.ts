@@ -52,8 +52,8 @@ export async function GET() {
         system_prompt: row.get('system prompt'),
         user_prompt: row.get('user prompt')
       };
-      //skip if
       console.log('prompt key: ', promptData.key);
+      // skip row if there is no prompt key; means it's not ready
       if (promptData.key) {
         console.log('adding row', row.rowNumber);
         await insertPrompt(promptData);

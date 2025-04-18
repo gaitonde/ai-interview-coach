@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from "openai";
 import PDFParser from 'pdf2json';
 import TurndownService from 'turndown';
-
+// import fs from 'fs';
 const turndownService = new TurndownService();
 
 const getToolBySlug = (slug: string) => {
@@ -37,11 +37,14 @@ interface ToolOutput {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('v2 tools POST')
   const formData = await request.formData();
   const profileId = formData.get('profileId') as string;
   const toolSlug = (formData.get('toolSlug') as string);
-
+  console.debug('v2 tools POST toolSlug: ', toolSlug)
+  console.debug('v2 tools POST profileId: ', profileId)
   const error = await validateInput(profileId, toolSlug);
+  console.debug('v2 tools POST error: ', error)
 
   if (error) {
     return NextResponse.json({ error }, { status: 400 });
@@ -251,8 +254,13 @@ function validateInput(profileId: string, toolSlug: string) {
 
 async function handleFetch(profileId: string, textKey: string, url: string, toolRuns: ToolRun[]) {
   const fetchTool = getToolBySlug('fetch-url') as Tool;
-  const content = url ? await fetchUrlContents(url) : null;
-  const toolRun = await insertToolRun(profileId, fetchTool.slug, { url }, { [textKey]: content })
+  let content = url ? await fetchUrlContents(url) : null;
+  if (content && content.length > 100000) {
+    console.log('original content length: ', content.length);
+    content = content.slice(0, 100000);
+    console.log('truncated content length: ', content.length);
+  }
+  const toolRun = await insertToolRun(profileId, fetchTool.slug, { url }, { [textKey]: content });
   toolRuns.push(toolRun);
   return toolRun;
 }
@@ -299,8 +307,9 @@ async function handleGenAI(profileId: string, tool: Tool, formData: FormData, to
     }
   }
 
-  console.log('stdVars: ', stdVars);
+  console.debug('stdVars: ', stdVars);
   constructuredUserPrompt = replaceStdVars(constructuredUserPrompt, stdVars);
+  console.debug('constructuredUserPrompt: ', constructuredUserPrompt);
   prompt.user_prompt = constructuredUserPrompt;
 
   const input = {
@@ -438,7 +447,9 @@ function replacePathVars(template: string, toolRun: any): string {
       // console.log('YY ToolRun: ', toolRun)
       // console.log('YY PATH: ', path)
       const value = getValueByPath(toolRun, path);
-      // console.log('YY Value: ', value)
+      if (variable === 'jobDescriptionText') {
+        console.debug('XXX jobDescriptionText Value: ', value)
+      }
       return value || match;
     } else {
       console.error('No match for this var: ', variable)
@@ -533,6 +544,65 @@ async function fetchUrlContents(url: string): Promise<string | null> {
     }
   }
 }
+
+/**
+ * Uses Puppeteer to fetch the HTML content of a URL, inlines iframe content if present,
+ * and returns the combined HTML as a string.
+ * Returns null if the URL is not provided or an error occurs.
+ */
+// async function fetchUrlContents2(url: string): Promise<string | null> {
+//   if (!url) return null;
+//   const puppeteer = require('puppeteer');
+//   let browser: any = null;
+
+//   try {
+//     browser = await puppeteer.launch({ headless: true });
+//     const page = await browser.newPage();
+
+//     await page.setUserAgent(
+//       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+//     );
+
+//     await page.goto(url, { waitUntil: 'networkidle2' });
+//     // Wait for 3 seconds to allow dynamic content and iframes to load
+//     await new Promise(resolve => setTimeout(resolve, 3000));
+
+//     // Get all iframe elements
+//     const iframeHandles = await page.$$('iframe');
+//     let mainContent = await page.content();
+
+//     if (iframeHandles.length > 0) {
+//       for (const iframeElement of iframeHandles) {
+//         const frame = await iframeElement.contentFrame();
+//         if (frame) {
+//           // Get the iframe's HTML content
+//           const iframeContent = await frame.content();
+
+//           // Get the outerHTML of the iframe element
+//           const iframeOuterHTML = await page.evaluate((el: { outerHTML: any; }) => el.outerHTML, iframeElement);
+
+//           // Replace the iframe tag in the main content with the iframe's HTML
+//           mainContent = mainContent.replace(iframeOuterHTML, iframeContent);
+//         }
+//       }
+//     }
+
+//     await browser.close();
+//     // return mainContent;
+//     const markdown = turndownService.turndown(mainContent || '');
+//     // console.log('XXX mainContent: ', mainContent);
+//     fs.writeFileSync('mainContent.html', mainContent);
+//     fs.writeFileSync('markdownContent.md', markdown);
+//     return markdown;
+
+//   } catch (error) {
+//     if (browser) {
+//       await browser.close();
+//     }
+//     console.error('Error in fetchUrlContents2:', error);
+//     return null;
+//   }
+// }
 
 // const gradYear = new Date(graduationDate).getFullYear();
 function fetchGradeClass(graduationYear: number): string {

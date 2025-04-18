@@ -94,7 +94,7 @@ const commonFields = {
     }
   },
   companyWebsiteText: {
-    type: 'text',
+    type: 'textarea',
     label: 'Company Website Text',
     validation: {
       minLength: 1,
@@ -109,8 +109,9 @@ const commonFields = {
     }
   },
   jobDescriptionText: {
-    type: 'text',
+    type: 'textarea',
     label: 'Job Description Text',
+    placeholderText: 'Copy and paste the job description here...',
     validation: {
       minLength: 1,
     }
@@ -142,7 +143,8 @@ const commonFields = {
   },
   interviewerLinkedInProfileText: {
     type: 'text',
-    label: 'Interviewer LinkedIn Profile Text',
+    label: 'Interviewer LinkedIn Text',
+    placeholderText: 'Copy and paste the interviewer LinkedIn profile here...',
     validation: {
       minLength: 1,
     }

@@ -16,15 +16,6 @@ type BaseValidation = {
   label: string;
   optional?: boolean;
 }
-// export type UrlOrTextValidation = BaseValidation & {
-//   type: 'urlOrText';
-//   textField: string;
-//   urlField: string;
-//   validation?: {
-//     protocols?: ('http' | 'https')[];
-//   //   allowedDomains?: string[];
-//   };
-// }
 
 export type TextValidation = BaseValidation & {
   type: 'text';
@@ -46,7 +37,7 @@ export type TextAreaValidation = BaseValidation & {
   };
 }
 
-type UrlValidation = BaseValidation & {
+export type UrlValidation = BaseValidation & {
   type: 'url';
   placeholderText?: string;
   validation?: {
@@ -101,6 +92,15 @@ export type GradeClassValidation = BaseValidation & {
   };
 }
 
+export type PairedFieldValidation = BaseValidation & {
+  type: 'paired';
+  label: string;
+  fields: {
+    urlField: string;
+    textField: string;
+  };
+}
+
 export type FormFieldValidation = TextValidation
   | TextAreaValidation
   | FileValidation
@@ -109,13 +109,24 @@ export type FormFieldValidation = TextValidation
   | EmailValidation
   | YearValidation
   | GradeClassValidation
-  // | UrlOrTextValidation
+  | PairedFieldValidation
 ;
 
 export type OutputType = 'Markdown' | 'Json' | 'None';
 
 //Associate Label with color here?
 export type Label = 'New' | 'Popular' | 'Trending' | 'Coming Soon';
+
+export type PairedFields = {
+  pair1: {
+    urlField: {
+      [key: string]: FormFieldValidation;
+    };
+    textField: {
+      [key: string]: FormFieldValidation;
+    };
+  }
+}
 
 export const tools: Tool[] = [
   // ✅ Fetch Contents - Internal
@@ -164,18 +175,18 @@ export const tools: Tool[] = [
     promptKey: 'sample',
     description: 'Sample desc',
     icon: <FileText className='h-8 w-8 text-emerald-400' />,
-    formData: pickFormFields([
-      'resumeFile',
-      // 'intervieweeRole',
-      // 'interviewerRole',
-      // 'question',
-      // 'companyWebsiteUrl',
-      // 'jobDescriptionUrl',
-      // 'intervieweeLinkedInUrl',
-      // 'interviewerLinkedInUrl',
-      // 'caseStudy',
-    ]),
+    // formData: pickFormFields(['url']),
+    formData: pickFormFields(['jobDescriptionUrl']),
+    // pairedFields: {
+    //   pair1: {
+    //     // label: 'Job Description',
+    //     urlField: pickFormFields(['jobDescriptionUrl']),
+    //     textField: pickFormFields(['jobDescriptionText']),
+    //   }
+    // },
+    outputType: 'None',
     labels: ['Trending'],
+    actions: ['run-gen-ai'],
     hidden: true,
   },
   // ✅ Know Your Resume
@@ -200,6 +211,12 @@ export const tools: Tool[] = [
     description: "Know your interviewer's background in seconds—before you step into the call.",
     icon: <User className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields([ 'resumeFile', 'interviewerLinkedInProfileUrl']),
+    pairedFields: {
+      pair1: {
+        urlField: pickFormFields(['interviewerLinkedInProfileUrl']),
+        textField: pickFormFields(['interviewerLinkedInProfileText']),
+      }
+    },
     resumeUploadType: 'upload-resume',
     actions: ['fetch', 'run-gen-ai'],
   },
@@ -212,6 +229,15 @@ export const tools: Tool[] = [
     description: 'Research the company in minutes so you can interview with confidence.',
     icon: <Building2 className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['companyWebsiteUrl']),
+    // formData: pickFormFields(['companyWebsiteUrl', 'companyWebsiteText']),
+    // pairedFields: {
+    //   pair1: {
+    //     // label: 'Company',
+    //     urlField: pickFormFields(['companyWebsiteUrl']),
+    //     textField: pickFormFields(['companyWebsiteText']),
+    //   }
+    // },
+
     actions: ['fetch', 'run-gen-ai']
   },
   // ✅ Question Scout
@@ -223,6 +249,14 @@ export const tools: Tool[] = [
     description: 'See the types and styles of questions you will get asked for this role at this company.',
     icon: <HelpCircle className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'companyWebsiteUrl', 'jobDescriptionUrl']),
+    // formData: pickFormFields(['resumeFile', 'companyWebsiteUrl', 'jobDescriptionUrl', 'jobDescriptionText']),
+    pairedFields: {
+      pair1: {
+        // label: 'Job Description',
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     actions: ['fetch', 'run-gen-ai'],
   },
@@ -235,6 +269,13 @@ export const tools: Tool[] = [
     description: 'Get tailored questions based on the role, company, and industry—be one step ahead.',
     icon: <MessageSquare className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'companyWebsiteUrl', 'jobDescriptionUrl']),
+    pairedFields: {
+      pair1: {
+        // label: 'Job Description',
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     actions: ['fetch', 'run-gen-ai'],
   },
@@ -283,6 +324,12 @@ export const tools: Tool[] = [
     description: 'Impress interviewers with thought-provoking questions that showcase your expertise.',
     icon: <MessageCircleQuestion className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'jobDescriptionUrl', 'interviewerRole']),
+    pairedFields: {
+      pair1: {
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     labels: ['New'],
     actions: ['fetch', 'run-gen-ai'],
@@ -296,6 +343,12 @@ export const tools: Tool[] = [
     description: 'See how well you fit the job description. Find out what you may need to work on.',
     icon: <Dumbbell className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'jobDescriptionUrl']),
+    pairedFields: {
+      pair1: {
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     labels: ['New'],
     actions: ['fetch', 'run-gen-ai'],
@@ -309,6 +362,12 @@ export const tools: Tool[] = [
     description: 'Tailor your cover to your job role and your background in seconds.',
     icon: <FileText className='h-8 w-8 text-emerald-400' />,
     formData: pickFormFields(['resumeFile', 'jobDescriptionUrl']),
+    pairedFields: {
+      pair1: {
+        urlField: pickFormFields(['jobDescriptionUrl']),
+        textField: pickFormFields(['jobDescriptionText']),
+      }
+    },
     resumeUploadType: 'parse-resume',
     labels: ['New'],
     actions: ['fetch', 'run-gen-ai'],
@@ -533,6 +592,17 @@ export function createZodSchema(formData: Record<string, FormFieldValidation>) {
             }
           )
         }
+        break
+
+      case 'paired':
+        fieldSchema = z.object({
+          urlField: z.string().refine((url) => {
+            return url.length > 1
+          }, {message: 'Required'}),
+          textField: z.string().refine((text) => {
+            return text.length > 1
+          }, {message: 'Required'})
+        })
         break
 
       default:

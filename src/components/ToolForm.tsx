@@ -1,4 +1,4 @@
-import { DynamicForm } from "@/components/DynamicForm";
+import DynamicForm from "@/components/DynamicForm";
 import { tools } from "@/data/tools";
 import { Tool } from "@/types/tools";
 import Cookies from "js-cookie";
@@ -63,7 +63,6 @@ export function ToolForm({slug}: {slug: string}) {
 
       const result = await response.json();
       return result.payload;
-      // return {finalOutput: {content: '# fixme'}};
     } catch (error) {
       console.error('Error in generating response for tool:', error);
       throw error;
@@ -71,24 +70,28 @@ export function ToolForm({slug}: {slug: string}) {
   }
 
   const handleSubmit = async (data: any) => {
-    // data: any
     console.log('Form data:', data)
     // TODO: Handle form submission
     // e.preventDefault();
     setIsSubmitting(true);
     setShowOutput(false);
 
-    const formData = jsonToFormData(data);
-    const payload = await generateResults(formData);
+    try {
+      const formData = jsonToFormData(data);
+      const payload = await generateResults(formData);
 
-    if (tool?.outputType === 'Json') {
-      console.error(`TODO: implement json`);
-    } else {
-      renderMarkdown(payload);
+      if (tool?.outputType === 'Json') {
+        console.error(`TODO: implement json`);
+      } else {
+        renderMarkdown(payload);
+      }
+      setShowOutput(true);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // You might want to show an error message to the user here
+    } finally {
+      setIsSubmitting(false);
     }
-    setShowOutput(true);
-    setIsSubmitting(false);
-
   }
 
   if (!tool) {
@@ -121,12 +124,17 @@ export function ToolForm({slug}: {slug: string}) {
             </div>
           </div>
 
-          {/* Input(s) */}
+          {/* Tool Input(s) */}
           <div className="w-full max-w-full sm:px-8 sm:pb-8 space-y-6 sm:space-y-8 bg-[#1F2937] rounded-xl shadow-md">
             <div className="text-[#F9FAFB] p-4">
               <h2 className="mt-2 text-3xl font-bold text-white mb-8">Inputs</h2>
               <div className="space-y-4">
-                <DynamicForm tool={tool} onSubmit={handleSubmit} setToolRuns={setToolRuns} />
+                <DynamicForm
+                  tool={tool}
+                  onSubmit={handleSubmit}
+                  setToolRuns={setToolRuns}
+                  content={content}
+                />
               </div>
               <p className="text-sm mt-1 text-center">
                 {isSubmitting && (
@@ -139,11 +147,13 @@ export function ToolForm({slug}: {slug: string}) {
 
           {/* Tool Output */}
           {showOutput && (
-            <ToolOutput content={content}>
-              {tool?.outputType === 'Json'
-                ? <JsonRenderer content={content} />
-                : <MarkdownRenderer content={content} />}
-            </ToolOutput>
+            <>
+              <ToolOutput content={content}>
+                {tool?.outputType === 'Json'
+                  ? <JsonRenderer content={content} />
+                  : <MarkdownRenderer content={content} />}
+              </ToolOutput>
+            </>
           )}
 
         </div>
@@ -155,28 +165,28 @@ export function jsonToFormData(data: Record<string, any>): FormData {
   const formData = new FormData();
 
   Object.entries(data).forEach(([key, value]) => {
-    // Handle File objects specially
+    // Handle File objects
     if (value instanceof File) {
-      formData.append(key, value)
+      formData.append(key, value);
     }
     // Handle arrays
     else if (Array.isArray(value)) {
-      value.forEach(item => formData.append(`${key}[]`, item))
+      value.forEach(item => formData.append(`${key}[]`, item));
     }
     // Handle nested objects
     else if (value instanceof Object) {
-      formData.append(key, JSON.stringify(value))
+      formData.append(key, JSON.stringify(value));
     }
     // Handle null or undefined
     else if (value === null || value === undefined) {
-      formData.append(key, '')
+      formData.append(key, '');
     }
     // Handle all other types
     else {
-      console.log('just putting in string, string ')
-      formData.append(key, String(value))
+      console.log('just putting in string, string ');
+      formData.append(key, String(value));
     }
   })
 
-  return formData
+  return formData;
 }
