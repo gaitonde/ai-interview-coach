@@ -45,13 +45,20 @@ function DynamicForm({ tool, onSubmit, setToolRuns, content }: DynamicFormProps)
   }, [inputType])
 
   const updateValidationSchema = async(newType: string) => {
-    console.log('updateValidationSchema, tool.formData: ', tool.formData)
     console.log('updateValidationSchema, newType: ', newType)
     const fd = structuredClone(tool.formData);
-    if (newType === 'text') {
-      delete fd[pairedUrlFieldKey]
-    } else {
-      delete fd[pairedTextFieldKey]
+
+    // Only include the active field in the schema
+    if (newType === 'text' && pairedTextFieldKey && pairedFields?.pair1.textField) {
+      // Remove URL field and add text field
+      delete fd[pairedUrlFieldKey];
+      fd[pairedTextFieldKey] = pairedFields.pair1.textField[pairedTextFieldKey];
+      fd[pairedTextFieldKey].optional = false;
+    } else if (pairedUrlFieldKey && pairedFields?.pair1.urlField) {
+      // Remove text field and add URL field
+      delete fd[pairedTextFieldKey];
+      fd[pairedUrlFieldKey] = pairedFields.pair1.urlField[pairedUrlFieldKey];
+      fd[pairedUrlFieldKey].optional = false;
     }
 
     console.log('updateValidationSchema, fd out: ', fd)
@@ -80,26 +87,29 @@ function DynamicForm({ tool, onSubmit, setToolRuns, content }: DynamicFormProps)
     const newType = inputType === "url" ? "text" : "url";
     setInputType(newType);
     updateValidationSchema(newType);
-
-    // // Clear the inactive field
-    // if (newType === "url") {
-    //   form.setValue(pairedTextFieldKey, "");
-    // } else {
-    //   form.setValue(pairedUrlFieldKey, "");
-    // }
   };
 
   const handleSubmit = async (data: any) => {
     console.log('HS: ', data)
-    // if (newType === "url") {
-    //   form.setValue(pairedTextFieldKey, "");
-    // } else {
-    //   form.setValue(pairedUrlFieldKey, "");
-    // }
-    setIsSubmitting(true);
-    setRanOnce(true);
-    await onSubmit(data);
-    setIsSubmitting(false);
+
+    // Filter out the inactive paired field
+    if (pairedFields) {
+      const filteredData = { ...data };
+      if (inputType === 'text') {
+        delete filteredData[pairedUrlFieldKey];
+      } else {
+        delete filteredData[pairedTextFieldKey];
+      }
+      setIsSubmitting(true);
+      setRanOnce(true);
+      await onSubmit(filteredData);
+      setIsSubmitting(false);
+    } else {
+      setIsSubmitting(true);
+      setRanOnce(true);
+      await onSubmit(data);
+      setIsSubmitting(false);
+    }
   };
 
   return (

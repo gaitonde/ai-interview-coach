@@ -71,17 +71,22 @@ export function ToolForm({slug}: {slug: string}) {
     setIsSubmitting(true);
     setShowOutput(false);
 
-    const formData = jsonToFormData(data);
-    const payload = await generateResults(formData);
+    try {
+      const formData = jsonToFormData(data);
+      const payload = await generateResults(formData);
 
-    if (tool?.outputType === 'Json') {
-      console.error(`TODO: implement json`);
-    } else {
-      renderMarkdown(payload);
+      if (tool?.outputType === 'Json') {
+        console.error(`TODO: implement json`);
+      } else {
+        renderMarkdown(payload);
+      }
+      setShowOutput(true);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // You might want to show an error message to the user here
+    } finally {
+      setIsSubmitting(false);
     }
-    setShowOutput(true);
-    setIsSubmitting(false);
-
   }
 
   if (!tool) {
