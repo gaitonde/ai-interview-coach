@@ -251,7 +251,13 @@ function validateInput(profileId: string, toolSlug: string) {
 
 async function handleFetch(profileId: string, textKey: string, url: string, toolRuns: ToolRun[]) {
   const fetchTool = getToolBySlug('fetch-url') as Tool;
-  const content = url ? await fetchUrlContents(url) : null;
+  let content = url ? await fetchUrlContents(url) : null;
+  if (content && content.length > 100000) {
+    console.log('original content length: ', content.length);
+    content = content.slice(0, 100000);
+    console.log('truncated content length: ', content.length);
+  }
+
   const toolRun = await insertToolRun(profileId, fetchTool.slug, { url }, { [textKey]: content })
   toolRuns.push(toolRun);
   return toolRun;
