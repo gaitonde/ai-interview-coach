@@ -189,6 +189,22 @@ export const tools: Tool[] = [
     actions: ['run-gen-ai'],
     hidden: true,
   },
+
+  // ✅ Boston College IBA Resume Checker
+  {
+    id: '797918dd-b1c3-40af-8d96-28c2bd96340d',
+    name: 'Boston College IBA Resume Checker',
+    slug: 'bc-resume-checker',
+    promptKey: 'prompt-tools-bc-resume-checker',
+    description: "Get resume feedback aligned with Boston College IBA best practices.",
+    icon: <FileText className='h-8 w-8 text-emerald-400' />,
+    formData: pickFormFields(['resumeFile']),
+    resumeUploadType: 'upload-resume',
+    labels: ['New'],
+    actions: ['run-gen-ai'],
+  },
+
+
   // ✅ Know Your Resume
   {
     id: 'f1354d4e-c1af-4dfc-a0aa-c355f87c7c18',
