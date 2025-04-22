@@ -25,9 +25,14 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                 li: ({ node, ...props }) => <li className="mb-1" {...props} />,
                 a: ({ node, ...props }) => <a className="text-[#10B981] hover:underline" target="_blank" {...props} />,
                 strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
-                table: ({ node, ...props }) => <table className="w-full border-collapse mb-4" {...props} />,
-                th: ({ node, ...props }) => <th className="p-2 border border-[#374151] bg-[#374151] text-[#F9FAFB]" {...props} />,
-                td: ({ node, ...props }) => <td className="p-2 border border-[#374151] text-[#F9FAFB]" {...props} />,
+                table: ({ node, ...props }) => (
+                  <div className="overflow-x-auto mb-4">
+                    <table className="min-w-full border-collapse" {...props} />
+                  </div>
+                ),
+                th: ({ node, ...props }) => <th className="p-2 border border-[#374151] bg-[#374151] text-[#F9FAFB] whitespace-normal break-words" {...props} />,
+                td: ({ node, ...props }) => <td className="p-2 border border-[#374151] text-[#F9FAFB] whitespace-normal break-words" {...props} />,
+                tr: ({ node, ...props }) => <tr className="hover:bg-[#2C3B4F]" {...props} />,
               }}
             >
               {content}
